@@ -16,7 +16,8 @@
     "format": "prettier --write .",
     "dev:frontend": "npm run dev -w frontend",
     "dev:backend": "npm run dev -w backend",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "npm run test --workspaces --if-present"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -39,6 +40,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.5.1",
     "prettier": "^3.9.9",
-    "typescript-eslint": "^8.70.1"
+    "typescript-eslint": "^8.70.1",
+    "vitest": "^5.0.1"
   }
 }
