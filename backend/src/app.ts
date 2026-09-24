@@ -1,7 +1,9 @@
 import express, { type Express, type Request, type Response } from 'express';
 
-export const app: Express = express();
+const app: Express = express();
 
 app.get('/health', (req: Request, res: Response) => {
-  res.send('ok');
+  res.status(200).send({ status: 'ok' });
 });
+
+export default app;
