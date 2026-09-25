@@ -1,12 +1,13 @@
-import './App.css';
+// App.tsx
+import { Routes, Route } from 'react-router';
+import LoginPage from './pages/LoginPage/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 
-function App() {
+export default function App() {
   return (
-    <>
-      <ProfilePage></ProfilePage>
-    </>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
+    </Routes>
   );
 }
-
-export default App;

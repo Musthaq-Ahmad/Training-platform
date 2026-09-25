@@ -27,6 +27,7 @@
   --color-bg-surface-1: #ffffff;
   --color-bg-surface-2: #f5f6fa;
   --color-bg-surface-3: #eef0f4;
+  --color-bg-surface-3: #0a0e1a1a;
 
   --color-bg-green-fill: #10b98114;
 
@@ -44,6 +45,7 @@
   --color-text-green: #069669;
   --color-text-green-40: #06966966;
   --color-text-on-accent: #ffffff;
+  --color-text-on-accent: #111318;
   --color-text-on-inverted: #5b5d6e;
   --color-text-slate: #475569;
   --color-text-stroke: #716c82;
@@ -59,6 +61,7 @@
   --color-border-emphasis: #cbd5e1b2;
   --color-border-strong: #8f8aa1;
   --color-border-subtle: #e4e5ec99;
+  --color-border-subtle: #4944544c;
 
   /* =========================================================
      Purple / Accent
@@ -72,6 +75,7 @@
   --color-accent-text: #6941c6;
   --color-accent-tint: #7c41e414;
 
+  --color-accent-lock: #e4e5ec;
   --color-accent-gradient-start: #7c41e4;
   --color-accent-gradient-end: #f5f6fa;
 
@@ -102,6 +106,8 @@
   --color-status-error-soft: #c5453b;
   --color-status-error-text: #c5453b;
   --color-status-error-tint: #ef444414;
+
+  --color-tag-bg: #d69ca2;
 
   /* =========================================================
      Overlays
@@ -173,6 +179,8 @@
     --color-text-slate: #94a3b8;
     --color-text-stroke: #cbd5e1;
 
+    --color-tag-bg: #93000a66;
+
     /* -------------------------------------------------------
        Borders
        ------------------------------------------------------- */
@@ -196,6 +204,7 @@
     --color-accent-label: #c084fc;
     --color-accent-text: #8b5cf6;
     --color-accent-tint: #8b5cf61a;
+    --color-accent-lock: #c084fc;
 
     --color-accent-gradient-start: #d0bcff;
     --color-accent-gradient-end: #0a0e1a;
