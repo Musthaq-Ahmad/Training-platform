@@ -1,0 +1,301 @@
+/* AccessRestrictedCard.module.css */
+
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 48px 24px;
+  background-color: var(--color-bg-page);
+  font-family: var(--font-sans);
+  box-sizing: border-box;
+}
+
+.card {
+  width: 100%;
+  max-width: 480px;
+  background-color: var(--color-bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.08); /* no matching token — kept literal */
+  border-radius: 16px;
+  box-shadow: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  padding: 32px 32px 57px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Icon */
+.iconWrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+.iconCircle {
+  width: 80px;
+  height: 80px;
+  border-radius: 9999px;
+  background-color: var(--color-bg-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: inset 0px 2px 4px 0px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shieldIcon {
+  width: 32px;
+  height: 40px;
+}
+
+.lockBadge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background-color: var(--color-bg-pill-inactive);
+  border: 1px solid var(--color-border-emphasis);
+  box-shadow:
+    0px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0px 2px 4px -2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lockBadgeIcon {
+  width: 10.667px;
+  height: 14px;
+}
+
+/* Title + description */
+.title {
+  margin: 0 0 4px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: clamp(28px, 6vw, 36px);
+  line-height: 1.22;
+  letter-spacing: -0.9px;
+  color: var(--color-bg-text-primary);
+  text-align: center;
+}
+
+.description {
+  margin: 0 0 40px;
+  max-width: 380px;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+.domainHighlight {
+  color: var(
+    --color-accent-gradient-start
+  ); /* value #D0BCFF matches exactly, name is coincidental */
+}
+
+/* Identity panel */
+.identityPanel {
+  width: 100%;
+  background-color: var(--color-bg-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+  padding: 17px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.identityHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.identityLabel {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.realmBadge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background-color: var(--color-tag-bg);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--color-status-error-text);
+  white-space: nowrap;
+}
+
+.identityRow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding-bottom: 8px;
+}
+
+.avatarCircle {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  margin-top: 2px;
+  border-radius: 9999px;
+  background-color: var(--color-bg-pill-inactive);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarIcon {
+  width: 16.667px;
+  height: 16.667px;
+  color: var(--color-text-tertiary);
+}
+
+.identityDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.emailRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.email {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.emailFlag {
+  font-size: 11.667px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.domainInfo {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.12px;
+  line-height: 18px;
+  color: var(--color-text-tertiary);
+}
+
+.policyBox {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 9px;
+  background-color: var(--color-bg-surface-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.policyIcon {
+  flex-shrink: 0;
+  width: 10.667px;
+  height: 15.333px;
+  margin-top: 2px;
+}
+
+.policyText {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.12px;
+  line-height: 19.5px;
+  color: var(--color-text-on-inverted);
+}
+
+/* Retry button */
+.retryButton {
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 25px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-overlay-highlight-15);
+  border-radius: 12px;
+  /* This specific gradient (#7c3aed → #9333ea → #4f46e5) does not match the
+     token file's --color-dark-accent-gradient-start/end (#D0BCFF → #0A0E1A),
+     which appears to be intended for a different element (e.g. an ambient
+     glow). Kept as the literal Figma-exact button gradient. */
+  background: linear-gradient(to right, #7c3aed, #9333ea 50%, #4f46e5);
+  box-shadow:
+    0px 10px 15px -3px var(--color-accent-shadow),
+    0px 4px 6px -4px var(--color-accent-shadow);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.35px;
+  color: var(--color-text-on-accent);
+}
+
+.retryButton:hover {
+  filter: brightness(1.06);
+}
+
+.retryIconCircle {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background-color: #ffffff; /* no dedicated "bg-white" token — value matches --color-dark-bg-text-on-accent, but that token is semantically text-only, so kept literal */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.retryIcon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 420px) {
+  .card {
+    padding: 24px 20px 40px;
+  }
+  .identityRow {
+    gap: 12px;
+  }
+  .description {
+    max-width: 100%;
+  }
+}
