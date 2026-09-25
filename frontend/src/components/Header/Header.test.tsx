@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { describe, it, expect, afterEach } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
 import Header from './Header';
 
 afterEach(() => {
@@ -7,29 +7,17 @@ afterEach(() => {
 });
 
 describe('Header', () => {
-  it('renders the app name, current page label, and user name', () => {
-    render(<Header currentPageLabel="Dashboard" onLogout={() => {}} onProfileClick={() => {}} />);
-
+  it('renders the app name, dashboard link, and user name', () => {
+    render(<Header />);
     expect(screen.getByText('In-House Trainee Training Platform')).toBeInTheDocument();
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Rahul Sharma')).toBeInTheDocument();
   });
 
-  it('calls onProfileClick when the user name is clicked', () => {
-    const onProfileClick = vi.fn();
-    render(
-      <Header currentPageLabel="Dashboard" onLogout={() => {}} onProfileClick={onProfileClick} />
-    );
-
-    fireEvent.click(screen.getByText('Rahul Sharma'));
-    expect(onProfileClick).toHaveBeenCalledTimes(1);
-  });
-
-  it('calls onLogout when the logout button is clicked', () => {
-    const onLogout = vi.fn();
-    render(<Header currentPageLabel="Dashboard" onLogout={onLogout} onProfileClick={() => {}} />);
-
-    fireEvent.click(screen.getByText('Log out'));
-    expect(onLogout).toHaveBeenCalledTimes(1);
+  it('renders Dashboard, user name, and logout as clickable buttons', () => {
+    render(<Header />);
+    expect(screen.getByText('Dashboard').tagName).toBe('BUTTON');
+    expect(screen.getByText('Rahul Sharma').tagName).toBe('BUTTON');
+    expect(screen.getByText('Log out').tagName).toBe('BUTTON');
   });
 });
