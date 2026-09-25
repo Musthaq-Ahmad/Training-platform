@@ -1,11 +1,11 @@
-import './App.css';
+// App.tsx
+import { Routes, Route } from 'react-router';
+import LoginPage from './pages/LoginPage/LoginPage';
 
-function App() {
+export default function App() {
   return (
-    <>
-      <div>Hello</div>
-    </>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+    </Routes>
   );
 }
-
-export default App;
