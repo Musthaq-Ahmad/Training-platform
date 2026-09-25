@@ -1,0 +1,52 @@
+.header {
+  margin-bottom: 2.5rem;
+}
+
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--color-border-divider);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.appName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1rem;
+}
+
+.pageLabel {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.divider {
+  color: var(--color-text-tertiary);
+}
+
+.userName {
+  color: var(--color-text-secondary);
+}
+
+.userName:hover {
+  color: var(--color-text-primary);
+}
+
+.logoutButton {
+  color: var(--color-text-secondary);
+}
+
+.logoutButton:hover {
+  color: var(--color-text-primary);
+}
