@@ -1,9 +1,10 @@
 import './App.css';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
     <>
-      <div>Hello</div>
+      <ProfilePage></ProfilePage>
     </>
   );
 }
