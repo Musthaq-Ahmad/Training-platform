@@ -37,16 +37,3 @@ export class NotFoundError extends AppError {
     super(404, 'NOT_FOUND', message);
   }
 }
-
-// Project-specific errors
-export class DayLockedError extends AppError {
-  constructor() {
-    super(403, 'DAY_LOCKED', "This day isn't unlocked yet.");
-  }
-}
-
-export class ChecklistIncompleteError extends AppError {
-  constructor() {
-    super(400, 'CHECKLIST_INCOMPLETE', 'Check all required items before submitting.');
-  }
-}
