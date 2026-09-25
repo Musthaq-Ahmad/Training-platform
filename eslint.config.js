@@ -39,6 +39,13 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': 'warn',
       'react/react-in-jsx-scope': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
     },
     settings: { react: { version: 'detect' } },
   },
@@ -55,7 +62,15 @@ export default tseslint.config(
         tsconfigRootDir: path.join(rootDir, 'backend'),
       },
     },
-    rules: {},
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
+    },
   },
 
   // Shared types package — type-aware, own root
