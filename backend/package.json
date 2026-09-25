@@ -18,7 +18,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
-    "@trainee-platform/types": "^1.0.0",
+    "@itp/types": "^1.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-session": "^1.19.0",

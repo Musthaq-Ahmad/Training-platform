@@ -1,5 +1,6 @@
 import app from './app';
+import { env } from './config/env';
 
-app.listen(3000, () => {
-  console.log('server listening on 3000');
+app.listen(env.PORT, () => {
+  console.log(`server listening on port:${env.PORT}`);
 });

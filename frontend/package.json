@@ -12,7 +12,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@trainee-platform/types": "^1.0.0",
+    "@itp/types": "^1.0.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
