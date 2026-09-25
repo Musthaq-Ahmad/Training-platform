@@ -5,9 +5,7 @@ import styles from './LoginCard.module.css';
 
 export default function LoginCard() {
   const handleGoogleSignIn = () => {
-    // window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
-    window.location.href = 'http://localhost:3000/api/auth/google';
-    console.log(`Now user in ${import.meta.env.VITE_API_URL}`);
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
   };
 
   return (
