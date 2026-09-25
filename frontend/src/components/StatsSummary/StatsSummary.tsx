@@ -7,13 +7,6 @@ type StatsSummaryProps = {
   typing: ProfileData['typing'];
 };
 
-// function formatDuration(seconds: number): string {
-//   const hours = Math.floor(seconds / 3600);
-//   const minutes = Math.floor((seconds % 3600) / 60);
-
-//   return `${hours}h ${String(minutes).padStart(2, '0')}m`;
-// }
-
 export default function StatsSummary({ total, typing }: StatsSummaryProps) {
   const totalSeconds = total.activeSeconds + total.readingSeconds;
 
