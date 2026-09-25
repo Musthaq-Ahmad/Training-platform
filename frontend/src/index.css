@@ -26,6 +26,7 @@
 
   --color-bg-surface-1: #ffffff;
   --color-bg-surface-2: #f5f6fa;
+  --color-bg-surface-3: #eef0f4;
   --color-bg-surface-3: #0a0e1a1a;
 
   --color-bg-green-fill: #10b98114;
@@ -43,6 +44,7 @@
   --color-text-bright: #111318;
   --color-text-green: #069669;
   --color-text-green-40: #06966966;
+  --color-text-on-accent: #ffffff;
   --color-text-on-accent: #111318;
   --color-text-on-inverted: #5b5d6e;
   --color-text-slate: #475569;
@@ -58,6 +60,7 @@
   --color-border-input: #cbd5e1;
   --color-border-emphasis: #cbd5e1b2;
   --color-border-strong: #8f8aa1;
+  --color-border-subtle: #e4e5ec99;
   --color-border-subtle: #4944544c;
 
   /* =========================================================
@@ -71,6 +74,7 @@
   --color-accent-label: #7c3fe4;
   --color-accent-text: #6941c6;
   --color-accent-tint: #7c41e414;
+
   --color-accent-lock: #e4e5ec;
   --color-accent-gradient-start: #7c41e4;
   --color-accent-gradient-end: #f5f6fa;
@@ -115,6 +119,7 @@
   --color-overlay-highlight-9: #00000008;
   --color-overlay-highlight-15: #00000026;
   --color-overlay-scrim: #00000066;
+
   /* =========================================================
      Misc
      ========================================================= */

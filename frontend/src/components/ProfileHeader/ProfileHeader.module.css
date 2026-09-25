@@ -1,0 +1,89 @@
+.header {
+  padding-top: 32px;
+}
+
+.brand {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.nav {
+  position: absolute;
+  top: 38px;
+  right: 32px;
+
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.nav a,
+.logout {
+  color: var(--color-text-secondary);
+  transition: color 140ms ease;
+}
+
+.nav a:hover,
+.logout:hover {
+  color: var(--color-text-primary);
+}
+
+.trainee {
+  color: var(--color-text-primary) !important;
+  font-weight: 600;
+}
+
+.separator {
+  color: var(--color-text-subtle);
+}
+
+.rule {
+  height: 1px;
+  margin-top: 26px;
+  background: var(--color-border-default);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  margin-top: 42px;
+
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.identity strong {
+  color: var(--color-text-primary);
+  font-size: 16px;
+}
+
+.dash {
+  color: var(--color-text-subtle);
+}
+
+.progress {
+  font-family: var(--font-mono);
+  color: var(--color-accent-purple-soft);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .nav {
+    position: static;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .identity {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+}
