@@ -5,6 +5,7 @@ import ProfileHeader from '../../components/ProfileHeader';
 import StatsSummary from '../../components/StatsSummary';
 import DailyActivityTable from '../../components/DailyActivityTable';
 import styles from './ProfilePage.module.css';
+import Header from '../../components/Header';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -39,33 +40,42 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <main className={styles.page}>
-        <div className={styles.loading} role="status" aria-label="Loading profile">
-          Loading profile...
-        </div>
-      </main>
+      <>
+        <main className={styles.page}>
+          <Header />
+          <div className={styles.loading} role="status" aria-label="Loading profile">
+            Loading profile...
+          </div>
+        </main>
+      </>
     );
   }
 
   if (!profile) {
     return (
-      <main className={styles.page}>
-        <div className={styles.error} role="alert">
-          Unable to load profile.
-        </div>
-      </main>
+      <>
+        <Header />
+        <main className={styles.page}>
+          <div className={styles.error} role="alert">
+            Unable to load profile.
+          </div>
+        </main>
+      </>
     );
   }
 
   return (
-    <main className={styles.page}>
-      <ProfileHeader trainee={profile.trainee} />
+    <>
+      <Header />
+      <main className={styles.page}>
+        <ProfileHeader trainee={profile.trainee} />
 
-      <section className={styles.card}>
-        <StatsSummary total={profile.total} typing={profile.typing} />
+        <section className={styles.card}>
+          <StatsSummary total={profile.total} typing={profile.typing} />
 
-        <DailyActivityTable days={profile.dailyActivity} />
-      </section>
-    </main>
+          <DailyActivityTable days={profile.dailyActivity} />
+        </section>
+      </main>
+    </>
   );
 }
