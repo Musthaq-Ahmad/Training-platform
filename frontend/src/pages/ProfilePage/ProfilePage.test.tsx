@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ProfileData } from '@itp/types';
 
@@ -63,11 +63,13 @@ describe('ProfilePage', () => {
 
     render(<ProfilePage />);
 
-    expect(await screen.findByText('Rahul Sharma')).toBeInTheDocument();
+    expect(await screen.findByText('rahul.sharma@vonnue.com')).toBeInTheDocument();
 
-    expect(screen.getByText('rahul.sharma@vonnue.com')).toBeInTheDocument();
+    const main = screen.getByRole('main');
 
-    expect(screen.getByText('JavaScript, Day 6 of 12')).toBeInTheDocument();
+    expect(within(main).getByText('Rahul Sharma')).toBeInTheDocument();
+
+    expect(within(main).getByText('JavaScript, Day 6 of 12')).toBeInTheDocument();
   });
 
   it('renders the stats from the profile data', async () => {
