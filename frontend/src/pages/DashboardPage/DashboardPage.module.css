@@ -1,0 +1,49 @@
+.header {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+.page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.status {
+  padding: 4rem;
+  text-align: center;
+  color: var(--color-bg-text-secondary);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.trackHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.sectionLabel {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: var(--color-bg-text-tertiary);
+  text-transform: uppercase;
+}
+
+.overallProgress {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--color-bg-text-secondary);
+}
+
+.divider {
+  border-top: 1px solid var(--color-border-divider);
+}
