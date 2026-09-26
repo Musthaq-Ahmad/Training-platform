@@ -1,0 +1,99 @@
+.dayCompletion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 24px 32px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px;
+}
+
+.dayCompletionContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.dayCompletionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.dayCompletionTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: rgba(218, 165, 3, 0.15);
+  border: 1px solid rgba(218, 165, 3, 0.3);
+  border-radius: 4px;
+  color: #ffb84d;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.dayCompletionDescription {
+  margin: 0;
+  color: #64748b;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.dayCompletionButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 10px 20px;
+  color: #475569;
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.buttonIcon {
+  flex-shrink: 0;
+}
+
+.dayCompletionButton:hover:not(:disabled) {
+  color: var(--color-accent-purple);
+  opacity: 0.9;
+}
+
+.dayCompletionButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .dayCompletion {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .dayCompletionButton {
+    align-self: flex-end;
+    padding: 10px 0;
+  }
+}

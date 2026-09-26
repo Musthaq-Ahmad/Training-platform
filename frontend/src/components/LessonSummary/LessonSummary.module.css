@@ -1,0 +1,52 @@
+.lessonSummary {
+  width: 100%;
+  padding: 24px 28px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lessonSummaryHeader {
+  display: flex;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-card);
+}
+
+.lessonSummaryLabel {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.lessonSummaryBox {
+  padding: 18px;
+  background: var(--color-bg-surface-3);
+  border-radius: 12px;
+}
+
+.lessonSummaryText {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.8;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 600px) {
+  .lessonSummary {
+    padding: 20px;
+  }
+
+  .lessonSummaryText {
+    font-size: 13px;
+  }
+}

@@ -1,0 +1,149 @@
+.daySummary {
+  width: 100%;
+  padding: 28px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: 16px;
+  box-sizing: border-box;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.daySummaryContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.daySummaryLabel {
+  color: var(--color-accent-label);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.daySummaryTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.daySummaryDescription {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 800px;
+}
+
+.daySummaryProgress {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.daySummaryProgressText {
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.daySummaryProgressTrack {
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  background: var(--color-bg-panel);
+  border-radius: 999px;
+}
+
+.daySummaryProgressFill {
+  height: 100%;
+  background: var(--color-accent-purple);
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+
+.daySummaryActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.daySummaryButton {
+  padding: 11px 20px;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-card);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.daySummaryButtonPrimary {
+  color: var(--color-text-on-accent);
+  background: var(--color-accent-purple);
+  border-color: var(--color-accent-purple);
+}
+
+.daySummaryButtonPrimary:hover {
+  opacity: 0.9;
+}
+
+.daySummaryButtonSecondary {
+  color: var(--color-text-primary);
+  background-color: var(-color-overlay-highlight-6);
+}
+
+.daySummaryButtonSecondary:hover {
+  background: var(--color-bg-button-secondary);
+}
+
+.daySummaryButton:focus-visible {
+  outline: 2px solid var(--color-accent-purple);
+  outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+  .daySummary {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .daySummaryTitle {
+    font-size: 22px;
+  }
+
+  .daySummaryActions {
+    width: 100%;
+  }
+
+  .daySummaryButton {
+    flex: 1;
+    text-align: center;
+  }
+}

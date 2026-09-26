@@ -1,0 +1,108 @@
+.journal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 28px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: 16px;
+  box-sizing: border-box;
+  min-width: 0;
+  gap: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-card);
+}
+
+.label {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.optionalBadge {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-button-secondary);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.prompt {
+  margin: 0;
+  color: var(----color-text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  min-height: 150px;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid var(--color-border-input);
+  border-radius: 8px;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.textarea:focus {
+  outline: 2px solid var(--color-accent-purple);
+  outline-offset: 2px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* flex-wrap: wrap; */
+  gap: 12px;
+}
+
+.footnote {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.savedMessage {
+  color: var(--color-status-success);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.saveButton {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  border: 1px solid var(--color-border-card);
+  border-radius: 8px;
+  background: var(--color-bg-button-secondary);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: var(--color-bg-elevated);
+}
+
+.saveButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
