@@ -10,6 +10,8 @@ const envSchema = z.object({
   GOOGLE_CALLBACK_URL: z.string().min(1),
   ALLOWED_EMAIL_DOMAIN: z.string().min(1),
   FRONTEND_URL: z.string().default('http://localhost:5173'),
+  JWT_SECRET: z.string().min(16),
+  JWT_EXPIRES_IN: z.string().default('1h'),
 });
 
 // Crashes on startup with a clear message if a variable is missing
