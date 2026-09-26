@@ -11,3 +11,9 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model trainee {
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  email String @unique
+}
