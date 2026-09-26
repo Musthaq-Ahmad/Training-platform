@@ -3,7 +3,6 @@ import { URLSearchParams } from 'url';
 import passport from './passport';
 import type { RequestHandler } from 'express';
 import { env } from '../../config/env';
-// import { authController } from './auth.controller';
 
 const authRoutes = Router();
 
