@@ -37,3 +37,19 @@ export class NotFoundError extends AppError {
     super(404, 'NOT_FOUND', message);
   }
 }
+
+export class DomainNotPermittedError extends AppError {
+  constructor() {
+    super(403, 'DOMAIN_NOT_PERMITTED', 'This Google account is not on an approved domain.');
+  }
+}
+
+export class NotProvisionedError extends AppError {
+  constructor() {
+    super(
+      403,
+      'NOT_PROVISIONED',
+      'Your account has not been provisioned yet. Contact your administrator.'
+    );
+  }
+}

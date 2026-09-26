@@ -1,0 +1,217 @@
+.skeleton {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 56px 1fr;
+  overflow: hidden;
+  background-color: var(--color-bg-page);
+}
+
+.toolbar {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 16px;
+  background-color: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border-card);
+}
+
+.toolbarLeft,
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.skeletonIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background-color: var(--color-bg-surface-2);
+}
+
+.skeletonTitle {
+  width: 180px;
+  height: 14px;
+  border-radius: 4px;
+  background-color: var(--color-bg-surface-2);
+}
+
+.skeletonButton {
+  width: 72px;
+  height: 32px;
+  border-radius: 7px;
+  background-color: var(--color-bg-surface-2);
+}
+
+.body {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+}
+
+.sidebar {
+  min-width: 0;
+  overflow: hidden;
+  background-color: var(--color-bg-card);
+  border-right: 1px solid var(--color-border-card);
+}
+
+.sidebarHeader {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--color-border-card);
+}
+
+.skeletonSmall {
+  width: 76px;
+  height: 11px;
+  border-radius: 3px;
+  background-color: var(--color-bg-surface-2);
+}
+
+.fileList {
+  padding: 10px 8px;
+}
+
+.fileRow {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 8px;
+  border-radius: 5px;
+}
+
+.skeletonFileIcon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  border-radius: 3px;
+  background-color: var(--color-bg-surface-2);
+}
+
+.skeletonFileName,
+.skeletonFileNameMedium,
+.skeletonFileNameShort {
+  height: 10px;
+  border-radius: 3px;
+  background-color: var(--color-bg-surface-2);
+}
+
+.skeletonFileName {
+  width: 125px;
+}
+
+.skeletonFileNameMedium {
+  width: 96px;
+}
+
+.skeletonFileNameShort {
+  width: 68px;
+}
+
+.editor {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background-color: var(--color-bg-page);
+}
+
+.editorHeader {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background-color: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border-card);
+}
+
+.skeletonTab {
+  width: 110px;
+  height: 11px;
+  border-radius: 3px;
+  background-color: var(--color-bg-surface-2);
+}
+
+.code {
+  padding: 20px 24px;
+}
+
+.codeLine {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.lineNumber {
+  width: 18px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 3px;
+  background-color: var(--color-bg-surface-2);
+}
+
+.codeShort,
+.codeMedium,
+.codeLong {
+  height: 9px;
+  border-radius: 3px;
+  background-color: var(--color-bg-surface-2);
+}
+
+.codeShort {
+  width: 110px;
+}
+
+.codeMedium {
+  width: 180px;
+}
+
+.codeLong {
+  width: 280px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeletonIcon,
+  .skeletonTitle,
+  .skeletonButton,
+  .skeletonSmall,
+  .skeletonFileIcon,
+  .skeletonFileName,
+  .skeletonFileNameMedium,
+  .skeletonFileNameShort,
+  .skeletonTab,
+  .lineNumber,
+  .codeShort,
+  .codeMedium,
+  .codeLong {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .body {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .toolbarRight {
+    display: none;
+  }
+}
