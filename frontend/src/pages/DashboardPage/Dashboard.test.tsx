@@ -356,6 +356,14 @@ describe('DashboardPage', () => {
     expect(await screen.findByText('Failed to load dashboard')).toBeInTheDocument();
   });
 
+  it('renders the header', async () => {
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+
+    render(<DashboardPage />);
+
+    expect(await screen.findByText('Header')).toBeInTheDocument();
+  });
+
   it('renders the current lesson information', async () => {
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
@@ -412,6 +420,32 @@ describe('DashboardPage', () => {
     expect(screen.getByRole('button', { name: '02' })).toBeInTheDocument();
   });
 
+  it('marks the selected track as active', async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+
+    render(<DashboardPage />);
+
+    await screen.findByText('JavaScript Module — Schedule');
+
+    const javascriptTab = screen.getByRole('tab', {
+      name: 'JavaScript',
+    });
+
+    const nodeTab = screen.getByRole('tab', {
+      name: 'Node.js',
+    });
+
+    expect(javascriptTab).toHaveAttribute('aria-selected', 'true');
+    expect(nodeTab).toHaveAttribute('aria-selected', 'false');
+
+    await user.click(nodeTab);
+
+    expect(javascriptTab).toHaveAttribute('aria-selected', 'false');
+    expect(nodeTab).toHaveAttribute('aria-selected', 'true');
+  });
+
   it('keeps the current lesson based on the actual current day when switching tracks', async () => {
     const user = userEvent.setup();
 
@@ -460,18 +494,35 @@ describe('DashboardPage', () => {
     expect(getDashboard).toHaveBeenCalledTimes(1);
   });
 
-  it('renders no current lesson card when currentDay is null', async () => {
-    const dashboardWithoutCurrentDay: DashboardResponse = {
+  it('falls back to HTML Day 1 for a new trainee', async () => {
+    const newTraineeDashboard: DashboardResponse = {
       ...mockDashboard,
       currentDay: null,
     };
 
-    vi.mocked(getDashboard).mockResolvedValue(dashboardWithoutCurrentDay);
+    vi.mocked(getDashboard).mockResolvedValue(newTraineeDashboard);
 
     render(<DashboardPage />);
 
-    expect(await screen.findByText('JavaScript Module — Schedule')).toBeInTheDocument();
+    expect(await screen.findByText('HTML lesson 1')).toBeInTheDocument();
 
-    expect(screen.queryByText('Closures and Higher-Order Functions')).not.toBeInTheDocument();
+    expect(screen.getByText('Day 1 of 2')).toBeInTheDocument();
+
+    expect(screen.getByText('HTML Module — Schedule')).toBeInTheDocument();
+  });
+
+  it('starts with HTML track when currentDay is null', async () => {
+    const newTraineeDashboard: DashboardResponse = {
+      ...mockDashboard,
+      currentDay: null,
+    };
+
+    vi.mocked(getDashboard).mockResolvedValue(newTraineeDashboard);
+
+    render(<DashboardPage />);
+
+    await screen.findByText('HTML Module — Schedule');
+
+    expect(screen.getByRole('tab', { name: 'HTML' })).toHaveAttribute('aria-selected', 'true');
   });
 });
