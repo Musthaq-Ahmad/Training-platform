@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { DashboardResponse } from '@itp/types';
+import type { DashboardResponse, DaySummary } from '@itp/types';
 import { getDashboard } from '../../api/dashboard';
 import { CURRICULUM_COURSES } from '../../constants/courses';
 import Header from '../../components/Header';
@@ -8,6 +8,8 @@ import TrackTabs from '../../components/TrackTabs';
 import ScheduleGrid from '../../components/ScheduleGrid';
 import StatsRow from '../../components/StatsRow';
 import styles from './DashboardPage.module.css';
+
+const DEFAULT_COURSE_ID = 'course-html';
 
 export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
@@ -19,7 +21,9 @@ export default function DashboardPage() {
     getDashboard()
       .then((data) => {
         setDashboard(data);
-        setActiveCourseId(data.currentCourseId);
+        // New trainee (no currentDay yet) starts on HTML, not whatever
+        // currentCourseId the API happened to send.
+        setActiveCourseId(data.currentDay ? data.currentCourseId : DEFAULT_COURSE_ID);
       })
       .catch((err: Error) => setError(err))
       .finally(() => setIsLoading(false));
@@ -34,26 +38,30 @@ export default function DashboardPage() {
   const activeCourseData = dashboard.courses.find((c) => c.id === activeTrack.id);
   const activeDays = activeCourseData?.days ?? [];
 
-  // The current-lesson card always reflects the trainee's actual in-progress
-  // day/course — independent of whichever track tab is selected below.
-  const currentDayCourse = dashboard.currentDay
-    ? dashboard.courses.find((c) => c.id === dashboard.currentDay!.courseId)
+  // For a brand-new trainee, dashboard.currentDay is null — fall back to
+  // HTML Day 1 so the current-lesson card always has something to show.
+  const htmlCourse = dashboard.courses.find((c) => c.id === DEFAULT_COURSE_ID);
+  const htmlDayOne: DaySummary | undefined = htmlCourse?.days.find((d) => d.dayNumber === 1);
+  const displayedDay = dashboard.currentDay ?? htmlDayOne ?? null;
+
+  const displayedDayCourse = displayedDay
+    ? dashboard.courses.find((c) => c.id === displayedDay.courseId)
     : undefined;
-  const currentDayTrackLabel =
-    CURRICULUM_COURSES.find((t) => t.id === dashboard.currentDay?.courseId)?.label ?? '';
+  const displayedDayTrackLabel =
+    CURRICULUM_COURSES.find((t) => t.id === displayedDay?.courseId)?.label ?? '';
 
   return (
     <>
       <Header />
 
       <div className={styles.page}>
-        {dashboard.currentDay && (
+        {displayedDay && (
           <CurrentLessonCard
-            courseTitle={currentDayTrackLabel}
-            dayNumber={dashboard.currentDay.dayNumber}
-            totalDays={currentDayCourse?.days.length ?? 0}
-            lessonTitle={dashboard.currentDay.title}
-            description={dashboard.currentDay.description ?? ''}
+            courseTitle={displayedDayTrackLabel}
+            dayNumber={displayedDay.dayNumber}
+            totalDays={displayedDayCourse?.days.length ?? 0}
+            lessonTitle={displayedDay.title}
+            description={displayedDay.description ?? ''}
             onContinue={() => {
               console.log('continue clicked');
             }}
@@ -79,7 +87,7 @@ export default function DashboardPage() {
           <ScheduleGrid
             title={`${activeTrack.label} Module — Schedule`}
             days={activeDays}
-            currentDayId={dashboard.currentDay?.id ?? null}
+            currentDayId={displayedDay?.id ?? null}
             onSelectDay={(dayId) => {
               console.log('day selected', dayId);
             }}
