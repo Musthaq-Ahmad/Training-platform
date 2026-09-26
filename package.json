@@ -17,7 +17,7 @@
     "dev:frontend": "npm run dev -w frontend",
     "dev:backend": "npm run dev -w backend",
     "prepare": "husky",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present -- --passWithNoTests"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
