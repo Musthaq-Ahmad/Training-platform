@@ -5,7 +5,9 @@ export type ErrorCode =
   | 'NOT_FOUND'
   | 'INTERNAL_ERROR'
   | 'DAY_LOCKED'
-  | 'CHECKLIST_INCOMPLETE';
+  | 'CHECKLIST_INCOMPLETE'
+  | 'DOMAIN_NOT_PERMITTED'
+  | 'NOT_PROVISIONED';
 
 /** Every error response from the API looks exactly like this. */
 export type ApiErrorResponse = {
