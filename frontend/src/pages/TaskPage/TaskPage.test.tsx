@@ -40,14 +40,8 @@ describe('TaskPage', () => {
     renderTaskPage('not-found');
 
     expect(await screen.findByRole('alert')).toBeInTheDocument();
-
     expect(screen.getByText(/task not found/i)).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('link', {
-        name: /back to dashboard/i,
-      })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /back to dashboard/i })).toBeInTheDocument();
   });
 
   it('shows a generic error state with Retry for an unexpected error', async () => {
@@ -59,12 +53,7 @@ describe('TaskPage', () => {
     renderTaskPage('error');
 
     expect(await screen.findByRole('alert')).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('button', {
-        name: /retry/i,
-      })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
   });
 
   it('retries loading when Retry is clicked', async () => {
@@ -80,24 +69,24 @@ describe('TaskPage', () => {
 
     renderTaskPage('t1');
 
-    const retryButton = await screen.findByRole('button', {
-      name: /retry/i,
-    });
-
+    const retryButton = await screen.findByRole('button', { name: /retry/i });
     await user.click(retryButton);
 
     expect(getTask).toHaveBeenCalledTimes(2);
     expect(getTaskCode).toHaveBeenCalledTimes(2);
 
-    expect(await screen.findByText(taskFixture.title)).toBeInTheDocument();
+    // TaskWorkspace (TK-2) renders on success now, not the task title directly —
+    // Back button is the reliable signal the workspace mounted.
+    expect(await screen.findByRole('button', { name: /back to tasks/i })).toBeInTheDocument();
   });
 
-  it('renders the task on successful load', async () => {
+  it('renders the workspace on successful load', async () => {
     vi.mocked(getTask).mockResolvedValue(taskFixture);
     vi.mocked(getTaskCode).mockResolvedValue(taskCodeFixture);
 
     renderTaskPage('t1');
 
-    expect(await screen.findByText(taskFixture.title)).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /back to tasks/i })).toBeInTheDocument();
+    expect(screen.getByText('Est: 50 min')).toBeInTheDocument();
   });
 });

@@ -1,0 +1,21 @@
+.workspace {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--color-bg-page);
+}
+
+.paneRow {
+  display: grid;
+  min-height: 0;
+}
+
+.pane {
+  min-height: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--color-border-divider);
+}
+
+.pane:last-child {
+  border-right: none;
+}

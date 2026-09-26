@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router';
 import { useTaskData } from './hooks/useTaskData';
 import TaskPageSkeleton from '../../components/TaskPageSkeleton';
 import styles from './TaskPage.module.css';
+import { WorkspaceProvider } from './state/WorkspaceContext';
+import TaskWorkspace from '../../components/TaskWorkspace';
 
 export default function TaskPage() {
   const { taskId } = useParams();
@@ -63,11 +65,9 @@ export default function TaskPage() {
     );
   }
 
-  // success — TK-2 replaces this stub with
-  // <WorkspaceProvider task={data.task} code={data.code}><TaskWorkspace /></WorkspaceProvider>
   return (
-    <div className={styles.page}>
-      <div className={styles.stubToolbar}>{data.task.title}</div>
-    </div>
+    <WorkspaceProvider key={data.task.id} code={data.code}>
+      <TaskWorkspace task={data.task} />
+    </WorkspaceProvider>
   );
 }
