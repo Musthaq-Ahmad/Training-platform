@@ -1,4 +1,3 @@
-// App.tsx
 import { Routes, Route } from 'react-router';
 import LoginPage from './pages/LoginPage/LoginPage';
 import ProfilePage from './pages/ProfilePage';

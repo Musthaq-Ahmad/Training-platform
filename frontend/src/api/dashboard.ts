@@ -1,4 +1,3 @@
-// frontend/src/api/dashboard.ts
 import type { DashboardResponse } from '@itp/types';
 
 // TODO: replace mock with real call once GET /api/dashboard exists (see conventions.md §4, §15)
