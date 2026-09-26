@@ -33,7 +33,7 @@ describe('LoginPage', () => {
 
   describe('domain_not_permitted error state', () => {
     it('renders AccessRestrictedCard instead of LoginCard', () => {
-      renderLoginPage('/login?error=domain_not_permitted');
+      renderLoginPage('/login?error=DOMAIN_NOT_PERMITTED&email="');
       expect(screen.getByRole('heading', { name: /access restricted/i })).toBeInTheDocument();
       expect(
         screen.queryByRole('heading', { name: /in-house trainee training platform/i })
@@ -41,17 +41,17 @@ describe('LoginPage', () => {
     });
 
     it('passes the email query param through as the detected email', () => {
-      renderLoginPage('/login?error=domain_not_permitted&email=alex.trainee%40gmail.com');
+      renderLoginPage('/login?error=DOMAIN_NOT_PERMITTED&email=alex.trainee%40gmail.com');
       expect(screen.getByText('alex.trainee@gmail.com')).toBeInTheDocument();
     });
 
     it('falls back to "unknown" when no email param is present', () => {
-      renderLoginPage('/login?error=domain_not_permitted');
+      renderLoginPage('/login?error=DOMAIN_NOT_PERMITTED');
       expect(screen.getByText('unknown')).toBeInTheDocument();
     });
 
     it('passes the fixed allowedDomain and domainInfo values', () => {
-      renderLoginPage('/login?error=domain_not_permitted');
+      renderLoginPage('/login?error=DOMAIN_NOT_PERMITTED');
       expect(screen.getByText('@vonnue.com')).toBeInTheDocument();
       expect(screen.getByText(/external personal domain/i)).toBeInTheDocument();
     });
@@ -59,7 +59,7 @@ describe('LoginPage', () => {
 
   describe('an unrecognized error value', () => {
     it('still falls back to LoginCard', () => {
-      renderLoginPage('/login?error=something_else');
+      renderLoginPage('/login?error=DOMAIN_NOT_PERMITTE');
       expect(
         screen.getByRole('heading', { name: /in-house trainee training platform/i })
       ).toBeInTheDocument();
@@ -89,7 +89,7 @@ describe('LoginPage', () => {
 
     it('navigates to the backend /api/auth/google endpoint when retry is clicked', async () => {
       const user = userEvent.setup();
-      renderLoginPage('/login?error=domain_not_permitted');
+      renderLoginPage('/login?error=DOMAIN_NOT_PERMITTED');
 
       await user.click(screen.getByRole('button', { name: /sign in with google account/i }));
 
