@@ -15,5 +15,5 @@ datasource db {
 model trainee {
   id String @id @default(uuid()) @db.Uuid
   name String
-  email String
+  email String @unique
 }

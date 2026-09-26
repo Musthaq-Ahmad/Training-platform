@@ -17,3 +17,10 @@ export type ApiErrorResponse = {
     details?: unknown; // e.g. which fields failed validation
   };
 };
+
+// Response returned by the authenticated user profile endpoint
+export type MeResponse = {
+  id: string;
+  email: string;
+  name: string;
+};
