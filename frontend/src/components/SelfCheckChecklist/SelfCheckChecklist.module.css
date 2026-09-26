@@ -1,0 +1,183 @@
+.selfCheck {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: 16px;
+}
+
+.selfCheckHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-card);
+}
+
+.selfCheckLabel {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.selfCheckDescription {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.selfCheckProgress {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  color: var(--color-accent-purple);
+  background: var(--color-accent-tint);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.selfCheckList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.selfCheckItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px;
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border-card);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.selfCheckItem:hover {
+  border-color: var(--color-accent-purple);
+}
+
+.selfCheckItemChecked {
+  border-color: var(--color-accent-purple);
+}
+
+.selfCheckCheckbox {
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+
+  background-color: var(--color-bg-surface-3);
+  border: 1px solid var(--color-border-section);
+  border-radius: 4px;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.selfCheckCheckbox:checked {
+  background-color: var(--color-accent-purple);
+  border-color: var(--color-accent-purple);
+}
+
+.selfCheckCheckbox:checked::after {
+  content: '';
+  position: absolute;
+
+  top: 45%;
+  left: 50%;
+
+  width: 5px;
+  height: 10px;
+
+  border: solid white;
+  border-width: 0 2.5px 2.5px 0;
+
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.selfCheckContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.selfCheckItemHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.selfCheckCode {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-button-secondary);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.selfCheckItemLabel {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.selfCheckItemDescription {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.selfCheckItemChecked .selfCheckItemLabel {
+  opacity: 0.75;
+}
+
+.selfCheckFootnote {
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border-card);
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .selfCheck {
+    padding: 18px;
+  }
+
+  .selfCheckItem {
+    padding: 14px;
+  }
+}

@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router';
 import LoginPage from './pages/LoginPage/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import DashboardPage from './pages/DashboardPage';
+import DayOverviewPage from './pages/DayOverviewPage';
 
 export default function App() {
   return (
@@ -9,6 +10,7 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/" element={<DashboardPage />} />
+      <Route path="/days/:dayId" element={<DayOverviewPage />} />
     </Routes>
   );
 }
