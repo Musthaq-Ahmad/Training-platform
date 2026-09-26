@@ -13,7 +13,7 @@ function renderTaskPage(taskId = 't1') {
   return render(
     <MemoryRouter initialEntries={[`/tasks/${taskId}`]}>
       <Routes>
-        <Route path="/task/:taskId" element={<TaskPage />} />
+        <Route path="/tasks/:taskId" element={<TaskPage />} />
       </Routes>
     </MemoryRouter>
   );
