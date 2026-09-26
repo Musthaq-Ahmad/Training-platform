@@ -11,6 +11,7 @@ import Header from '../../components/Header';
 import DayBreadcrumb from '../../components/DayBreadcrumb/DayBreadcrumb';
 import TaskModal from '../../components/TaskModal';
 import styles from './DayOverviewPage.module.css';
+import StateMessage from '../../components/StateMessage';
 
 export default function DayOverviewPage() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -28,14 +29,39 @@ export default function DayOverviewPage() {
 
   const day = formattedKey ? mockDayContents[formattedKey] : undefined;
 
-  // Handle invalid day ID
   if (!day) {
-    return <p>Day not found.</p>;
+    return (
+      <>
+        <Header />
+        <main className={styles.dayOverview}>
+          <StateMessage
+            icon="🔍"
+            title="Day not found"
+            description="We couldn't find the day you're looking for. It may have been moved, or the link you followed is incorrect."
+            actionLabel="Back to Dashboard"
+            actionHref="/"
+          />
+        </main>
+      </>
+    );
   }
 
   // Handle locked day
   if (day.isLocked) {
-    return <p>This day is locked.</p>;
+    return (
+      <>
+        <Header />
+        <main className={styles.dayOverview}>
+          <StateMessage
+            icon="🔒"
+            title="This day is locked"
+            description="Finish the previous day to unlock this one and keep going."
+            actionLabel="Back to Dashboard"
+            actionHref="/"
+          />
+        </main>
+      </>
+    );
   }
 
   // Count completed required tasks
