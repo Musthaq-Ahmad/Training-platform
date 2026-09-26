@@ -79,7 +79,7 @@ export default function DashboardPage() {
           <TrackTabs
             tracks={CURRICULUM_COURSES}
             activeTrackId={activeTrack.id}
-            onSelect={setActiveCourseId}
+            onSelect={setActiveCourseId} //all courses can be selected to view the overall days in that course but each particular day cant be selected
           />
         </section>
 
