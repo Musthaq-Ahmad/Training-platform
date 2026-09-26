@@ -24,8 +24,9 @@ function clearDays() {
 }
 
 // Renders inside a real MemoryRouter/Routes so nested router components
-// (DayBreadcrumb's <Link>, etc.) have the context they need — no react-router
-// mocking required, just a route param supplied via the URL.
+// (DayBreadcrumb's <Link>, StateMessage's <Link>, etc.) have the context
+// they need — no react-router mocking required, just a route param
+// supplied via the URL.
 function renderWithDayId(dayId: string) {
   return render(
     <MemoryRouter initialEntries={[`/days/${dayId}`]}>
@@ -103,18 +104,20 @@ describe('DayOverviewPage', () => {
     vi.restoreAllMocks();
   });
 
-  it("shows 'Day not found.' when the dayId does not match any day", () => {
+  it('shows a not-found message when the dayId does not match any day', () => {
     renderWithDayId('day-99');
 
-    expect(screen.getByText('Day not found.')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Day not found' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to Dashboard' })).toBeInTheDocument();
   });
 
-  it("shows 'This day is locked.' for a locked day, without rendering its content", () => {
+  it('shows a locked message for a locked day, without rendering its content', () => {
     setDay('day-01', { ...baseDay, isLocked: true });
 
     renderWithDayId('day-01');
 
-    expect(screen.getByText('This day is locked.')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'This day is locked' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to Dashboard' })).toBeInTheDocument();
     expect(screen.queryByText(baseDay.title)).not.toBeInTheDocument();
   });
 
