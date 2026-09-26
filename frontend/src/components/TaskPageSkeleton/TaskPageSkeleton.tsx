@@ -2,7 +2,7 @@ import styles from './TaskPageSkeleton.module.css';
 
 export default function TaskPageSkeleton() {
   return (
-    <div className={styles.skeleton} aria-hidden="true">
+    <div className={styles.skeleton} role="status" aria-hidden="true" aria-label="Loading task">
       <div className={styles.toolbar}>
         <div className={styles.toolbarLeft}>
           <div className={styles.skeletonIcon} />

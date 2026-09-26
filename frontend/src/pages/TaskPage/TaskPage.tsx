@@ -24,7 +24,7 @@ export default function TaskPage() {
   if (data.status === 'error') {
     if (data.error.code === 'NOT_FOUND') {
       return (
-        <div className={styles.messageScreen}>
+        <div className={styles.messageScreen} role="alert">
           <div className={styles.messageCard}>
             <div className={styles.messageIcon} aria-hidden="true">
               404
@@ -45,7 +45,7 @@ export default function TaskPage() {
     }
 
     return (
-      <div className={styles.messageScreen}>
+      <div className={styles.messageScreen} role="alert">
         <div className={styles.messageCard}>
           <div className={`${styles.messageIcon} ${styles.messageIconError}`} aria-hidden="true">
             !
