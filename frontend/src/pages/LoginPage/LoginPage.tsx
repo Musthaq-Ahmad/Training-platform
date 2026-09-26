@@ -9,11 +9,15 @@ export default function LoginPage() {
   const handleGoogleSignIn = () => {
     window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
   };
-  if (error === 'domain_not_permitted') {
+  if (error === 'DOMAIN_NOT_PERMITTED' || error === 'NOT_PROVISIONED' || error === 'LOGIN_FAILED') {
     return (
       <AccessRestrictedCard
         detectedEmail={searchParams.get('email') ?? 'unknown'}
-        domainInfo="External Personal Domain • OAuth2 / IdP Ingress"
+        domainInfo={
+          error === 'DOMAIN_NOT_PERMITTED'
+            ? 'External Personal Domain • OAuth2 / IdP Ingress'
+            : 'Valid Domain • Account Not Provisioned'
+        }
         allowedDomain="vonnue.com"
         onSignInRetry={handleGoogleSignIn}
       />

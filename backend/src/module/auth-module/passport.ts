@@ -19,8 +19,9 @@ passport.use(
           const trainee = await authService.verifyGoogleProfile(profile);
           done(null, trainee);
         } catch (error) {
+          const email = profile.emails?.[0]?.value;
           if (error instanceof AppError) {
-            done(null, false, { message: error.code });
+            done(null, false, { message: error.code, email });
           } else {
             done(error);
           }
