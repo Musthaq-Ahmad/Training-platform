@@ -1,0 +1,105 @@
+.learningObjectives {
+  width: 100%;
+  padding: 24px 28px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.learningObjectivesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-card);
+}
+
+.learningObjectivesLabel {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.learningObjectivesBadge {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-page);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.learningObjectivesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.learningObjectivesItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px;
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border-card);
+  border-radius: 12px;
+}
+
+.learningObjectivesCode {
+  flex-shrink: 0;
+  padding-top: 2px;
+  color: var(--color-accent-purple);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.learningObjectivesContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.learningObjectivesItemTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.learningObjectivesItemDescription {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 600px) {
+  .learningObjectives {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .learningObjectivesItem {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .learningObjectivesItemTitle {
+    font-size: 14px;
+  }
+}

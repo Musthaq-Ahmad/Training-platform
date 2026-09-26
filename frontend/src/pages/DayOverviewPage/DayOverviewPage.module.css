@@ -1,0 +1,43 @@
+.dayOverview {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+  box-sizing: border-box;
+  margin-top: -2rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.left,
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .dayOverview {
+    gap: 16px;
+    padding: 0 16px 24px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .left,
+  .right {
+    gap: 16px;
+  }
+}
