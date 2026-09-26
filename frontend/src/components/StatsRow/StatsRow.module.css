@@ -1,0 +1,36 @@
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  margin-right: 8rem;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-bg-text-tertiary);
+  margin-bottom: 0.5rem;
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-bg-text-primary);
+}
+
+.typingTestButton {
+  padding: 0.85rem 1.75rem;
+  background-color: transparent;
+  border: 1px solid var(--color-border-default);
+  border-radius: 10px;
+  color: var(--color-bg-text-secondary);
+  font-size: 0.95rem;
+}
+
+.typingTestButton:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-bg-text-primary);
+}
