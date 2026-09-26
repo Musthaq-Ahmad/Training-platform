@@ -12,6 +12,7 @@ const envSchema = z.object({
   FRONTEND_URL: z.string().default('http://localhost:5173'),
   JWT_SECRET: z.string().min(16),
   JWT_EXPIRES_IN: z.string().default('1h'),
+  NODE_ENV: z.string().min(1).default('development'),
 });
 
 // Crashes on startup with a clear message if a variable is missing

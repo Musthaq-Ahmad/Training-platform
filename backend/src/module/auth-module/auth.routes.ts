@@ -3,8 +3,11 @@ import { URLSearchParams } from 'url';
 import passport from './passport';
 import type { RequestHandler } from 'express';
 import { env } from '../../config/env';
+import { signJwt } from '../../utils/jwt';
 
 const authRoutes = Router();
+
+const COOKIE_NAME = 'auth-token';
 
 authRoutes.get(
   '/google',
@@ -17,6 +20,7 @@ authRoutes.get(
 authRoutes.get('/google/callback', (req: Request, res: Response, next: NextFunction) => {
   const authenticateCallback: RequestHandler = passport.authenticate(
     'google',
+    { session: false },
     (
       error: unknown,
       trainee: Express.User | false,
@@ -32,11 +36,15 @@ authRoutes.get('/google/callback', (req: Request, res: Response, next: NextFunct
 
         return res.redirect(`${env.FRONTEND_URL}/login?${params.toString()}`);
       }
+      const token = signJwt({ id: trainee.id, name: trainee.name, email: trainee.email });
 
-      // req.logIn(trainee, (loginError) => {
-      //   if (loginError) return next(loginError);
-
-      // });
+      res.cookie(COOKIE_NAME, token, {
+        httpOnly: true,
+        secure: env.NODE_ENV === 'production',
+        sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000, //7 days should keep in sync with JWT_EXPIRES_IN
+      });
       res.redirect(`${env.FRONTEND_URL}`);
     }
   ) as RequestHandler;
