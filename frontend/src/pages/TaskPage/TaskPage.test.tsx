@@ -11,7 +11,7 @@ vi.mock('../../api/tasks');
 
 function renderTaskPage(taskId = 't1') {
   return render(
-    <MemoryRouter initialEntries={[`/task/${taskId}`]}>
+    <MemoryRouter initialEntries={[`/tasks/${taskId}`]}>
       <Routes>
         <Route path="/task/:taskId" element={<TaskPage />} />
       </Routes>
