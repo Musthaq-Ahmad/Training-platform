@@ -1,0 +1,11 @@
+.badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
+
+.imageIcon {
+  color: var(--color-status-success);
+}
