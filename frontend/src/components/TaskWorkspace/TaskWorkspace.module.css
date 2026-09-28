@@ -19,3 +19,7 @@
 .pane:last-child {
   border-right: none;
 }
+
+.paneHidden {
+  display: none;
+}
