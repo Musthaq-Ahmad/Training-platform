@@ -1,73 +1,135 @@
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { useParams, Link } from 'react-router';
-import { useTaskData } from './hooks/useTaskData';
+import { Lock } from 'lucide-react';
+import Header from '../../components/Header';
+import TaskBreadcrumb from '../../components/TaskBreadcrumb';
 import TaskPageSkeleton from '../../components/TaskPageSkeleton';
-import styles from './TaskPage.module.css';
-import { WorkspaceProvider } from './state/WorkspaceContext';
 import TaskWorkspace from '../../components/TaskWorkspace';
+import { useTaskData } from './hooks/useTaskData';
+import { WorkspaceProvider } from './state/WorkspaceContext';
+import styles from './TaskPage.module.css';
 
-export default function TaskPage() {
-  const { taskId } = useParams();
-  const data = useTaskData(taskId);
+type TaskData = ReturnType<typeof useTaskData>;
 
-  useEffect(() => {
-    if (data.status !== 'success') return;
-    const previousTitle = document.title;
-    document.title = `${data.task.title} · Task ${data.task.sequenceOrder}`;
-    return () => {
-      document.title = previousTitle;
-    };
-  }, [data]);
+type MessageScreenProps = {
+  icon: ReactNode;
+  isError?: boolean;
+  title: string;
+  text: string;
+  action: ReactNode;
+};
 
+function MessageScreen({ icon, isError = false, title, text, action }: MessageScreenProps) {
+  const iconClass = isError
+    ? `${styles.messageIcon} ${styles.messageIconError}`
+    : styles.messageIcon;
+
+  return (
+    <div className={styles.messageScreen} role="alert">
+      <div className={styles.messageCard}>
+        <div className={iconClass} aria-hidden="true">
+          {icon}
+        </div>
+        <h1 className={styles.messageTitle}>{title}</h1>
+        <p className={styles.messageText}>{text}</p>
+        {action}
+      </div>
+    </div>
+  );
+}
+
+function DashboardLink() {
+  return (
+    <Link className={styles.messageLink} to="/">
+      Back to dashboard
+    </Link>
+  );
+}
+
+function TaskPageBody({ data }: { data: TaskData }) {
   if (data.status === 'loading') {
     return <TaskPageSkeleton />;
   }
 
   if (data.status === 'error') {
-    if (data.error.code === 'NOT_FOUND') {
-      return (
-        <div className={styles.messageScreen} role="alert">
-          <div className={styles.messageCard}>
-            <div className={styles.messageIcon} aria-hidden="true">
-              404
-            </div>
+    switch (data.error.code) {
+      case 'DAY_LOCKED':
+        return (
+          <MessageScreen
+            icon={<Lock size={20} />}
+            title="This day is locked"
+            text="Finish the previous day to unlock this task."
+            action={<DashboardLink />}
+          />
+        );
 
-            <h1 className={styles.messageTitle}>Task not found</h1>
+      case 'NOT_FOUND':
+        return (
+          <MessageScreen
+            icon="404"
+            title="Task not found"
+            text="The task you're looking for doesn't exist or is no longer available."
+            action={<DashboardLink />}
+          />
+        );
 
-            <p className={styles.messageText}>
-              The task you&apos;re looking for doesn&apos;t exist or is no longer available.
-            </p>
-
-            <Link className={styles.messageLink} to="/dashboard">
-              Back to dashboard
-            </Link>
-          </div>
-        </div>
-      );
+      default:
+        return (
+          <MessageScreen
+            icon="!"
+            isError
+            title="Something went wrong"
+            text={data.error.message}
+            action={
+              <button type="button" className={styles.messageAction} onClick={data.reload}>
+                Retry
+              </button>
+            }
+          />
+        );
     }
-
-    return (
-      <div className={styles.messageScreen} role="alert">
-        <div className={styles.messageCard}>
-          <div className={`${styles.messageIcon} ${styles.messageIconError}`} aria-hidden="true">
-            !
-          </div>
-
-          <h1 className={styles.messageTitle}>Something went wrong</h1>
-
-          <p className={styles.messageText}>{data.error.message}</p>
-
-          <button className={styles.messageAction} onClick={data.reload}>
-            Retry
-          </button>
-        </div>
-      </div>
-    );
   }
 
   return (
     <WorkspaceProvider key={data.task.id} code={data.code}>
       <TaskWorkspace task={data.task} />
     </WorkspaceProvider>
+  );
+}
+
+export default function TaskPage() {
+  const { taskId } = useParams();
+  const data = useTaskData(taskId);
+
+  const pageTitle =
+    data.status === 'success' ? `${data.task.title} · Task ${data.task.sequenceOrder}` : null;
+
+  useEffect(() => {
+    if (!pageTitle) return;
+    const previousTitle = document.title;
+    document.title = pageTitle;
+    return () => {
+      document.title = previousTitle;
+    };
+  }, [pageTitle]);
+
+  const breadcrumb =
+    data.status === 'success' ? (
+      <TaskBreadcrumb
+        courseTitle={data.task.day.courseTitle}
+        dayId={data.task.day.id}
+        dayNumber={data.task.day.dayNumber}
+        taskNumber={data.task.sequenceOrder}
+      />
+    ) : undefined;
+
+  return (
+    <div className={styles.page}>
+      {/* TODO(BL-1): pass the ACTIVE SESSION timer as `status` once the activity timer exists */}
+      <Header leading={breadcrumb} />
+      <div className={styles.body}>
+        <TaskPageBody data={data} />
+      </div>
+    </div>
   );
 }
