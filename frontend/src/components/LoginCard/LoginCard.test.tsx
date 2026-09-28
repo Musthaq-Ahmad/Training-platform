@@ -3,9 +3,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LoginCard from './LoginCard';
 
+const mockLogin = vi.fn();
+
 describe('LoginCard', () => {
   it('renders the heading and subtitle', () => {
-    render(<LoginCard />);
+    render(<LoginCard handleGoogleSignIn={mockLogin} />);
     expect(
       screen.getByRole('heading', { name: /in-house trainee training platform/i })
     ).toBeInTheDocument();
@@ -15,12 +17,12 @@ describe('LoginCard', () => {
   });
 
   it('renders the Google sign-in button', () => {
-    render(<LoginCard />);
+    render(<LoginCard handleGoogleSignIn={mockLogin} />);
     expect(screen.getByRole('button', { name: /continue with google/i })).toBeInTheDocument();
   });
 
   it('renders the enterprise security notice with the domain highlighted', () => {
-    render(<LoginCard />);
+    render(<LoginCard handleGoogleSignIn={mockLogin} />);
     expect(screen.getByText(/enterprise security/i)).toBeInTheDocument();
     expect(screen.getByText('@vonnue.com')).toBeInTheDocument();
   });
@@ -48,10 +50,10 @@ describe('Google sign-in navigation', () => {
 
   it('navigates to the backend /api/auth/google endpoint on click', async () => {
     const user = userEvent.setup();
-    render(<LoginCard />);
+    render(<LoginCard handleGoogleSignIn={mockLogin} />);
 
     await user.click(screen.getByRole('button', { name: /continue with google/i }));
 
-    expect(window.location.href).toBe('http://localhost:3000/api/auth/google');
+    expect(mockLogin).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
+import { useState } from 'react';
+import { useAuth } from '../../context/Useauth';
 import styles from './Header.module.css';
-
-const userName = 'Rahul Sharma';
 
 type HeaderProps = {
   /** Replaces the app name on the left. The task page puts its breadcrumb here. */
@@ -11,6 +11,9 @@ type HeaderProps = {
 };
 
 export default function Header({ leading, status }: HeaderProps) {
+  const { user, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
   const handleProfileClick = () => {
     // TODO: replace with <NavLink to="/profile"> once routing exists
     console.log('profile clicked');
@@ -21,9 +24,16 @@ export default function Header({ leading, status }: HeaderProps) {
     console.log('dashboard clicked');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // TODO: replace with useAuth().logout() once AuthContext exists
-    console.log('logout clicked');
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout request failed', error);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -39,11 +49,17 @@ export default function Header({ leading, status }: HeaderProps) {
             </button>
             <span className={styles.divider}>/</span>
             <button className={styles.userName} onClick={handleProfileClick}>
-              {userName}
+              {user?.name}
             </button>
             <span className={styles.divider}>/</span>
-            <button className={styles.logoutButton} onClick={handleLogout}>
-              Log out
+            <button
+              className={styles.logoutButton}
+              disabled={isLoggingOut}
+              onClick={() => {
+                void handleLogout();
+              }}
+            >
+              {isLoggingOut ? 'Logging out…' : 'Log out'}
             </button>
           </nav>
         </div>

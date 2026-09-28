@@ -8,6 +8,17 @@ import { ApiError } from '../../api/errors';
 import { taskFixture, taskCodeFixture } from '../../test/fixtures/task';
 import { ToastProvider } from '../../components/Toast';
 
+vi.mock('../../context/Useauth', () => ({
+  useAuth: () => ({
+    user: {
+      id: 'user-1',
+      name: 'Rahul Sharma',
+      email: 'rahul@example.com',
+    },
+    isLoading: false,
+    logout: vi.fn(),
+  }),
+}));
 vi.mock('../../api/tasks');
 
 function renderTaskPage(taskId = 't1') {

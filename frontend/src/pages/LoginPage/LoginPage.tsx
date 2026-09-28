@@ -1,13 +1,15 @@
 import { useSearchParams } from 'react-router';
 import LoginCard from '../../components/LoginCard';
 import AccessRestrictedCard from '../../components/AccessRestrictedCard';
+import { useAuth } from '../../context/Useauth';
 
 export default function LoginPage() {
+  const { login } = useAuth();
   const [searchParams] = useSearchParams();
   const error = searchParams.get('error');
 
   const handleGoogleSignIn = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
+    login();
   };
   if (error === 'DOMAIN_NOT_PERMITTED' || error === 'NOT_PROVISIONED' || error === 'LOGIN_FAILED') {
     return (
@@ -23,5 +25,5 @@ export default function LoginPage() {
       />
     );
   }
-  return <LoginCard />;
+  return <LoginCard handleGoogleSignIn={handleGoogleSignIn} />;
 }

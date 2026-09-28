@@ -17,7 +17,7 @@ export default defineConfig({
     port: 5173,
     headers: isolationHeaders,
     proxy: {
-      '/api': 'http://localhost:4000',
+      '/api': 'http://localhost:3000',
     },
   },
   preview: {
