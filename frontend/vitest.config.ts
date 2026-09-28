@@ -8,7 +8,7 @@ export default mergeConfig(
       environment: 'jsdom',
       setupFiles: './src/test/setup.ts',
       env: {
-        VITE_USE_TASK_FIXTURES: 'false',
+        VITE_USE_MOCKS: 'true',
       },
     },
   })
