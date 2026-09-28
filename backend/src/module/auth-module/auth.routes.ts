@@ -50,7 +50,7 @@ authRoutes.get('/google/callback', (req: Request, res: Response, next: NextFunct
   authenticateCallback(req, res, next);
 });
 
-authRoutes.post('/logout', authController.logout);
+authRoutes.post('/logout', requireAuth, authController.logout);
 authRoutes.get('/me', requireAuth, authController.me);
 
 export default authRoutes;
