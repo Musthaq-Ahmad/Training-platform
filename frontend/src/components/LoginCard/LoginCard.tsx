@@ -3,11 +3,11 @@ import shieldCheckIcon from './assets/shield-check.svg';
 import LockIcon from './assets/icons/lockIcon';
 import styles from './LoginCard.module.css';
 
-export default function LoginCard() {
-  const handleGoogleSignIn = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
-  };
+interface LoginCardProps {
+  handleGoogleSignIn: () => void;
+}
 
+export default function LoginCard({ handleGoogleSignIn }: LoginCardProps) {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
@@ -26,7 +26,13 @@ export default function LoginCard() {
         </div>
 
         <div className={styles.actionSection}>
-          <button type="button" className={styles.googleButton} onClick={handleGoogleSignIn}>
+          <button
+            type="button"
+            className={styles.googleButton}
+            onClick={() => {
+              void handleGoogleSignIn();
+            }}
+          >
             <img src={googleLogo} alt="" className={styles.googleIcon} />
             <span className={styles.googleButtonText}>Continue with Google</span>
           </button>

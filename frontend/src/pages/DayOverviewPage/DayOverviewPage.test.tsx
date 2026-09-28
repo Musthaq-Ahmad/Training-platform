@@ -5,6 +5,18 @@ import type { DayContent, DayTask } from '@itp/types';
 import DayOverviewPage from './DayOverviewPage';
 import { mockDayContents } from '../../api/dayOverview';
 
+vi.mock('../../context/Useauth', () => ({
+  useAuth: () => ({
+    user: {
+      id: 'user-1',
+      name: 'Rahul Sharma',
+      email: 'rahul@example.com',
+    },
+    isLoading: false,
+    logout: vi.fn(),
+  }),
+}));
+
 function TaskRouteProbe() {
   const { taskId } = useParams();
   return <p>Task page for {taskId}</p>;

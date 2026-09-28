@@ -1,17 +1,28 @@
 // LoginPage.test.tsx
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
+import { AuthProvider } from '../../context/AuthProvider';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import LoginPage from './LoginPage';
 
+const mockLogin = vi.fn();
+vi.mock('../../context/Useauth', () => ({
+  useAuth: () => ({
+    user: null,
+    isLoading: false,
+    login: mockLogin,
+  }),
+}));
 // LoginPage reads query params via useSearchParams, so every render needs a
 // Router context to supply the current location — MemoryRouter with
 // initialEntries lets each test control exactly what the URL looks like.
 function renderLoginPage(initialEntry: string = '/login') {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
-      <LoginPage />
+      <AuthProvider>
+        <LoginPage />
+      </AuthProvider>
     </MemoryRouter>
   );
 }
@@ -93,7 +104,7 @@ describe('LoginPage', () => {
 
       await user.click(screen.getByRole('button', { name: /sign in with google account/i }));
 
-      expect(window.location.href).toBe('http://localhost:3000/api/auth/google');
+      expect(mockLogin).toHaveBeenCalledTimes(1);
     });
   });
 });

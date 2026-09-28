@@ -1,6 +1,20 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import Header from './Header';
+
+const mockLogout = vi.fn();
+
+vi.mock('../../context/Useauth', () => ({
+  useAuth: () => ({
+    user: {
+      id: 'user-1',
+      name: 'Rahul Sharma',
+      email: 'rahul@example.com',
+    },
+    isLoading: false,
+    logout: mockLogout,
+  }),
+}));
 
 afterEach(() => {
   cleanup();

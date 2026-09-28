@@ -5,6 +5,17 @@ import type { ProfileData } from '@itp/types';
 import ProfilePage from './ProfilePage';
 import { getProfile } from '../../api/profile';
 
+vi.mock('../../context/Useauth', () => ({
+  useAuth: () => ({
+    user: {
+      id: 'user-1',
+      name: 'Rahul Sharma',
+      email: 'rahul@example.com',
+    },
+    isLoading: false,
+    logout: vi.fn(),
+  }),
+}));
 vi.mock('../../api/profile', () => ({
   getProfile: vi.fn(),
 }));
