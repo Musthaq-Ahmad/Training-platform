@@ -4,10 +4,11 @@ import passport from './passport';
 import type { RequestHandler } from 'express';
 import { env } from '../../config/env';
 import { signJwt } from '../../utils/jwt';
+import { AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, AUTH_COOKIE_MAX_AGE_MS } from './auth.constants';
+import { authController } from './auth.controller';
+import { requireAuth } from '../../middleware/authMiddleware';
 
 const authRoutes = Router();
-
-const COOKIE_NAME = 'auth-token';
 
 authRoutes.get(
   '/google',
@@ -38,12 +39,9 @@ authRoutes.get('/google/callback', (req: Request, res: Response, next: NextFunct
       }
       const token = signJwt({ id: trainee.id, name: trainee.name, email: trainee.email });
 
-      res.cookie(COOKIE_NAME, token, {
-        httpOnly: true,
-        secure: env.NODE_ENV === 'production',
-        sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
-        path: '/',
-        maxAge: 7 * 24 * 60 * 60 * 1000, //7 days should keep in sync with JWT_EXPIRES_IN
+      res.cookie(AUTH_COOKIE_NAME, token, {
+        ...AUTH_COOKIE_OPTIONS,
+        maxAge: AUTH_COOKIE_MAX_AGE_MS, //7 days should keep in sync with JWT_EXPIRES_IN
       });
       res.redirect(`${env.FRONTEND_URL}`);
     }
@@ -51,5 +49,8 @@ authRoutes.get('/google/callback', (req: Request, res: Response, next: NextFunct
 
   authenticateCallback(req, res, next);
 });
+
+authRoutes.post('/logout', requireAuth, authController.logout);
+authRoutes.get('/me', requireAuth, authController.me);
 
 export default authRoutes;
