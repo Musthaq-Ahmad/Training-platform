@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { mockDayContents } from '../../api/dayOverview';
 import DaySummary from '../../components/DaySummary/DaySummary';
 import LessonSummary from '../../components/LessonSummary/LessonSummary';
@@ -16,6 +16,7 @@ import StateMessage from '../../components/StateMessage';
 export default function DayOverviewPage() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isJournalSaved, setIsJournalSaved] = useState(false);
+  const navigate = useNavigate();
 
   const isSavingJournal = false;
 
@@ -129,7 +130,7 @@ export default function DayOverviewPage() {
         onClose={() => setIsTaskModalOpen(false)}
         onSelectTask={(task) => {
           setIsTaskModalOpen(false);
-          console.log('Selected task:', task.id);
+          void navigate(`/tasks/${task.id}`);
         }}
       />
     </>

@@ -1,4 +1,7 @@
-export type TaskStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'SUBMITTED';
+import type { DayTask } from './dayOverview';
+
+/** Same values the day page uses: 'not_started' | 'in_progress' | 'completed' */
+export type TaskStatus = DayTask['status'];
 
 export type TaskFile = {
   path: string; // e.g. "src/App.tsx"
@@ -34,6 +37,6 @@ export type SaveCodeRequest = {
 
 /** POST /api/tasks/:taskId/submit — can be called more than once; does not lock editing */
 export type SubmitTaskResponse = {
-  status: 'SUBMITTED';
+  status: 'completed';
   submittedAt: string;
 };

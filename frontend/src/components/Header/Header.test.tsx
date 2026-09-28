@@ -20,4 +20,18 @@ describe('Header', () => {
     expect(screen.getByText('Rahul Sharma').tagName).toBe('BUTTON');
     expect(screen.getByText('Log out').tagName).toBe('BUTTON');
   });
+
+  it('shows leading content instead of the app name when given', () => {
+    render(<Header leading={<span>Custom crumb</span>} />);
+
+    expect(screen.getByText('Custom crumb')).toBeInTheDocument();
+    expect(screen.queryByText(/in-house trainee training platform/i)).not.toBeInTheDocument();
+  });
+
+  it('renders the status slot before the nav', () => {
+    render(<Header status={<span>ACTIVE SESSION</span>} />);
+
+    expect(screen.getByText('ACTIVE SESSION')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /log out/i })).toBeInTheDocument();
+  });
 });

@@ -1,0 +1,26 @@
+.group {
+  display: flex;
+  gap: 4px;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.toggle:hover {
+  background: var(--color-overlay-highlight-6);
+}
+
+.toggle[aria-pressed='true'] {
+  background: var(--color-bg-button-secondary);
+  color: var(--color-text-primary);
+}

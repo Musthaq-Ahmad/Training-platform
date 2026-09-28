@@ -1,8 +1,16 @@
+import type { ReactNode } from 'react';
 import styles from './Header.module.css';
 
 const userName = 'Rahul Sharma';
 
-export default function Header() {
+type HeaderProps = {
+  /** Replaces the app name on the left. The task page puts its breadcrumb here. */
+  leading?: ReactNode;
+  /** Shown just before the nav links. The task page's session timer goes here later. */
+  status?: ReactNode;
+};
+
+export default function Header({ leading, status }: HeaderProps) {
   const handleProfileClick = () => {
     // TODO: replace with <NavLink to="/profile"> once routing exists
     console.log('profile clicked');
@@ -21,21 +29,24 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <span className={styles.appName}>In-House Trainee Training Platform</span>
+        {leading ?? <span className={styles.appName}>In-House Trainee Training Platform</span>}
 
-        <nav className={styles.nav}>
-          <button className={styles.pageLabel} onClick={handleDashboardClick}>
-            Dashboard
-          </button>
-          <span className={styles.divider}>/</span>
-          <button className={styles.userName} onClick={handleProfileClick}>
-            {userName}
-          </button>
-          <span className={styles.divider}>/</span>
-          <button className={styles.logoutButton} onClick={handleLogout}>
-            Log out
-          </button>
-        </nav>
+        <div className={styles.end}>
+          {status}
+          <nav className={styles.nav}>
+            <button className={styles.pageLabel} onClick={handleDashboardClick}>
+              Dashboard
+            </button>
+            <span className={styles.divider}>/</span>
+            <button className={styles.userName} onClick={handleProfileClick}>
+              {userName}
+            </button>
+            <span className={styles.divider}>/</span>
+            <button className={styles.logoutButton} onClick={handleLogout}>
+              Log out
+            </button>
+          </nav>
+        </div>
       </div>
     </header>
   );

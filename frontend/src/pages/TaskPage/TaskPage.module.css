@@ -1,7 +1,19 @@
+/* Header on top, the task content fills the rest of the screen */
 .page {
   height: 100%;
   display: grid;
   grid-template-rows: auto 1fr;
+  background-color: var(--color-bg-page);
+}
+
+/* The shared Header has margin-bottom: 2.5rem for normal pages; the workspace needs every pixel */
+.page > header {
+  margin-bottom: 0;
+}
+
+.body {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .messageScreen {
@@ -88,15 +100,4 @@
 
 .messageLink:hover {
   text-decoration: underline;
-}
-
-.stubToolbar {
-  height: 56px;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  background-color: var(--color-bg-card);
-  border-bottom: 1px solid var(--color-border-card);
-  color: var(--color-text-primary);
-  font-weight: 600;
 }

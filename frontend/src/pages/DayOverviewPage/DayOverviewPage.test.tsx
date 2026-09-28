@@ -1,9 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router';
+import { MemoryRouter, Routes, Route, useParams } from 'react-router';
 import type { DayContent, DayTask } from '@itp/types';
 import DayOverviewPage from './DayOverviewPage';
 import { mockDayContents } from '../../api/dayOverview';
+
+function TaskRouteProbe() {
+  const { taskId } = useParams();
+  return <p>Task page for {taskId}</p>;
+}
 
 type MockDayContents = Record<string, DayContent>;
 
@@ -32,6 +37,7 @@ function renderWithDayId(dayId: string) {
     <MemoryRouter initialEntries={[`/days/${dayId}`]}>
       <Routes>
         <Route path="/days/:dayId" element={<DayOverviewPage />} />
+        <Route path="/tasks/:taskId" element={<TaskRouteProbe />} />
       </Routes>
     </MemoryRouter>
   );
@@ -140,7 +146,7 @@ describe('DayOverviewPage', () => {
     expect(screen.getByRole('button', { name: /tasks \(1\/3\)/i })).toBeInTheDocument();
   });
 
-  it('opens the task modal when the tasks summary is clicked, and closes it after selecting a task', () => {
+  it('opens the task page when a task is selected in the modal', () => {
     setDay('day-01', baseDay);
 
     renderWithDayId('day-01');
@@ -149,7 +155,7 @@ describe('DayOverviewPage', () => {
     expect(screen.getByText('Style a button')).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Style a button'));
-    expect(screen.queryByText('Style a nav bar')).not.toBeInTheDocument();
+    expect(screen.getByText('Task page for task-1')).toBeInTheDocument();
   });
 
   it('marks the journal as saved after the save handler is called', () => {
