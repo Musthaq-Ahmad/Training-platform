@@ -6,7 +6,7 @@ export const taskFixture: TaskResponse = {
   isStretchGoal: false,
   sequenceOrder: 7,
   estimatedMinutes: 50,
-  status: 'IN_PROGRESS',
+  status: 'in_progress',
   day: {
     id: 'd1',
     dayNumber: 1,

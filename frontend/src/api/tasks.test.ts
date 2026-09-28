@@ -53,7 +53,7 @@ describe('tasks api', () => {
 
   it('submitTask posts to the submit endpoint', async () => {
     const response = {
-      status: 'SUBMITTED' as const,
+      status: 'completed' as const,
       submittedAt: '2026-09-26T00:00:00.000Z',
     };
 
