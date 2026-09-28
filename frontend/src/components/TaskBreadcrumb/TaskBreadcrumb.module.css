@@ -1,0 +1,36 @@
+.list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list li + li::before {
+  content: '/';
+  color: var(--color-text-muted);
+}
+
+.link {
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.current {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
