@@ -1,6 +1,5 @@
 // LoginPage.test.tsx
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
-import { AuthProvider } from '../../context/AuthProvider';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
@@ -20,9 +19,7 @@ vi.mock('../../context/Useauth', () => ({
 function renderLoginPage(initialEntry: string = '/login') {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
-      <AuthProvider>
-        <LoginPage />
-      </AuthProvider>
+      <LoginPage />
     </MemoryRouter>
   );
 }
