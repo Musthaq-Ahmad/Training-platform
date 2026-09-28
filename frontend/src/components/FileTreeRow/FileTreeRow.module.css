@@ -1,0 +1,70 @@
+.row {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.row:hover {
+  background-color: var(--color-overlay-highlight-6);
+}
+
+.rowActive {
+  background-color: var(--color-accent-purple-wash);
+  border: 1px solid var(--color-border-strong);
+}
+
+.chevron,
+.folderIcon {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.badgeSlot {
+  display: inline-flex;
+  justify-content: center;
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.name {
+  flex: 1;
+  font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileCount {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.dirtyDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-status-warning);
+  flex-shrink: 0;
+}
+
+.deleteButton {
+  display: none;
+  align-items: center;
+  color: var(--color-text-secondary);
+}
+
+.row:hover .deleteButton,
+.row:focus-within .deleteButton,
+.deleteButton:focus {
+  display: flex;
+}
+
+.deleteButton:hover {
+  color: var(--color-status-error-text);
+}

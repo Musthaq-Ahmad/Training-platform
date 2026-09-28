@@ -1,0 +1,25 @@
+.pane {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background-color: var(--color-bg-base);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.emptyAction {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background-color: var(--color-bg-button-secondary);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+}

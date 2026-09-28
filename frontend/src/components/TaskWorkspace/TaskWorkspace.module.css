@@ -12,10 +12,15 @@
 
 .pane {
   min-height: 0;
-  overflow: hidden;
+  overflow: clip;
+  /* overflow: hidden; */
   border-right: 1px solid var(--color-border-divider);
 }
 
 .pane:last-child {
   border-right: none;
+}
+
+.paneHidden {
+  display: none;
 }

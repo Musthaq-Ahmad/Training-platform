@@ -1,9 +1,21 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { Runner } from '../../runtimes/runnerContext';
 import TaskToolbar from './TaskToolbar';
 
 const visiblePanes = { sidebar: true, code: true, result: false };
+
+function makeRunner(overrides: Partial<Runner> = {}): Runner {
+  return {
+    canRun: true,
+    label: 'Run',
+    title: 'Run (Ctrl+Enter)',
+    isRunning: false,
+    run: vi.fn(),
+    ...overrides,
+  };
+}
 
 describe('TaskToolbar', () => {
   it('formats an estimate under an hour', () => {
@@ -14,7 +26,7 @@ describe('TaskToolbar', () => {
         onTogglePane={vi.fn()}
         onBack={vi.fn()}
         onRun={vi.fn()}
-        canRun
+        runner={makeRunner()}
         saveIndicator={null}
         submitSlot={null}
       />
@@ -30,7 +42,7 @@ describe('TaskToolbar', () => {
         onTogglePane={vi.fn()}
         onBack={vi.fn()}
         onRun={vi.fn()}
-        canRun
+        runner={makeRunner()}
         saveIndicator={null}
         submitSlot={null}
       />
@@ -46,7 +58,7 @@ describe('TaskToolbar', () => {
         onTogglePane={vi.fn()}
         onBack={vi.fn()}
         onRun={vi.fn()}
-        canRun
+        runner={makeRunner()}
         saveIndicator={null}
         submitSlot={null}
       />
@@ -65,7 +77,7 @@ describe('TaskToolbar', () => {
         onTogglePane={vi.fn()}
         onBack={onBack}
         onRun={onRun}
-        canRun
+        runner={makeRunner()}
         saveIndicator={null}
         submitSlot={null}
       />
@@ -78,7 +90,7 @@ describe('TaskToolbar', () => {
     expect(onRun).toHaveBeenCalledTimes(1);
   });
 
-  it('disables Run when canRun is false', () => {
+  it('shows the runner label and title', () => {
     render(
       <TaskToolbar
         estimatedMinutes={50}
@@ -86,11 +98,46 @@ describe('TaskToolbar', () => {
         onTogglePane={vi.fn()}
         onBack={vi.fn()}
         onRun={vi.fn()}
-        canRun={false}
+        runner={makeRunner({ label: 'Run: npm test', title: 'Run npm test (Ctrl+Enter)' })}
+        saveIndicator={null}
+        submitSlot={null}
+      />
+    );
+    const button = screen.getByRole('button', { name: /run: npm test/i });
+    expect(button).toHaveAttribute('title', 'Run npm test (Ctrl+Enter)');
+  });
+
+  it('disables Run when the runner cannot run', () => {
+    render(
+      <TaskToolbar
+        estimatedMinutes={50}
+        visiblePanes={visiblePanes}
+        onTogglePane={vi.fn()}
+        onBack={vi.fn()}
+        onRun={vi.fn()}
+        runner={makeRunner({ canRun: false })}
         saveIndicator={null}
         submitSlot={null}
       />
     );
     expect(screen.getByRole('button', { name: /run/i })).toBeDisabled();
+  });
+
+  it('shows a spinner while the runner is running', () => {
+    render(
+      <TaskToolbar
+        estimatedMinutes={50}
+        visiblePanes={visiblePanes}
+        onTogglePane={vi.fn()}
+        onBack={vi.fn()}
+        onRun={vi.fn()}
+        runner={makeRunner({ isRunning: true })}
+        saveIndicator={null}
+        submitSlot={null}
+      />
+    );
+    expect(
+      screen.getByRole('button', { name: /run/i }).querySelector('svg')
+    ).not.toBeInTheDocument();
   });
 });

@@ -6,7 +6,9 @@ import TaskBreadcrumb from '../../components/TaskBreadcrumb';
 import TaskPageSkeleton from '../../components/TaskPageSkeleton';
 import TaskWorkspace from '../../components/TaskWorkspace';
 import { useTaskData } from './hooks/useTaskData';
+import { EditorProvider } from './state/EditorContext';
 import { WorkspaceProvider } from './state/WorkspaceContext';
+import { RunnerProvider } from '../../runtimes/runnerContext';
 import styles from './TaskPage.module.css';
 
 type TaskData = ReturnType<typeof useTaskData>;
@@ -92,7 +94,11 @@ function TaskPageBody({ data }: { data: TaskData }) {
 
   return (
     <WorkspaceProvider key={data.task.id} code={data.code}>
-      <TaskWorkspace task={data.task} />
+      <EditorProvider>
+        <RunnerProvider>
+          <TaskWorkspace task={data.task} />
+        </RunnerProvider>
+      </EditorProvider>
     </WorkspaceProvider>
   );
 }

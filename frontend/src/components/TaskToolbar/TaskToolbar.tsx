@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { ArrowLeft, Timer, Play } from 'lucide-react';
 import type { PaneId } from '../../types/workspaceTypes';
+import type { Runner } from '../../runtimes/runnerContext';
 import ViewToggleGroup from '../ViewToggleGroup';
 import { formatMinutes } from '../../lib/formatMinutes';
 import styles from './TaskToolbar.module.css';
@@ -11,7 +12,7 @@ export type TaskToolbarProps = {
   onTogglePane: (pane: PaneId) => void;
   onBack: () => void;
   onRun: () => void;
-  canRun: boolean;
+  runner: Runner;
   saveIndicator: ReactNode;
   submitSlot: ReactNode;
 };
@@ -22,7 +23,7 @@ export default function TaskToolbar({
   onTogglePane,
   onBack,
   onRun,
-  canRun,
+  runner,
   saveIndicator,
   submitSlot,
 }: TaskToolbarProps) {
@@ -50,11 +51,15 @@ export default function TaskToolbar({
         type="button"
         className={styles.runButton}
         onClick={onRun}
-        disabled={!canRun}
-        title={canRun ? 'Run (Ctrl+Enter)' : 'Add an .html file to run'}
+        disabled={!runner.canRun}
+        title={runner.title}
       >
-        <Play size={14} aria-hidden="true" />
-        Run
+        {runner.isRunning ? (
+          <span className={styles.runSpinner} aria-hidden="true" />
+        ) : (
+          <Play size={14} aria-hidden="true" />
+        )}
+        {runner.label}
       </button>
 
       {saveIndicator}

@@ -1,0 +1,79 @@
+.dialog {
+  /* The global reset (index.css) zeroes every element's margin, including the
+     native <dialog>'s UA margin: auto that normally centers it — so we set
+     our own centering here instead of touching the shared reset. */
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(440px, calc(100vw - 32px));
+  height: fit-content;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background-color: var(--color-bg-card);
+  color: var(--color-text-primary);
+  box-shadow: 0 8px 24px var(--color-overlay-scrim);
+}
+
+.dialog::backdrop {
+  background-color: var(--color-overlay-scrim);
+}
+
+.content {
+  width: min(90vw, 420px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.body {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.error {
+  font-size: 13px;
+  color: var(--color-status-error-text);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cancelButton {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background-color: var(--color-bg-button-secondary);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.confirmButton {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background-color: var(--color-accent-purple);
+  color: var(--color-text-on-accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.confirmButtonDanger {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background-color: var(--color-status-error-icon);
+  color: var(--color-text-on-accent);
+  font-size: 14px;
+  font-weight: 600;
+}
