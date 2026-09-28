@@ -16,9 +16,8 @@ export function useLocalStorageState<T>(key: string, defaultValue: T): [T, (valu
 
       try {
         window.localStorage.setItem(key, JSON.stringify(next));
-      } catch (error) {
-        // ignore write failures
-        console.log(error);
+      } catch {
+        // Storage can be unavailable (private mode, quota). Pane layout is a convenience, so ignore it.
       }
     },
     [key]

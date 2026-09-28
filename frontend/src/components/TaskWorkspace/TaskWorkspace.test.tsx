@@ -42,12 +42,11 @@ describe('TaskWorkspace', () => {
     expect(screen.getByTestId('result-pane')).toBeInTheDocument();
   });
 
-  it('keeps the code pane mounted when Code is toggled off', async () => {
+  it('removes the code pane stub when Code is toggled off', async () => {
     const user = userEvent.setup();
     renderWorkspace();
     await user.click(screen.getByRole('button', { name: /^code$/i }));
-    // TK-2 unmounts the stub; this test documents the current behaviour so
-    // TK-4 has a failing test to update once the real EditorPane lands.
+    // TK-4: flip this once the real editor lands — it must stay mounted (hidden) to keep undo history.
     expect(screen.queryByTestId('code-pane')).not.toBeInTheDocument();
   });
 
