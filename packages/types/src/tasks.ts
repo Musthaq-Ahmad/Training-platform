@@ -8,6 +8,9 @@ export type TaskFile = {
   content: string;
 };
 
+/** How the Run button executes a task. Set per task in the seed data. */
+export type TaskRuntime = 'browser' | 'node' | 'sql';
+
 /** GET /api/tasks/:taskId */
 export type TaskResponse = {
   id: string;
@@ -22,6 +25,11 @@ export type TaskResponse = {
     dayNumber: number;
     courseTitle: string;
   };
+  runtime: TaskRuntime;
+  /** node only: what Run types into the terminal, e.g. "npm test". null for browser and sql. */
+  runCommand: string | null;
+  /** node only: true when trainee code needs its own Postgres (DATABASE_URL). Always false for browser. */
+  usesDatabase: boolean;
 };
 
 /** GET /api/tasks/:taskId/code */

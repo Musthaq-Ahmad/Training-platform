@@ -12,6 +12,9 @@ export const taskFixture: TaskResponse = {
     dayNumber: 1,
     courseTitle: 'CSS',
   },
+  runtime: 'browser',
+  runCommand: null,
+  usesDatabase: false,
   instructionsMarkdown: `## Hands-on Objective
 Implement production-grade responsive layout components for the client portal
 services view inside \`services.html\` adhering to semantic structuring and
@@ -137,3 +140,127 @@ export const taskCodeFixture: TaskCodeResponse = {
 export function makeTaskCode(overrides: Partial<TaskCodeResponse> = {}): TaskCodeResponse {
   return { ...taskCodeFixture, ...overrides };
 }
+
+export const nodeTaskFixture: TaskResponse = {
+  id: 't-node',
+  title: 'System Information CLI',
+  isStretchGoal: false,
+  sequenceOrder: 1,
+  estimatedMinutes: 30,
+  status: 'not_started',
+  day: {
+    id: 'd-node-1',
+    dayNumber: 1,
+    courseTitle: 'Node.js',
+  },
+  runtime: 'node',
+  runCommand: 'npm test',
+  usesDatabase: false,
+  instructionsMarkdown: `## Hands-on Objective
+Write a small Node.js module that reports basic information about the
+current system, and make the provided test pass.
+
+## Functional Requirements
+- Export a \`getInfo()\` function from \`src/sysinfo.js\`.
+- Return an object with \`platform\`, \`arch\` and \`nodeVersion\` keys.
+- Make \`npm test\` pass without changing \`src/sysinfo.test.js\`.
+`,
+};
+
+export const nodeTaskCodeFixture: TaskCodeResponse = {
+  updatedAt: null,
+  files: [
+    {
+      path: 'package.json',
+      content: `{
+  "name": "system-info-cli",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}
+`,
+    },
+    {
+      path: 'src/sysinfo.js',
+      content: `function getInfo() {
+  // TODO: return platform, arch and nodeVersion
+}
+
+module.exports = { getInfo };
+`,
+    },
+    {
+      path: 'src/sysinfo.test.js',
+      content: `const test = require('node:test');
+const assert = require('node:assert');
+const { getInfo } = require('./sysinfo');
+
+test('getInfo returns platform, arch and nodeVersion', () => {
+  const info = getInfo();
+  assert.ok(info.platform);
+  assert.ok(info.arch);
+  assert.ok(info.nodeVersion);
+});
+`,
+    },
+  ],
+};
+
+export const sqlTaskFixture: TaskResponse = {
+  id: 't-sql',
+  title: 'Ticket System Schema',
+  isStretchGoal: false,
+  sequenceOrder: 1,
+  estimatedMinutes: 40,
+  status: 'not_started',
+  day: {
+    id: 'd-sql-1',
+    dayNumber: 1,
+    courseTitle: 'PostgreSQL',
+  },
+  runtime: 'sql',
+  runCommand: null,
+  usesDatabase: false,
+  instructionsMarkdown: `## Hands-on Objective
+Design a simple ticket-tracking schema in \`schema.sql\`, seed it with a
+few rows in \`seed.sql\`, and write two read queries in \`queries.sql\`.
+
+## Functional Requirements
+- A \`tickets\` table with an id, title, status and created_at column.
+- \`seed.sql\` inserts three sample tickets.
+- \`queries.sql\` selects all open tickets, and counts tickets per status.
+`,
+};
+
+export const sqlTaskCodeFixture: TaskCodeResponse = {
+  updatedAt: null,
+  files: [
+    {
+      path: 'schema.sql',
+      content: `create table tickets (
+  id serial primary key,
+  title text not null,
+  status text not null default 'open',
+  created_at timestamptz not null default now()
+);
+`,
+    },
+    {
+      path: 'seed.sql',
+      content: `insert into tickets (title, status) values
+  ('Login button is unresponsive', 'open'),
+  ('Add dark mode toggle', 'open'),
+  ('Fix typo on pricing page', 'closed');
+`,
+    },
+    {
+      path: 'queries.sql',
+      content: `select * from tickets where status = 'open';
+
+select status, count(*) from tickets group by status;
+`,
+    },
+  ],
+};
