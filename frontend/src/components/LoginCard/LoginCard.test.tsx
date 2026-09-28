@@ -5,15 +5,6 @@ import LoginCard from './LoginCard';
 
 const mockLogin = vi.fn();
 
-// vi.mock('../../context/Useauth', () => ({
-//   useAuth: () => ({
-//     user: null,
-//     isLoading: false,
-//     login: mockLogin,
-//     logout: vi.fn(),
-//   }),
-// }));
-
 describe('LoginCard', () => {
   it('renders the heading and subtitle', () => {
     render(<LoginCard handleGoogleSignIn={mockLogin} />);
