@@ -1,48 +1,131 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { TaskResponse } from '@itp/types';
-import { selectHtmlEntry } from '../../pages/TaskPage/state/selectors';
+import { getTaskCode, saveTaskCode } from '../../api/tasks';
+import { applyRuntimeSettings } from '../../lib/monacoSetup';
+import {
+  selectFileCount,
+  selectFilesForSave,
+  selectIsDirty,
+  selectOversizedPath,
+} from '../../pages/TaskPage/state/selectors';
+import { useAutosave } from '../../pages/TaskPage/hooks/useAutosave';
+import { useRunner } from '../../runtimes/runnerContext';
+import RuntimeHost from '../../runtimes/RuntimeHost';
 import type { PaneId } from '../../types/workspaceTypes';
 import {
   useWorkspaceDispatch,
   useWorkspaceState,
 } from '../../pages/TaskPage/state/WorkspaceContext';
+import ConfirmDialog from '../ConfirmDialog';
+import EditorPane from '../EditorPane';
+import FilesPanel from '../FilesPanel';
+import InstructionsPanel from '../InstructionsPanel';
+import SaveIndicator from '../SaveIndicator';
 import TaskToolbar from '../TaskToolbar';
+import WorkspaceSidebar from '../WorkspaceSidebar';
 import styles from './TaskWorkspace.module.css';
 
 type TaskWorkspaceProps = {
   task: TaskResponse;
 };
 
-// Stubbed until TK-6 (autosave) and TK-7 (preview) land — same shape the real hooks return.
-const stubAutosave = {
-  async flush() {
-    await Promise.resolve();
-    return true;
-  },
-};
-const stubPreview = { run: () => {} };
-
 export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
   const state = useWorkspaceState();
   const dispatch = useWorkspaceDispatch();
   const navigate = useNavigate();
+  const runner = useRunner();
 
-  const canRun = selectHtmlEntry(state) !== null;
+  const [isRefreshConfirmOpen, setIsRefreshConfirmOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [isLeaveConfirmOpen, setIsLeaveConfirmOpen] = useState(false);
 
-  const handleBack = useCallback(() => {
-    void (async () => {
-      await stubAutosave.flush();
-      await navigate(`/days/${task.day.id}`);
-    })();
-  }, [navigate, task.day.id]);
+  useEffect(() => {
+    applyRuntimeSettings(task.runtime);
+  }, [task.runtime]);
+
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+  });
+
+  const autosave = useAutosave({
+    isDirty: selectIsDirty(state),
+    changeKey: state.files,
+    getSnapshot: () => selectFilesForSave(stateRef.current),
+    save: (files) => saveTaskCode(task.id, { files }),
+    onSaved: (files) =>
+      dispatch({
+        type: 'saveSucceeded',
+        snapshot: Object.fromEntries(files.map((f) => [f.path, f.content])),
+      }),
+    validate: () => {
+      const path = selectOversizedPath(stateRef.current);
+      return path ? `${path} is too large to save (200,000 characters max).` : null;
+    },
+  });
+
+  const { flush } = autosave;
+  const { run: runnerRun } = runner;
 
   const handleRun = useCallback(() => {
     if (!state.visiblePanes.result) {
       dispatch({ type: 'paneToggled', pane: 'result' });
     }
-    stubPreview.run();
-  }, [dispatch, state.visiblePanes.result]);
+    runnerRun();
+  }, [dispatch, runnerRun, state.visiblePanes.result]);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+      if (isCtrlOrCmd && event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        void flush();
+      } else if (isCtrlOrCmd && event.key === 'Enter') {
+        event.preventDefault();
+        handleRun();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [flush, handleRun]);
+
+  const loadServerFiles = useCallback(async () => {
+    setIsRefreshing(true);
+    setRefreshError(null);
+    try {
+      const code = await getTaskCode(task.id);
+      dispatch({ type: 'serverFilesLoaded', code });
+      setIsRefreshConfirmOpen(false);
+    } catch (error) {
+      setRefreshError(
+        error instanceof Error ? error.message : 'Something went wrong. Please try again.'
+      );
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [dispatch, task.id]);
+
+  const refreshFiles = useCallback(() => {
+    if (selectIsDirty(state)) {
+      setRefreshError(null);
+      setIsRefreshConfirmOpen(true);
+      return;
+    }
+    void loadServerFiles();
+  }, [state, loadServerFiles]);
+
+  const handleBack = useCallback(() => {
+    void (async () => {
+      const ok = await autosave.flush();
+      if (ok) {
+        await navigate(`/days/${task.day.id}`);
+      } else {
+        setIsLeaveConfirmOpen(true);
+      }
+    })();
+  }, [autosave, navigate, task.day.id]);
 
   const handleTogglePane = useCallback(
     (pane: PaneId) => dispatch({ type: 'paneToggled', pane }),
@@ -65,30 +148,68 @@ export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
         onTogglePane={handleTogglePane}
         onBack={handleBack}
         onRun={handleRun}
-        canRun={canRun}
-        saveIndicator={null}
+        runner={runner}
+        saveIndicator={<SaveIndicator state={autosave.state} onRetry={autosave.retry} />}
         submitSlot={null}
       />
       <div className={styles.paneRow} style={{ gridTemplateColumns: gridColumns }}>
         {state.visiblePanes.sidebar && (
           <div className={styles.pane} data-testid="sidebar-pane">
-            {/* TODO(TK-3): WorkspaceSidebar */}
+            <WorkspaceSidebar
+              activeTab={state.sidebarTab}
+              onTabChange={(tab) => dispatch({ type: 'sidebarTabChanged', tab })}
+              fileCount={selectFileCount(state)}
+              onCollapse={() => dispatch({ type: 'paneToggled', pane: 'sidebar' })}
+              instructions={<InstructionsPanel markdown={task.instructionsMarkdown} />}
+              files={<FilesPanel onRefresh={refreshFiles} />}
+            />
           </div>
         )}
-        {state.visiblePanes.code && (
-          // TODO(TK-4): replace with the Monaco editor. Once real, keep this mounted and
-          // hide with display:none on toggle instead of conditional rendering — unmounting
-          // Monaco is expensive and would lose undo history.
-          <div className={styles.pane} data-testid="code-pane">
-            {/* TODO(TK-4): Monaco editor */}
-          </div>
-        )}
-        {state.visiblePanes.result && (
-          <div className={styles.pane} data-testid="result-pane">
-            {/* TODO(TK-7): ResultPane */}
-          </div>
-        )}
+        {/* Always mounted, hidden with CSS when toggled off — unmounting Monaco would lose undo history. */}
+        <div
+          className={state.visiblePanes.code ? styles.pane : `${styles.pane} ${styles.paneHidden}`}
+          data-testid="code-pane"
+        >
+          <EditorPane taskId={task.id} onSave={() => void autosave.flush()} onRun={handleRun} />
+        </div>
+
+        {/* Always mounted, hidden with CSS when toggled off — the node runtime's terminal
+            and running server must survive the pane being hidden. */}
+        <div
+          className={
+            state.visiblePanes.result ? styles.pane : `${styles.pane} ${styles.paneHidden}`
+          }
+          data-testid="result-pane"
+        >
+          <RuntimeHost task={task} />
+        </div>
       </div>
+
+      <ConfirmDialog
+        open={isRefreshConfirmOpen}
+        title="Discard unsaved changes and reload files from the server?"
+        confirmLabel="Reload"
+        isConfirming={isRefreshing}
+        error={refreshError}
+        onConfirm={() => void loadServerFiles()}
+        onCancel={() => setIsRefreshConfirmOpen(false)}
+      >
+        Your local changes will be lost.
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        open={isLeaveConfirmOpen}
+        title="Your latest changes aren't saved. Leave anyway?"
+        confirmLabel="Leave"
+        tone="danger"
+        onConfirm={() => {
+          setIsLeaveConfirmOpen(false);
+          void navigate(`/days/${task.day.id}`);
+        }}
+        onCancel={() => setIsLeaveConfirmOpen(false)}
+      >
+        Unsaved changes will be lost.
+      </ConfirmDialog>
     </div>
   );
 }
