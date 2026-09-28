@@ -21,7 +21,11 @@ export type MonacoLike = {
 const WORKSPACE_PREFIX = 'file:///workspace/';
 
 /** Make Monaco's models match `files`: create missing ones, update changed ones, dispose removed ones. */
-export function syncMonacoModels(monaco: MonacoLike, files: Record<string, string>): void {
+export function syncMonacoModels(
+  monaco: MonacoLike,
+  files: Record<string, string>,
+  skipUri?: string
+): void {
   const keptUris = new Set<string>();
 
   for (const [path, content] of Object.entries(files)) {
@@ -37,7 +41,7 @@ export function syncMonacoModels(monaco: MonacoLike, files: Record<string, strin
 
     if (!existing) {
       monaco.editor.createModel(content, fileType.monacoLanguage, uri);
-    } else if (existing.getValue() !== content) {
+    } else if (modelUri !== skipUri && existing.getValue() !== content) {
       existing.setValue(content);
     }
   }
