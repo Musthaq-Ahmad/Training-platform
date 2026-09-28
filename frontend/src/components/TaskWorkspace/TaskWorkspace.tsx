@@ -133,7 +133,8 @@ export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
   );
 
   const gridColumns = [
-    state.visiblePanes.sidebar && '320px',
+    state.visiblePanes.sidebar &&
+      (state.visiblePanes.code || state.visiblePanes.result ? '320px' : 'minmax(0, 1fr)'),
     state.visiblePanes.code && 'minmax(0, 1fr)',
     state.visiblePanes.result && 'minmax(0, 1fr)',
   ]
