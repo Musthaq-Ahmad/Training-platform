@@ -128,6 +128,14 @@
   --color-google-green: #34a853;
   --color-google-red: #ea4335;
   --color-google-yellow: #fbbc05;
+
+  /* =========================================================
+     File type badges
+     ========================================================= */
+  --color-filetype-html: #c2410c;
+  --color-filetype-css: #1d4ed8;
+  --color-filetype-js: #a16207;
+  --color-filetype-ts: #2563eb;
 }
 
 /* =========================================================
@@ -291,6 +299,14 @@
     --color-google-green: #34a853;
     --color-google-red: #ea4335;
     --color-google-yellow: #fbbc05;
+
+    /* -------------------------------------------------------
+       File type badges
+       ------------------------------------------------------- */
+    --color-filetype-html: #fb923c;
+    --color-filetype-css: #60a5fa;
+    --color-filetype-js: #facc15;
+    --color-filetype-ts: #3b82f6;
   }
 }
 

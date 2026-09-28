@@ -158,13 +158,11 @@ describe('workspaceReducer', () => {
     });
   });
 
-  it('saveSucceeded merges the snapshot into savedFiles without touching files', () => {
+  it('saveSucceeded replaces savedFiles with the snapshot', () => {
     const state = { ...baseState(), files: { ...baseState().files, 'services.html': 'dirty' } };
-    const next = workspaceReducer(state, {
-      type: 'saveSucceeded',
-      snapshot: { 'services.html': 'dirty' },
-    });
-    expect(next.savedFiles['services.html']).toBe('dirty');
+    const snapshot = { 'services.html': 'dirty' };
+    const next = workspaceReducer(state, { type: 'saveSucceeded', snapshot });
+    expect(next.savedFiles).toEqual(snapshot);
     expect(next.files['services.html']).toBe('dirty');
   });
 
@@ -231,5 +229,78 @@ describe('workspaceReducer', () => {
     const next = workspaceReducer(state, { type: 'sidebarTabChanged', tab: 'files' });
     expect(next.sidebarTab).toBe('files');
     expect(next.visiblePanes.sidebar).toBe(true);
+  });
+
+  describe('fileCreated', () => {
+    it('adds and opens the new file', () => {
+      const state = baseState();
+      const next = workspaceReducer(state, {
+        type: 'fileCreated',
+        path: 'new.js',
+        content: 'hi',
+      });
+      expect(next.files['new.js']).toBe('hi');
+      expect(next.openPaths).toContain('new.js');
+      expect(next.activePath).toBe('new.js');
+    });
+
+    it('adds without opening when open is false', () => {
+      const state = baseState();
+      const next = workspaceReducer(state, {
+        type: 'fileCreated',
+        path: 'new.js',
+        open: false,
+      });
+      expect(next.files['new.js']).toBe('');
+      expect(next.openPaths).not.toContain('new.js');
+    });
+
+    it('ignores an existing path', () => {
+      const state = baseState();
+      const next = workspaceReducer(state, {
+        type: 'fileCreated',
+        path: 'services.html',
+        content: 'x',
+      });
+      expect(next).toBe(state);
+    });
+  });
+
+  describe('fileDeleted', () => {
+    it('removes the file and closes its tab', () => {
+      const state = {
+        ...baseState(),
+        openPaths: ['services.html', 'styles.css'],
+        activePath: 'services.html',
+      };
+      const next = workspaceReducer(state, { type: 'fileDeleted', path: 'services.html' });
+      expect(next.files['services.html']).toBeUndefined();
+      expect(next.openPaths).toEqual(['styles.css']);
+      expect(next.activePath).toBe('styles.css');
+    });
+
+    it('ignores an unknown path', () => {
+      const state = baseState();
+      const next = workspaceReducer(state, { type: 'fileDeleted', path: 'nope.js' });
+      expect(next).toBe(state);
+    });
+  });
+
+  describe('folderDeleted', () => {
+    it('removes every file under the prefix but not a similarly-named sibling folder', () => {
+      const state = {
+        ...baseState(),
+        files: {
+          'src/a.js': 'a',
+          'src/b.js': 'b',
+          'src2/x.js': 'x',
+        },
+        savedFiles: {},
+        openPaths: [],
+        activePath: null,
+      };
+      const next = workspaceReducer(state, { type: 'folderDeleted', path: 'src' });
+      expect(next.files).toEqual({ 'src2/x.js': 'x' });
+    });
   });
 });

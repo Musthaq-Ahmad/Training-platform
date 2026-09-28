@@ -68,7 +68,31 @@ export function workspaceReducer(state: WorkspaceState, action: WorkspaceAction)
     }
 
     case 'saveSucceeded':
-      return { ...state, savedFiles: { ...state.savedFiles, ...action.snapshot } };
+      return { ...state, savedFiles: action.snapshot };
+
+    case 'fileCreated': {
+      if (action.path in state.files) return state;
+      const withFile = { ...state, files: { ...state.files, [action.path]: action.content ?? '' } };
+      return action.open === false
+        ? withFile
+        : workspaceReducer(withFile, { type: 'fileOpened', path: action.path });
+    }
+
+    case 'fileDeleted': {
+      if (!(action.path in state.files)) return state;
+      const files = Object.fromEntries(
+        Object.entries(state.files).filter(([path]) => path !== action.path)
+      );
+      const afterClose = workspaceReducer(state, { type: 'tabClosed', path: action.path });
+      return { ...afterClose, files };
+    }
+
+    case 'folderDeleted': {
+      const prefix = `${action.path}/`;
+      return Object.keys(state.files)
+        .filter((path) => path.startsWith(prefix))
+        .reduce((next, path) => workspaceReducer(next, { type: 'fileDeleted', path }), state);
+    }
 
     case 'folderToggled': {
       const isExpanded = state.expandedFolders.includes(action.path);

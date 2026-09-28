@@ -24,4 +24,8 @@ export type WorkspaceAction =
   | { type: 'allFoldersCollapsed' }
   | { type: 'paneToggled'; pane: PaneId }
   | { type: 'panesSet'; visiblePanes: Record<PaneId, boolean> }
-  | { type: 'sidebarTabChanged'; tab: SidebarTab };
+  | { type: 'sidebarTabChanged'; tab: SidebarTab }
+  /** open: false is used by the Node runtime when a file appears from the terminal (FE-08) */
+  | { type: 'fileCreated'; path: string; content?: string; open?: boolean }
+  | { type: 'fileDeleted'; path: string }
+  | { type: 'folderDeleted'; path: string };

@@ -6,6 +6,7 @@ import TaskPage from './TaskPage';
 import { getTask, getTaskCode } from '../../api/tasks';
 import { ApiError } from '../../api/errors';
 import { taskFixture, taskCodeFixture } from '../../test/fixtures/task';
+import { ToastProvider } from '../../components/Toast';
 
 vi.mock('../../context/Useauth', () => ({
   useAuth: () => ({
@@ -22,11 +23,13 @@ vi.mock('../../api/tasks');
 
 function renderTaskPage(taskId = 't1') {
   return render(
-    <MemoryRouter initialEntries={[`/tasks/${taskId}`]}>
-      <Routes>
-        <Route path="/tasks/:taskId" element={<TaskPage />} />
-      </Routes>
-    </MemoryRouter>
+    <ToastProvider>
+      <MemoryRouter initialEntries={[`/tasks/${taskId}`]}>
+        <Routes>
+          <Route path="/tasks/:taskId" element={<TaskPage />} />
+        </Routes>
+      </MemoryRouter>
+    </ToastProvider>
   );
 }
 
@@ -41,7 +44,7 @@ describe('TaskPage', () => {
 
     renderTaskPage();
 
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Loading task' })).toBeInTheDocument();
   });
 
   it('shows a not-found state for a NOT_FOUND error', async () => {

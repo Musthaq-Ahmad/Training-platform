@@ -1,0 +1,74 @@
+.container {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(360px, calc(100vw - 32px));
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  background-color: var(--color-bg-card);
+  color: var(--color-text-primary);
+  box-shadow: 0 8px 24px var(--color-overlay-scrim);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toast {
+    animation: toast-slide-in 160ms ease-out;
+  }
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.dismissButton {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.dismissButton:hover {
+  color: var(--color-text-primary);
+}
+
+.info {
+  background-color: var(--color-bg-card);
+}
+
+.success {
+  border-left-color: var(--color-status-success);
+}
+
+.warning {
+  background-color: var(--color-status-warning-bg);
+  border-left-color: var(--color-status-warning);
+  color: var(--color-text-primary);
+}
+
+.error {
+  background-color: var(--color-status-error-tint);
+  border-left-color: var(--color-status-error-icon);
+  color: var(--color-text-primary);
+}

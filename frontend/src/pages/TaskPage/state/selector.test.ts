@@ -7,7 +7,10 @@ import {
   selectActiveFile,
   selectHtmlEntry,
   selectFileCount,
+  selectVisiblePaths,
+  selectOversizedPath,
 } from './selectors';
+import { workspaceReducer } from './workspaceReducer';
 import { initWorkspace } from './initWorkspace';
 import { taskCodeFixture } from '../../../test/fixtures/task';
 
@@ -51,6 +54,32 @@ describe('selectors', () => {
     expect(paths).toContain('test.spec.js');
   });
 
+  it('selectFilesForSave skips ignored paths', () => {
+    const state = {
+      ...baseState(),
+      files: {
+        ...baseState().files,
+        'node_modules/a.js': 'x',
+        'package-lock.json': '{}',
+      },
+    };
+    const paths = selectFilesForSave(state).map((f) => f.path);
+    expect(paths).not.toContain('node_modules/a.js');
+    expect(paths).not.toContain('package-lock.json');
+  });
+
+  it('selectOversizedPath finds a file over the character limit', () => {
+    const state = {
+      ...baseState(),
+      files: { ...baseState().files, 'huge.js': 'a'.repeat(200_001) },
+    };
+    expect(selectOversizedPath(state)).toBe('huge.js');
+  });
+
+  it('selectOversizedPath returns null when nothing is too large', () => {
+    expect(selectOversizedPath(baseState())).toBeNull();
+  });
+
   it('selectSaveSnapshot mirrors selectFilesForSave as a record', () => {
     const state = baseState();
     const snapshot = selectSaveSnapshot(state);
@@ -87,10 +116,34 @@ describe('selectors', () => {
     expect(selectHtmlEntry(state)).toBeNull();
   });
 
-  it('selectFileCount only counts files at the workspace root', () => {
+  it('selectFileCount counts every visible file, including nested ones', () => {
     const state = baseState();
     // fixture: services.html, styles.css, script.js, package.json, test.spec.js at root (5),
-    // plus assets/logo.svg and assets/banner-grid.svg nested
-    expect(selectFileCount(state)).toBe(5);
+    // plus assets/logo.svg and assets/banner-grid.svg nested (2) — none ignored
+    expect(selectFileCount(state)).toBe(7);
+  });
+
+  it('selectDirtyPaths treats a deleted file as dirty', () => {
+    const state = baseState();
+    const afterDelete = workspaceReducer(state, { type: 'fileDeleted', path: 'services.html' });
+    expect(selectDirtyPaths(afterDelete)).toContain('services.html');
+  });
+
+  it('nothing is dirty after saveSucceeded with a snapshot that omits the deleted file', () => {
+    const state = baseState();
+    const afterDelete = workspaceReducer(state, { type: 'fileDeleted', path: 'services.html' });
+    const afterSave = workspaceReducer(afterDelete, {
+      type: 'saveSucceeded',
+      snapshot: selectSaveSnapshot(afterDelete),
+    });
+    expect(selectDirtyPaths(afterSave)).toEqual([]);
+  });
+
+  it('selectVisiblePaths drops ignored paths like node_modules', () => {
+    const state = {
+      ...baseState(),
+      files: { ...baseState().files, 'node_modules/a.js': 'x' },
+    };
+    expect(selectVisiblePaths(state)).not.toContain('node_modules/a.js');
   });
 });
