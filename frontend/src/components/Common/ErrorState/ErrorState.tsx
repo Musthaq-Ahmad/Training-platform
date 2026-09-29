@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import styles from './ErrorState.module.css';
 
-export interface ErrorStateProps {
+interface ErrorStateProps {
   /** Short heading. */
   title?: string;
   /** Supporting text. Pass an empty string to hide it. */
