@@ -63,7 +63,4 @@ export const nodejsDay01: DayContent = {
   ],
   journalPrompt:
     'What did you learn about the Node.js runtime and project setup today? Describe how you structured your System Information CLI and handled command parsing, data collection, and testing.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

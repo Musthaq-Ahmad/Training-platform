@@ -59,7 +59,4 @@ export const prismaDay06: DayContent = {
   ],
   journalPrompt:
     'How did you design and enforce permissions for administrators, agents, and customers? Reflect on the permission matrix, ownership checks, and forbidden-access tests.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

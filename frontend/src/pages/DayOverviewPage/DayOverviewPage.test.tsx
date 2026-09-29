@@ -1,27 +1,31 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router';
-import type { DayContent, DayTask } from '@itp/types';
+import type { DayContent, DayTask, DayCurrentStatus, DayJournal } from '@itp/types';
 import type { ApiError } from '../../api/errors';
 import DayOverviewPage from './DayOverviewPage';
-import { getDayContent, getDayTasks } from '../../api/days';
-
-afterEach(() => {
-  cleanup();
-  vi.restoreAllMocks();
-});
+import { getDayTasks, getDayStatus, getDayJournal } from '../../api/days';
+import { mockDayContents } from '../../api/dayOverview';
 
 vi.mock('../../components/Header', () => ({
   default: () => <header>Header</header>,
 }));
 
 vi.mock('../../api/days', () => ({
-  getDayContent: vi.fn(),
   getDayTasks: vi.fn(),
+  getDayStatus: vi.fn(),
+  getDayJournal: vi.fn(),
 }));
 
-const mockGetDayContent = vi.mocked(getDayContent);
+// Day content is static in the page, so each test fills this object.
+vi.mock('../../api/dayOverview', () => ({
+  mockDayContents: {} as Record<string, DayContent>,
+}));
+
 const mockGetDayTasks = vi.mocked(getDayTasks);
+const mockGetDayStatus = vi.mocked(getDayStatus);
+const mockGetDayJournal = vi.mocked(getDayJournal);
+const days = mockDayContents;
 
 function makeApiError(code: string, message = code): ApiError {
   return Object.assign(new Error(message), { code }) as unknown as ApiError;
@@ -76,9 +80,7 @@ const baseDay: DayContent = {
     },
   ],
   journalPrompt: 'What was the hardest part today?',
-  journalResponse: '',
-  isCompleted: false,
-} as DayContent;
+};
 
 const baseTasks: DayTask[] = [
   {
@@ -104,52 +106,84 @@ const baseTasks: DayTask[] = [
   },
 ];
 
-function mockSuccess(day: DayContent = baseDay, tasks: DayTask[] = baseTasks) {
-  mockGetDayContent.mockResolvedValue(day);
+const baseStatus: DayCurrentStatus = { isLocked: false, isCompleted: false };
+const emptyJournal: DayJournal = { responseText: null };
+
+function setDay(day: DayContent = baseDay) {
+  days[day.dayId] = day;
+}
+
+function mockLoad(
+  tasks: DayTask[] = baseTasks,
+  status: DayCurrentStatus = baseStatus,
+  journal: DayJournal = emptyJournal
+) {
   mockGetDayTasks.mockResolvedValue(tasks);
+  mockGetDayStatus.mockResolvedValue(status);
+  mockGetDayJournal.mockResolvedValue(journal);
 }
 
 describe('DayOverviewPage', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    for (const key of Object.keys(days)) {
+      delete days[key];
+    }
+    // The page calls .catch() on the journal promise, so it must always return one.
+    mockGetDayJournal.mockResolvedValue(emptyJournal);
   });
 
   afterEach(() => {
+    cleanup();
     vi.restoreAllMocks();
   });
 
   it('shows a loading state while the requests are pending', () => {
-    mockGetDayContent.mockReturnValue(new Promise(() => {}));
+    setDay();
     mockGetDayTasks.mockReturnValue(new Promise(() => {}));
+    mockGetDayStatus.mockReturnValue(new Promise(() => {}));
+    mockGetDayJournal.mockReturnValue(new Promise(() => {}));
 
     renderWithDayId('day-01');
 
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('passes the dayId from the URL to the API unchanged', async () => {
-    mockSuccess();
+  it('fetches tasks, status and journal with the dayId from the URL, unchanged', async () => {
+    setDay();
+    mockLoad();
 
     renderWithDayId('day-01');
 
     await screen.findByText(baseDay.title);
-    expect(mockGetDayContent).toHaveBeenCalledWith('day-01');
     expect(mockGetDayTasks).toHaveBeenCalledWith('day-01');
+    expect(mockGetDayStatus).toHaveBeenCalledWith('day-01');
+    expect(mockGetDayJournal).toHaveBeenCalledWith('day-01');
+  });
+
+  it('shows a not-found message when the dayId has no day content, without calling the API', () => {
+    renderWithDayId('day-99');
+
+    expect(screen.getByRole('heading', { name: 'Day not found' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to Dashboard' })).toBeInTheDocument();
+    expect(mockGetDayTasks).not.toHaveBeenCalled();
+    expect(mockGetDayStatus).not.toHaveBeenCalled();
+    expect(mockGetDayJournal).not.toHaveBeenCalled();
   });
 
   it('shows a not-found message when the API returns NOT_FOUND', async () => {
-    mockGetDayContent.mockRejectedValue(makeApiError('NOT_FOUND'));
+    setDay();
     mockGetDayTasks.mockRejectedValue(makeApiError('NOT_FOUND'));
+    mockGetDayStatus.mockRejectedValue(makeApiError('NOT_FOUND'));
 
-    renderWithDayId('day-99');
+    renderWithDayId('day-01');
 
     expect(await screen.findByRole('heading', { name: 'Day not found' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Back to Dashboard' })).toBeInTheDocument();
   });
 
-  it('shows a locked message when the API returns DAY_LOCKED, without rendering content', async () => {
-    mockGetDayContent.mockRejectedValue(makeApiError('DAY_LOCKED'));
-    mockGetDayTasks.mockRejectedValue(makeApiError('DAY_LOCKED'));
+  it('shows a locked message when the status says the day is locked', async () => {
+    setDay();
+    mockLoad(baseTasks, { ...baseStatus, isLocked: true });
 
     renderWithDayId('day-01');
 
@@ -158,20 +192,35 @@ describe('DayOverviewPage', () => {
     expect(screen.queryByText(baseDay.title)).not.toBeInTheDocument();
   });
 
-  it('renders no day content for an unexpected error', async () => {
-    mockGetDayContent.mockRejectedValue(makeApiError('SERVER_ERROR'));
-    mockGetDayTasks.mockRejectedValue(makeApiError('SERVER_ERROR'));
+  it('shows a locked message when the API returns DAY_LOCKED', async () => {
+    setDay();
+    mockGetDayTasks.mockRejectedValue(makeApiError('DAY_LOCKED'));
+    mockGetDayStatus.mockResolvedValue(baseStatus);
 
     renderWithDayId('day-01');
 
-    await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
+    expect(await screen.findByRole('heading', { name: 'This day is locked' })).toBeInTheDocument();
+    expect(screen.queryByText(baseDay.title)).not.toBeInTheDocument();
+  });
+
+  it('shows an error message for an unexpected API error', async () => {
+    setDay();
+    mockGetDayTasks.mockRejectedValue(makeApiError('SERVER_ERROR'));
+    mockGetDayStatus.mockRejectedValue(makeApiError('SERVER_ERROR'));
+
+    renderWithDayId('day-01');
+
+    expect(
+      await screen.findByRole('heading', { name: "Couldn't load this day" })
+    ).toBeInTheDocument();
     expect(screen.queryByText(baseDay.title)).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Day not found' })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'This day is locked' })).not.toBeInTheDocument();
   });
 
   it('renders day content and counts only completed, non-stretch tasks', async () => {
-    mockSuccess();
+    setDay();
+    mockLoad();
 
     renderWithDayId('day-01');
 
@@ -181,8 +230,29 @@ describe('DayOverviewPage', () => {
     expect(screen.getByRole('button', { name: /tasks \(1\/2\)/i })).toBeInTheDocument();
   });
 
+  it('pre-fills the journal with the saved response', async () => {
+    setDay();
+    mockLoad(baseTasks, baseStatus, { responseText: 'Saved earlier' });
+
+    renderWithDayId('day-01');
+
+    expect(await screen.findByRole('textbox')).toHaveValue('Saved earlier');
+  });
+
+  it('still renders the day when the journal request fails', async () => {
+    setDay();
+    mockLoad();
+    mockGetDayJournal.mockRejectedValue(makeApiError('SERVER_ERROR'));
+
+    renderWithDayId('day-01');
+
+    expect(await screen.findByText(baseDay.title)).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toHaveValue('');
+  });
+
   it('navigates to the references page when References is clicked', async () => {
-    mockSuccess();
+    setDay();
+    mockLoad();
 
     renderWithDayId('day-01');
 
@@ -194,7 +264,8 @@ describe('DayOverviewPage', () => {
 
   it('closes the task modal and logs the task id when a task is selected', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    mockSuccess();
+    setDay();
+    mockLoad();
 
     renderWithDayId('day-01');
 
@@ -210,7 +281,8 @@ describe('DayOverviewPage', () => {
 
   it('marks the journal as saved after the save handler is called', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    mockSuccess();
+    setDay();
+    mockLoad();
 
     renderWithDayId('day-01');
 
@@ -226,10 +298,8 @@ describe('DayOverviewPage', () => {
 
   it('enables Submit Day when all required tasks are completed and handles the click', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    mockSuccess(
-      baseDay,
-      baseTasks.map((t): DayTask => ({ ...t, status: 'completed' }))
-    );
+    setDay();
+    mockLoad(baseTasks.map((t): DayTask => ({ ...t, status: 'completed' })));
 
     renderWithDayId('day-01');
 
@@ -242,10 +312,23 @@ describe('DayOverviewPage', () => {
   });
 
   it('disables Submit Day while required tasks are incomplete', async () => {
-    mockSuccess();
+    setDay();
+    mockLoad();
 
     renderWithDayId('day-01');
 
     expect(await screen.findByRole('button', { name: /submit day/i })).toBeDisabled();
+  });
+
+  it('disables Submit Day when the day is already completed', async () => {
+    setDay();
+    mockLoad(
+      baseTasks.map((t): DayTask => ({ ...t, status: 'completed' })),
+      { ...baseStatus, isCompleted: true }
+    );
+
+    renderWithDayId('day-01');
+
+    expect(await screen.findByRole('button', { name: /day completed/i })).toBeDisabled();
   });
 });

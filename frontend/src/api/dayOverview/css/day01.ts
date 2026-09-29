@@ -68,7 +68,4 @@ export const cssDay01: DayContent = {
   ],
   journalPrompt:
     'Why is box-sizing: border-box almost always the better choice? When would you not use it?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

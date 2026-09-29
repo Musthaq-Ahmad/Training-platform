@@ -59,7 +59,4 @@ export const reactDay10: DayContent = {
   ],
   journalPrompt:
     "What did you learn while testing the React application from a user's perspective? Reflect on accessible queries, realistic interactions, API mocking, and the different UI behaviours you tested.",
-  journalResponse: null,
-  isLocked: true,
-  isCompleted: false,
 };

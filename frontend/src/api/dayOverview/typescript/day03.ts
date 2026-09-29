@@ -88,7 +88,4 @@ export const tsDay03: DayContent = {
   ],
   journalPrompt:
     'When should you use interface vs type alias vs abstract class? Write a decision tree.\n\nTypeScript private vs JavaScript #private — what is the practical difference and when does it matter?\n\nWhat is one thing you want to look up more deeply tomorrow?',
-  journalResponse: null,
-  isLocked: true,
-  isCompleted: false,
 };

@@ -51,7 +51,7 @@ export default function DayCompletion({
         >
           <polyline points="20 6 9 17 4 12" />
         </svg>
-        <span>{isCompleted ? 'DAY SUBMITTED' : 'SUBMIT DAY'}</span>
+        <span>{isCompleted ? 'Day completed' : 'SUBMIT DAY'}</span>
       </button>
     </section>
   );

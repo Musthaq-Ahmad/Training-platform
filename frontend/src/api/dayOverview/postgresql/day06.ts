@@ -58,7 +58,4 @@ export const postgresqlDay06: DayContent = {
   ],
   journalPrompt:
     'What changed when you replaced file storage with PostgreSQL? Reflect on connection configuration, repository design, parameterised queries, and database failure handling.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

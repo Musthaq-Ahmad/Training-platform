@@ -65,7 +65,4 @@ export const nodejsDay05: DayContent = {
   ],
   journalPrompt:
     'Reflect on your Support Ticket API assessment. How did you break down the requirements, plan the implementation, handle validation, and verify your work through tests and documentation?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

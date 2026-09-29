@@ -66,7 +66,4 @@ export const nodejsDay04: DayContent = {
   ],
   journalPrompt:
     'How did refactoring the Task API into Express change the structure of your application? Explain how you separated responsibilities and handled middleware, logging, and centralized errors.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

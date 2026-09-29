@@ -60,7 +60,4 @@ export const postgresqlDay05: DayContent = {
   ],
   journalPrompt:
     'Reflect on your Equipment Booking System database assessment. How did you translate the requirements into a schema, implement the queries and transaction, and validate your work from a clean database?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

@@ -60,7 +60,4 @@ export const reactDay05: DayContent = {
   ],
   journalPrompt:
     'Reflect on your Employee Leave Request assessment. How did you plan the components, implement state and validation, handle UI states, and ensure the interface was responsive and accessible?',
-  journalResponse: null,
-  isLocked: true,
-  isCompleted: false,
 };

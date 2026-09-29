@@ -60,7 +60,4 @@ export const prismaDay05: DayContent = {
   ],
   journalPrompt:
     'How did you implement authentication in the ticket system? Reflect on password hashing, access tokens, protected routes, and preventing information leakage.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

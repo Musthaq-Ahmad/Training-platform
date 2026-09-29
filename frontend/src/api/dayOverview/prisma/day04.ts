@@ -61,7 +61,4 @@ export const prismaDay04: DayContent = {
   ],
   journalPrompt:
     'How did you approach modifying an unfamiliar repository? Reflect on tracing the request flow, impact analysis, implementing comments and status history, and preparing your pull request.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

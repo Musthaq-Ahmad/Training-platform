@@ -68,7 +68,4 @@ export const htmlDay02: DayContent = {
   ],
   journalPrompt:
     'A screen reader user cannot see your page. What would their experience be of the blog page you built today?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

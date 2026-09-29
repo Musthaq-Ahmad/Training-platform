@@ -56,7 +56,4 @@ export const postgresqlDay03: DayContent = {
   ],
   journalPrompt:
     'Which SQL report did you find most challenging to build? Explain how you selected joins, applied grouping and filters, and verified the results.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

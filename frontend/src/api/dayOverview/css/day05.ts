@@ -67,7 +67,4 @@ export const cssDay05: DayContent = {
     },
   ],
   journalPrompt: 'Which page was hardest to style and why?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

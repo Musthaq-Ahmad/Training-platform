@@ -67,7 +67,4 @@ export const htmlDay05: DayContent = {
     },
   ],
   journalPrompt: 'Which page was hardest to build and why?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

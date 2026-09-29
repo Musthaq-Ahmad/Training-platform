@@ -58,7 +58,4 @@ export const reactDay02: DayContent = {
   ],
   journalPrompt:
     'How did you use props, lists, and conditional rendering to build the Issue List? Reflect on stable keys, reusable components, and the different UI states you handled.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

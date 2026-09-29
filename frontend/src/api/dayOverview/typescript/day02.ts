@@ -88,7 +88,4 @@ export const tsDay02: DayContent = {
   ],
   journalPrompt:
     'What is the difference between Partial<T> and Optional? How does Partial actually work under the hood?\n\nWhen would you use a discriminated union instead of inheritance? Give a concrete example.\n\nWhat is one thing you want to look up more deeply tomorrow?',
-  journalResponse: null,
-  isLocked: true,
-  isCompleted: false,
 };

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import type { DayTask, DayContent } from '@itp/types';
-import { getDayTasks, getDayContent } from '../../api/days';
+import type { DayTask, DayContent, DayCurrentStatus } from '@itp/types';
+import { getDayTasks, getDayStatus, getDayJournal } from '../../api/days';
+import { mockDayContents } from '../../api/dayOverview';
 import DaySummary from '../../components/DaySummary/DaySummary';
 import LessonSummary from '../../components/LessonSummary/LessonSummary';
 import LearningObjectives from '../../components/LearningObjectives/LearningObjectives';
@@ -16,7 +17,8 @@ import StateMessage from '../../components/StateMessage';
 import { ApiError } from '../../api/errors';
 
 type LoadResult =
-  { dayId: string; day: DayContent; tasks: DayTask[] } | { dayId: string; error: ApiError };
+  | { dayId: string; tasks: DayTask[]; status: DayCurrentStatus; journalResponse: string }
+  | { dayId: string; error: ApiError };
 
 export default function DayOverviewPage() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -28,14 +30,25 @@ export default function DayOverviewPage() {
   const { dayId } = useParams();
   const navigate = useNavigate();
 
+  // Static curriculum content. TODO: replace with an API call when a day endpoint exists.
+  const day: DayContent | undefined = dayId ? mockDayContents[dayId] : undefined;
+  const shouldLoad = Boolean(dayId && day);
+
   // Hooks must run before any early return.
   useEffect(() => {
-    if (!dayId) return;
+    if (!dayId || !shouldLoad) return;
     let isCancelled = false; // ignore late responses after navigating away
 
-    Promise.all([getDayContent(dayId), getDayTasks(dayId)])
-      .then(([day, tasks]) => {
-        if (!isCancelled) setResult({ dayId, day, tasks });
+    Promise.all([
+      getDayTasks(dayId),
+      getDayStatus(dayId),
+      // A journal failure is not fatal: the page still renders with an empty journal.
+      getDayJournal(dayId).catch(() => ({ responseText: null })),
+    ])
+      .then(([tasks, status, journal]) => {
+        if (!isCancelled) {
+          setResult({ dayId, tasks, status, journalResponse: journal.responseText ?? '' });
+        }
       })
       .catch((error: ApiError) => {
         if (!isCancelled) setResult({ dayId, error });
@@ -44,27 +57,17 @@ export default function DayOverviewPage() {
     return () => {
       isCancelled = true;
     };
-  }, [dayId]);
+  }, [dayId, shouldLoad]);
 
-  // Only trust a result that belongs to the current dayId; otherwise we're loading.
+  // Only trust a result that belongs to the current dayId.
   const current = result && result.dayId === dayId ? result : null;
-  const isLoading = Boolean(dayId) && current === null;
   const error = current && 'error' in current ? current.error : null;
-  const day = current && 'day' in current ? current.day : null;
   const tasks = current && 'tasks' in current ? current.tasks : [];
+  const status = current && 'status' in current ? current.status : null;
+  const journalResponse = current && 'journalResponse' in current ? current.journalResponse : '';
+  const isLoading = shouldLoad && current === null;
 
-  if (isLoading) {
-    return (
-      <>
-        <Header />
-        <main className={styles.dayOverview}>
-          <p>Loading...</p>
-        </main>
-      </>
-    );
-  }
-
-  if (error?.code === 'NOT_FOUND' || (!error && !day)) {
+  if (!day || error?.code === 'NOT_FOUND') {
     return (
       <>
         <Header />
@@ -81,7 +84,18 @@ export default function DayOverviewPage() {
     );
   }
 
-  if (error?.code === 'DAY_LOCKED') {
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <main className={styles.dayOverview}>
+          <p>Loading...</p>
+        </main>
+      </>
+    );
+  }
+
+  if (status?.isLocked || error?.code === 'DAY_LOCKED') {
     return (
       <>
         <Header />
@@ -98,7 +112,22 @@ export default function DayOverviewPage() {
     );
   }
 
-  if (!day) return null;
+  if (error || !status) {
+    return (
+      <>
+        <Header />
+        <main className={styles.dayOverview}>
+          <StateMessage
+            icon="⚠️"
+            title="Couldn't load this day"
+            description="Something went wrong while loading your progress. Please try again."
+            actionLabel="Back to Dashboard"
+            actionHref="/"
+          />
+        </main>
+      </>
+    );
+  }
 
   const completedTasks = tasks.filter(
     (task) => task.status === 'completed' && !task.isStretchGoal
@@ -135,7 +164,7 @@ export default function DayOverviewPage() {
 
             <DailyJournal
               prompt={day.journalPrompt}
-              initialResponse={day.journalResponse}
+              initialResponse={journalResponse}
               isSaving={isSavingJournal}
               isSaved={isJournalSaved}
               onSave={(responseText) => {
@@ -149,7 +178,7 @@ export default function DayOverviewPage() {
         <DayCompletion
           completedTasks={completedTasks}
           totalTasks={requiredTasks}
-          isCompleted={day.isCompleted}
+          isCompleted={status.isCompleted}
           onComplete={() => {
             console.log('Submit Day clicked');
           }}

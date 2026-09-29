@@ -65,7 +65,4 @@ export const nodejsDay03: DayContent = {
   ],
   journalPrompt:
     'How did you turn the Task Manager into an HTTP API? Reflect on your route design, HTTP methods, status codes, request validation, and how you avoided duplicating response-writing logic.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

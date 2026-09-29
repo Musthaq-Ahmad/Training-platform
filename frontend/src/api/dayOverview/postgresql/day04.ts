@@ -59,7 +59,4 @@ export const postgresqlDay04: DayContent = {
   ],
   journalPrompt:
     'How did you ensure that ticket reassignment remained consistent when an operation failed? Reflect on your transaction, rollback test, and index performance comparison.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

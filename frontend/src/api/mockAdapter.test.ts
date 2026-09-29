@@ -5,17 +5,34 @@ import type {
   TaskCodeResponse,
   TaskResponse,
   TraineeDatabaseResponse,
-  DayContent,
   DayTask,
+  DayCurrentStatus,
+  DayJournal,
 } from '@itp/types';
 import { installMockAdapter } from './mockAdapter';
 import { mockDayContents } from './dayOverview';
 import { mockTasksByDay } from '../test/fixtures/dayTasks';
+import { mockJournalByDay, mockStatusByDay } from '../test/fixtures/dayStatus';
 
 function createClient() {
   const client = axios.create();
   installMockAdapter(client);
   return client;
+}
+
+// Lock state now lives in mockStatusByDay, not on the day content.
+function findUnlockedDayId(): string {
+  const dayId = Object.keys(mockDayContents).find(
+    (id) => mockStatusByDay[id] && !mockStatusByDay[id].isLocked
+  );
+  if (!dayId) throw new Error('No unlocked day fixture found');
+  return dayId;
+}
+
+function findLockedDayId(): string {
+  const dayId = Object.keys(mockDayContents).find((id) => mockStatusByDay[id]?.isLocked);
+  if (!dayId) throw new Error('No locked day fixture found');
+  return dayId;
 }
 
 describe('mockAdapter', () => {
@@ -63,59 +80,68 @@ describe('mockAdapter', () => {
     expect(third.data.status).toBe('ready');
   });
 
-  it('returns day content for GET /days/:dayId', async () => {
-    const dayId = Object.keys(mockDayContents).find((id) => !mockDayContents[id].isLocked);
+  describe('days', () => {
+    it('returns tasks for GET /days/:dayId/tasks', async () => {
+      const dayId = findUnlockedDayId();
 
-    if (!dayId) throw new Error('No unlocked day fixture found');
+      const res = await client.get<DayTask[]>(`/days/${dayId}/tasks`);
 
-    const res = await client.get<DayContent>(`/days/${dayId}`);
-
-    expect(res.status).toBe(200);
-    expect(res.data).toEqual(mockDayContents[dayId]);
-  });
-
-  it('returns tasks for GET /days/:dayId/tasks', async () => {
-    const dayId = Object.keys(mockDayContents).find((id) => !mockDayContents[id].isLocked);
-
-    if (!dayId) throw new Error('No unlocked day fixture found');
-
-    const res = await client.get<DayTask[]>(`/days/${dayId}/tasks`);
-
-    expect(res.status).toBe(200);
-    expect(res.data).toEqual(mockTasksByDay[dayId] ?? []);
-  });
-
-  it('rejects GET /days/missing/tasks with 404 NOT_FOUND', async () => {
-    await expect(client.get('/days/missing/tasks')).rejects.toMatchObject({
-      response: {
-        status: 404,
-        data: { error: { code: 'NOT_FOUND' } },
-      },
+      expect(res.status).toBe(200);
+      expect(res.data).toEqual(mockTasksByDay[dayId] ?? []);
     });
-  });
-  it('rejects GET /days/:dayId with 403 DAY_LOCKED for a locked day', async () => {
-    const dayId = Object.keys(mockDayContents).find((id) => mockDayContents[id].isLocked);
 
-    if (!dayId) throw new Error('No locked day fixture found');
-
-    await expect(client.get(`/days/${dayId}`)).rejects.toMatchObject({
-      response: {
-        status: 403,
-        data: { error: { code: 'DAY_LOCKED' } },
-      },
+    it('rejects GET /days/missing/tasks with 404 NOT_FOUND', async () => {
+      await expect(client.get('/days/missing/tasks')).rejects.toMatchObject({
+        response: { status: 404, data: { error: { code: 'NOT_FOUND' } } },
+      });
     });
-  });
 
-  it('rejects GET /days/:dayId/tasks with 403 DAY_LOCKED for a locked day', async () => {
-    const dayId = Object.keys(mockDayContents).find((id) => mockDayContents[id].isLocked);
+    it('rejects GET /days/:dayId/tasks with 403 DAY_LOCKED for a locked day', async () => {
+      const dayId = findLockedDayId();
 
-    if (!dayId) throw new Error('No locked day fixture found');
+      await expect(client.get(`/days/${dayId}/tasks`)).rejects.toMatchObject({
+        response: { status: 403, data: { error: { code: 'DAY_LOCKED' } } },
+      });
+    });
 
-    await expect(client.get(`/days/${dayId}/tasks`)).rejects.toMatchObject({
-      response: {
-        status: 403,
-        data: { error: { code: 'DAY_LOCKED' } },
-      },
+    it('returns the status for GET /days/:dayId/status', async () => {
+      const dayId = findUnlockedDayId();
+
+      const res = await client.get<DayCurrentStatus>(`/days/${dayId}/status`);
+
+      expect(res.status).toBe(200);
+      expect(res.data).toEqual(mockStatusByDay[dayId]);
+    });
+
+    it('returns the status with isLocked: true for a locked day instead of an error', async () => {
+      const dayId = findLockedDayId();
+
+      const res = await client.get<DayCurrentStatus>(`/days/${dayId}/status`);
+
+      expect(res.status).toBe(200);
+      expect(res.data.isLocked).toBe(true);
+    });
+
+    it('rejects GET /days/missing/status with 404 NOT_FOUND', async () => {
+      await expect(client.get('/days/missing/status')).rejects.toMatchObject({
+        response: { status: 404, data: { error: { code: 'NOT_FOUND' } } },
+      });
+    });
+
+    it('returns the journal for GET /days/:dayId/journal', async () => {
+      const dayId = findUnlockedDayId();
+
+      const res = await client.get<DayJournal>(`/days/${dayId}/journal`);
+
+      expect(res.status).toBe(200);
+      expect(res.data).toEqual(mockJournalByDay[dayId] ?? { responseText: null });
+    });
+
+    it('returns an empty journal, not a 404, when the day has no journal row yet', async () => {
+      const res = await client.get<DayJournal>('/days/no-journal-yet/journal');
+
+      expect(res.status).toBe(200);
+      expect(res.data).toEqual({ responseText: null });
     });
   });
 });

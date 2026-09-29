@@ -57,7 +57,4 @@ export const reactDay09: DayContent = {
   ],
   journalPrompt:
     'How did you manage authentication state and protect pages in React? Reflect on authentication context, session restoration, logout, protected routes, and role-aware navigation.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

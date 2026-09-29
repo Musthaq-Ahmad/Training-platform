@@ -57,7 +57,4 @@ export const prismaDay08: DayContent = {
   ],
   journalPrompt:
     'How did you make the API easier for another developer to operate? Reflect on structured logging, request IDs, health checks, API documentation, and verifying the setup from a clean directory.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

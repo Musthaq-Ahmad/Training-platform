@@ -82,7 +82,4 @@ export const jsDay05: DayContent = {
   ],
   journalPrompt:
     'What was the hardest JavaScript concept this week? Write a two-paragraph explanation in your own words. Which feature of your site are you most proud of, and why?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

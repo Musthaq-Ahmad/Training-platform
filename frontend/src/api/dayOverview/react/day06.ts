@@ -58,7 +58,4 @@ export const reactDay06: DayContent = {
   ],
   journalPrompt:
     'How did you turn the React components into a navigable application? Reflect on route structure, nested layouts, route parameters, active navigation, and direct URL testing.',
-  journalResponse: null,
-  isLocked: true,
-  isCompleted: false,
 };

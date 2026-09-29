@@ -67,7 +67,4 @@ export const cssDay03: DayContent = {
     },
   ],
   journalPrompt: 'When would you choose CSS Grid instead of Flexbox?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

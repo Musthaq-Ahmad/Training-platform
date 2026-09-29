@@ -56,7 +56,4 @@ export const reactDay03: DayContent = {
   ],
   journalPrompt:
     'How did you make the issue screen interactive? Reflect on state design, controlled inputs, derived filtered data, immutable updates, and the interactions you tested.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

@@ -67,7 +67,4 @@ export const cssDay02: DayContent = {
     },
   ],
   journalPrompt: 'What is the difference between the main axis and cross axis in Flexbox?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

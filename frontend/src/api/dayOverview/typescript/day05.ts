@@ -86,7 +86,4 @@ export const tsDay05: DayContent = {
   ],
   journalPrompt:
     'After five weeks, what is the single most important habit you have developed as a programmer?\n\nIf you were teaching Week 1 to the next cohort, what would you emphasise that you wish you had known on Day 1?\n\nWhat is one thing you want to look up more deeply tomorrow?',
-  journalResponse: null,
-  isLocked: true,
-  isCompleted: false,
 };

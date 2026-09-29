@@ -67,7 +67,4 @@ export const htmlDay04: DayContent = {
     },
   ],
   journalPrompt: 'Why do responsive images matter for performance, not just design?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

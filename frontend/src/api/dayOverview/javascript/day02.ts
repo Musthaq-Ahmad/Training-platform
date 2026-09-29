@@ -81,7 +81,4 @@ export const jsDay02: DayContent = {
   ],
   journalPrompt:
     'What is the difference between event.target and event.currentTarget? Give an example where they differ. Why is one delegated listener on a parent better than one listener per child?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

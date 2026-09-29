@@ -84,7 +84,4 @@ export const jsDay10: DayContent = {
   ],
   journalPrompt:
     'After building your own mini SPA, what problems do React and Vue actually solve? Which parts were hardest? What would you add with one more week? What technical debt did you leave behind? What is one thing you want to look up more deeply tomorrow?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

@@ -61,7 +61,4 @@ export const postgresqlDay02: DayContent = {
   ],
   journalPrompt:
     'What did you learn about enforcing business rules at the database level? Reflect on the CRUD queries, constraints, and invalid-data cases you tested.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

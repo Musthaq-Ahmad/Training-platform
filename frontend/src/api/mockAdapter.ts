@@ -26,6 +26,7 @@ import {
 import { mockUser } from '../test/fixtures/user';
 
 import { mockTasksByDay } from '../test/fixtures/dayTasks';
+import { mockStatusByDay, mockJournalByDay } from '../test/fixtures/dayStatus';
 import { mockDayContents } from './dayOverview';
 
 const MOCK_DELAY_MS = 300;
@@ -134,7 +135,8 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   const submitMatch = /^\/tasks\/([^/]+)\/submit$/.exec(url);
   const activityMatch = /^\/activity\/([^/]+)\/events$/.exec(url);
   const dayTasksMatch = /^\/days\/([^/]+)\/tasks$/.exec(url);
-  const dayMatch = /^\/days\/([^/]+)$/.exec(url);
+  const dayStatusMatch = /^\/days\/([^/]+)\/status$/.exec(url);
+  const dayJournalMatch = /^\/days\/([^/]+)\/journal$/.exec(url);
 
   if (method === 'get' && codeMatch) {
     const taskId = codeMatch[1];
@@ -200,23 +202,29 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   if (method === 'get' && url === '/auth/me') {
     return respond(config, 200, mockUser);
   }
+
   if (method === 'get' && dayTasksMatch) {
     const dayId = dayTasksMatch[1];
-    const day = mockDayContents[dayId];
-    if (!day) return errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
-    if (day.isLocked) {
+    if (!mockDayContents[dayId]) return errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
+    if (mockStatusByDay[dayId]?.isLocked) {
       return errorResponse(config, 403, 'DAY_LOCKED', "This day isn't unlocked yet.");
     }
     return respond(config, 200, mockTasksByDay[dayId] ?? []);
   }
 
-  if (method === 'get' && dayMatch) {
-    const day = mockDayContents[dayMatch[1]];
-    if (!day) return errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
-    if (day.isLocked) {
-      return errorResponse(config, 403, 'DAY_LOCKED', "This day isn't unlocked yet.");
+  if (method === 'get' && dayStatusMatch) {
+    const dayId = dayStatusMatch[1];
+    const status = mockStatusByDay[dayId];
+    if (!mockDayContents[dayId] || !status) {
+      return errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
     }
-    return respond(config, 200, day);
+    return respond(config, 200, status);
+  }
+
+  if (method === 'get' && dayJournalMatch) {
+    // No journal row yet is normal for a new trainee: return an empty response, not a 404.
+    const journal = mockJournalByDay[dayJournalMatch[1]] ?? { responseText: null };
+    return respond(config, 200, journal);
   }
 
   return errorResponse(config, 404, 'NOT_FOUND', 'Not found.');

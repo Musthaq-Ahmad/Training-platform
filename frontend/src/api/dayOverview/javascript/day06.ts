@@ -84,7 +84,4 @@ export const jsDay06: DayContent = {
   ],
   journalPrompt:
     'The Observer pattern and event listeners are both ways to react to changes. How are they different, and when would you choose one over the other? What would a codebase look like if no one used design patterns? Give a specific example of the problem each solves. What is one thing you want to look up more deeply tomorrow?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

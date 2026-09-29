@@ -59,7 +59,4 @@ export const reactDay04: DayContent = {
   ],
   journalPrompt:
     'What challenges did you face while building the issue forms? Reflect on controlled fields, validation, accessible error messages, submit states, and unsaved-change handling.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

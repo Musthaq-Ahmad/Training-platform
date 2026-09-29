@@ -67,7 +67,4 @@ export const cssDay04: DayContent = {
     },
   ],
   journalPrompt: 'What is the difference between a CSS transition and a CSS animation?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

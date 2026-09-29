@@ -86,7 +86,4 @@ export const tsDay04: DayContent = {
   ],
   journalPrompt:
     'What was the hardest migration error today? Describe the error and three options you considered.\n\nWhy are type-only imports a performance optimisation for large TypeScript codebases?\n\nWhat is one thing you want to look up more deeply tomorrow?',
-  journalResponse: null,
-  isLocked: true,
-  isCompleted: false,
 };

@@ -83,7 +83,4 @@ export const jsDay01: DayContent = {
   ],
   journalPrompt:
     'What is the difference between == and === in JavaScript? Give an example where == gives a surprising result. Then explain closure in plain English to a non-programmer, and say what problem it solves.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

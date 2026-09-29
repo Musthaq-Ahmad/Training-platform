@@ -57,7 +57,4 @@ export const prismaDay03: DayContent = {
   ],
   journalPrompt:
     'What did you learn while building the backend test suite? Reflect on test isolation, test data setup, the arrange-act-assert structure, and the failure cases you covered.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

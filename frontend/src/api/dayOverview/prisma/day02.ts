@@ -60,7 +60,4 @@ export const prismaDay02: DayContent = {
   ],
   journalPrompt:
     'How did you enhance GET /tickets with pagination, filtering, and sorting? Reflect on query validation, database-level pagination, metadata, and edge cases you tested.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

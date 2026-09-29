@@ -60,7 +60,4 @@ export const reactDay08: DayContent = {
   ],
   journalPrompt:
     'How did custom hooks help you separate reusable behaviour from UI? Reflect on the hooks you created, effect dependencies, cleanup, and how you verified their behaviour.',
-  journalResponse: null,
-  isLocked: true,
-  isCompleted: false,
 };

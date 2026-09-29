@@ -84,7 +84,4 @@ export const jsDay09: DayContent = {
   ],
   journalPrompt:
     'What is layout thrashing and what specifically causes it? Draw the browser rendering pipeline. When should you use a Web Worker? What are its limitations? What is one thing you want to look up more deeply tomorrow?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

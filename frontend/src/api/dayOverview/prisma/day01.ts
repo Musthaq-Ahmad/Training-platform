@@ -58,7 +58,4 @@ export const prismaDay01: DayContent = {
   ],
   journalPrompt:
     'How did Prisma change the way you manage the database schema and repository queries? Reflect on models, migrations, seed data, and the generated SQL you inspected.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

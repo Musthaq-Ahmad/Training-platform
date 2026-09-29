@@ -32,9 +32,6 @@ export interface DayContent {
   learningObjectives: LearningObjective[];
   selfCheckItems: SelfCheckItem[];
   journalPrompt: string;
-  journalResponse: string | null;
-  isLocked: boolean;
-  isCompleted: boolean;
 }
 export interface DailyJournalProps {
   prompt: string;
@@ -42,4 +39,13 @@ export interface DailyJournalProps {
   isSaving: boolean;
   isSaved: boolean;
   onSave: (responseText: string) => void;
+}
+
+export interface DayCurrentStatus {
+  isLocked: boolean;
+  isCompleted: boolean;
+}
+
+export interface DayJournal {
+  responseText: string | null;
 }

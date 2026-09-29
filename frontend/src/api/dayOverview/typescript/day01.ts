@@ -88,7 +88,4 @@ export const tsDay01: DayContent = {
   ],
   journalPrompt:
     'What is the difference between any and unknown in TypeScript? When would you use unknown?\n\nWhat is the temporal dead zone in JavaScript, and how does TypeScript help prevent similar bugs through static analysis?\n\nWhat is one thing you want to look up more deeply tomorrow?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

@@ -82,7 +82,4 @@ export const jsDay03: DayContent = {
   ],
   journalPrompt:
     "What is the difference between a class method and a class field arrow function, and when does the difference matter? Why does immutable state make code easier to debug? Give a specific example from today's work.",
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

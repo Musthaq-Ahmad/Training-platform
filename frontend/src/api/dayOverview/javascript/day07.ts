@@ -84,7 +84,4 @@ export const jsDay07: DayContent = {
   ],
   journalPrompt:
     'What is a Service Worker? Why does it run in a separate thread, and why does that matter for performance? When would you store data in IndexedDB instead of localStorage? Give two specific scenarios. What is one thing you want to look up more deeply tomorrow?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

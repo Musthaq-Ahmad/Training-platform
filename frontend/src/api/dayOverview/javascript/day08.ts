@@ -86,7 +86,4 @@ export const jsDay08: DayContent = {
   ],
   journalPrompt:
     'What should you test: implementation (how) or behaviour (what)? Why does the distinction matter? What is the difference between a mock, a stub, and a spy? Give a code example of each. What is one thing you want to look up more deeply tomorrow?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

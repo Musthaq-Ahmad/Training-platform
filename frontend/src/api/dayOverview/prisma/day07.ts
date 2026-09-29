@@ -58,7 +58,4 @@ export const prismaDay07: DayContent = {
   ],
   journalPrompt:
     'What security risks did you identify during your API review? Reflect on the protections you implemented, the tests you added, and the risks that remain.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

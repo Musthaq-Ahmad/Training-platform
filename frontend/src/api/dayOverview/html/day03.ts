@@ -68,7 +68,4 @@ export const htmlDay03: DayContent = {
   ],
   journalPrompt:
     'Why is using a placeholder as the only label for an input an accessibility problem?',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

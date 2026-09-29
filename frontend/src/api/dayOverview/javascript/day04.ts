@@ -85,7 +85,4 @@ export const jsDay04: DayContent = {
   ],
   journalPrompt:
     'What is the microtask queue, how is it different from the task queue, and why do Promise callbacks run before setTimeout callbacks? When should you use Promise.all vs sequential awaits? Write a real example of each.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

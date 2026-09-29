@@ -64,7 +64,4 @@ export const nodejsDay02: DayContent = {
   ],
   journalPrompt:
     'What challenges did you face while building the Task Manager CLI? Explain how you handled asynchronous file operations, separated storage from business logic, and tested failure cases.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

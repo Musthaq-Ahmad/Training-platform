@@ -59,7 +59,4 @@ export const postgresqlDay01: DayContent = {
   ],
   journalPrompt:
     'How did you translate the Support Ticket requirements into a relational model? Reflect on your entity choices, relationships, keys, constraints, and assumptions.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };

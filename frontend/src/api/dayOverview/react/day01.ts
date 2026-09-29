@@ -57,7 +57,4 @@ export const reactDay01: DayContent = {
   ],
   journalPrompt:
     'How did you break the dashboard into reusable React components? Reflect on your component tree, typed props, semantic HTML, and accessibility and responsiveness review.',
-  journalResponse: null,
-  isLocked: false,
-  isCompleted: false,
 };
