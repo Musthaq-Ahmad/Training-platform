@@ -3,7 +3,7 @@ import type { DayCurrentStatus, DayJournal } from '@itp/types';
 export const mockStatusByDay: Record<string, DayCurrentStatus> = {
   'html-day-01': {
     isLocked: false,
-    isCompleted: false,
+    isCompleted: true,
   },
   'html-day-02': {
     isLocked: false,

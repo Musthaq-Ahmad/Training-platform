@@ -1,23 +1,34 @@
-import type { DayTask } from '@itp/types';
+import type { DayTask, TaskStatus } from '@itp/types';
 
 // Temporary static data. Tasks will come from the backend (GET /days/:dayId/tasks).
 // Keyed by dayId, the same ids used in the day content files.
 
 // Builds one task. The last task of a day can be flagged as the stretch goal.
-function task(dayId: string, sequenceOrder: number, title: string, isStretchGoal = false): DayTask {
+function task(
+  dayId: string,
+  sequenceOrder: number,
+  title: string,
+  status: TaskStatus,
+  isStretchGoal = false
+): DayTask {
   return {
     id: `${dayId}-t-${sequenceOrder}`,
     sequenceOrder,
     title,
-    status: 'not_started',
+    status,
     isStretchGoal,
   };
 }
 
 // Builds a day's task list from dayId titles, plus an optional stretch goal.
-function tasksFor(dayId: string, titles: string[], stretchTitle?: string): DayTask[] {
-  const tasks = titles.map((title, index) => task(dayId, index + 1, title));
-  if (stretchTitle) tasks.push(task(dayId, titles.length + 1, stretchTitle, true));
+function tasksFor(
+  dayId: string,
+  titles: string[],
+  status: TaskStatus,
+  stretchTitle?: string
+): DayTask[] {
+  const tasks = titles.map((title, index) => task(dayId, index + 1, title, status));
+  if (stretchTitle) tasks.push(task(dayId, titles.length + 1, stretchTitle, status, true));
   return tasks;
 }
 
@@ -32,6 +43,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Internal Navigation with Anchor Links',
       'Every Inline Text Element',
     ],
+    'completed',
     'CV for a fictional software engineer in pure HTML'
   ),
 
@@ -45,6 +57,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Accessibility Audit & Fix',
       'Full Press Release Page',
     ],
+    'completed',
     'A fully semantic, fully accessible portfolio homepage'
   ),
 
@@ -58,6 +71,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Multi-Section Application Form',
       'Accessible Form Audit',
     ],
+    'completed',
     ' comprehensive job application form '
   ),
 
@@ -71,6 +85,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Responsive Images - srcset & picture',
       'Complete Metadata for Social Sharing',
     ],
+    'completed',
     ' sports results archive page '
   ),
 
@@ -84,6 +99,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Cross-link, Polish & Final Validation',
       'README + GitHub Pages Deploy',
     ],
+    'completed',
     'Add a sixth page - a Products page '
   ),
 
@@ -99,6 +115,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Pseudo-Classes & Pseudo-Elements',
       'Apply Styles to Week 1 Home Page',
     ],
+    'completed',
     'CSS design-system documentation page '
   ),
 
@@ -114,6 +131,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Apply Flexbox to Week 1 Blog Page',
       'Style About Page Footer Component',
     ],
+    'completed',
     'e-commerce product listing page using only Flexbox for all layouts'
   ),
 
@@ -129,6 +147,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Style Week 1 Services Page',
       'Combine Grid and Flexbox',
     ],
+    'not_started',
     ' newspaper homepage layout using CSS Grid '
   ),
 
@@ -144,6 +163,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Dark Mode with prefers-color-scheme',
       'Print Stylesheet',
     ],
+    'not_started',
     ' fully animated, responsive landing page for a fictional SaaS product  '
   ),
 
@@ -157,6 +177,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Global Polish & Consistency Pass',
       'Audit, Fix & Deploy',
     ],
+    'not_started',
     'fully animated mobile navigation drawer '
   ),
 
@@ -172,6 +193,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Wire the Dark Mode Toggle',
       'Mobile Navigation Drawer: JS Implementation',
     ],
+    'not_started',
     'JavaScript Typing Speed Test'
   ),
 
@@ -187,6 +209,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Scroll Animations & Progress Bar',
       'Image Lightbox',
     ],
+    'not_started',
     'Keyboard Shortcut System'
   ),
 
@@ -202,6 +225,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Drag-and-Drop Kanban Board',
       'Blog Comment System',
     ],
+    'not_started',
     'Sortable, Filterable, Paginated Data Table'
   ),
 
@@ -217,6 +241,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Infinite Scroll Blog Feed',
       'URL State & Shareable Filters',
     ],
+    'not_started',
     'Product Search System'
   ),
 
@@ -229,6 +254,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'API-Powered Content',
       'Polish, Lint & Deploy',
     ],
+    'not_started',
     'Site-Wide Search'
   ),
 
@@ -244,6 +270,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Virtual Scroll for Large Lists',
       'Canvas Chart from Data',
     ],
+    'not_started',
     'full dependency injection container'
   ),
 
@@ -259,6 +286,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'IndexedDB - Offline Data',
       'requestAnimationFrame & Animation Performance',
     ],
+    'not_started',
     'fully offline note-taking PWA'
   ),
 
@@ -274,6 +302,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Test-Driven Development Mini Exercise',
       'CI-Ready Test Suite',
     ],
+    'not_started',
     'complete test suite for the Kanban board'
   ),
 
@@ -289,6 +318,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Proxy & Reactive State',
       'Portfolio Performance Pass',
     ],
+    'not_started',
     'spreadsheet-like data grid in Canvas'
   ),
 
@@ -301,6 +331,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Features, Persistence & Polish',
       'Test Suite & Deploy',
     ],
+    'not_started',
     'Real-time cross-tab sync using the BroadcastChannel API'
   ),
 
@@ -316,6 +347,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Type Declarations for Third-Party Code',
       'Strict Mode Deep Dive',
     ],
+    'not_started',
     'FormValidator to TypeScript with full generics '
   ),
 
@@ -331,6 +363,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Conditional & Infer Types',
       'Convert the Router to TypeScript',
     ],
+    'not_started',
     'Build a type-safe query builder'
   ),
 
@@ -346,6 +379,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Design Pattern Interfaces',
       'TypeScript Decorators',
     ],
+    'not_started',
     ' type-safe DI container '
   ),
 
@@ -361,6 +395,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Coverage on TypeScript Project',
       'Type-Only Imports & Path Aliases',
     ],
+    'not_started',
     'TypeScript utility type FormSchema<T>'
   ),
 
@@ -374,162 +409,194 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
       'Checkpoint 1 Review Preparation',
       'Phase 1 Reflection',
     ],
+    'not_started',
     'runtime type validation to your TypeScript project '
   ),
 
   'nodejs-day-01': tasksFor(
     'nodejs-day-01',
     ['Build a System Information CLI that accepts commands and prints runtime information'],
+    'not_started',
     'Add a --json option that prints machine-readable output'
   ),
 
   'nodejs-day-02': tasksFor(
     'nodejs-day-02',
     ['file-based Task Manager CLI.'],
+    'not_started',
     'Support exporting filtered tasks to a second JSON file.'
   ),
 
   'nodejs-day-03': tasksFor(
     'nodejs-day-03',
     ['the task manager into a Node.js HTTP API without Express'],
+    'not_started',
     'Add filtering by completion status through query parameters'
   ),
 
   'nodejs-day-04': tasksFor(
     'nodejs-day-04',
     ['Task API to Express'],
+    'not_started',
     'Add a request ID to every response.'
   ),
 
-  'nodejs-day-05': tasksFor('nodejs-day-05', ['file-backed Support Ticket API.']),
+  'nodejs-day-05': tasksFor('nodejs-day-05', ['file-backed Support Ticket API.'], 'not_started'),
 
   'postgresql-day-01': tasksFor(
     'postgresql-day-01',
     ['Design the Support Ticket database'],
+    'not_started',
     'Add a labels/tags model without storing comma-separated values'
   ),
 
   'postgresql-day-02': tasksFor(
     'postgresql-day-02',
     ['Implement and seed the ticket-system schema'],
+    'not_started',
     'Reusable reset script for the training database.'
   ),
 
   'postgresql-day-03': tasksFor(
     'postgresql-day-03',
     ['SQL pack for the Support Ticket system'],
+    'not_started',
     'weekly workload report using a common table expression'
   ),
 
   'postgresql-day-04': tasksFor(
     'postgresql-day-04',
     ['transactional ticket reassignment and comparison of search query before and after indexing.'],
+    'not_started',
     'Investigate a composite index for status and assignee.'
   ),
 
-  'postgresql-day-05': tasksFor('postgresql-day-05', [
-    'Design and implement the Equipment Booking System database',
-  ]),
+  'postgresql-day-05': tasksFor(
+    'postgresql-day-05',
+    ['Design and implement the Equipment Booking System database'],
+    'not_started'
+  ),
 
   'prisma-day-01': tasksFor(
     'prisma-day-01',
     ['Replace the file repository with PostgreSQL67'],
+    'not_started',
     'Add graceful shutdown of the connection pool'
   ),
 
   'prisma-day-02': tasksFor(
     'prisma-day-02',
     ['Migrate the ticket API repository to Prisma'],
+    'not_started',
     'Demonstrate how to correct a faulty migration in development.'
   ),
 
   'prisma-day-03': tasksFor(
     'prisma-day-03',
     ['Enhance GET /tickets'],
+    'not_started',
     'Support multiple status values'
   ),
 
   'prisma-day-04': tasksFor(
     'prisma-day-04',
     ['Add a complete backend test suite'],
+    'not_started',
     'Add a small test-data factory.'
   ),
 
   'prisma-day-05': tasksFor(
     'prisma-day-05',
     ['ticket comments and status history in the supplied codebase'],
+    'not_started',
     'Add a history endpoint with pagination'
   ),
   'prisma-day-06': tasksFor(
     'prisma-day-06',
     ['Authentication to the ticket system'],
+    'not_started',
     'Add token expiry handling'
   ),
 
   'prisma-day-07': tasksFor(
     'prisma-day-07',
     ['Add role-based and ownership-based permissions'],
+    'not_started',
     'Add project membership permissions'
   ),
 
   'prisma-day-08': tasksFor(
     'prisma-day-08',
     ['security review and implement fixes'],
+    'not_started',
     'Add an audit log for repeated rejected requests'
   ),
   'prisma-day-09': tasksFor(
     'prisma-day-09',
     ['operational readiness features'],
+    'not_started',
     'Add readiness and liveness health endpoints'
   ),
 
   'react-day-01': tasksFor(
     'react-day-01',
     ['Build a static project and issue dashboard'],
+    'not_started',
     'Create a component gallery page showing all variants'
   ),
 
   'react-day-02': tasksFor(
     'react-day-02',
     ['Build the Issue List screen'],
+    'not_started',
     'Add grouped display by status'
   ),
 
   'react-day-03': tasksFor(
     'react-day-03',
     ['Add search, filters, sorting and issue creation'],
+    'not_started',
     'Persist filters in the URL'
   ),
 
   'react-day-04': tasksFor(
     'react-day-04',
     ['Build create/edit issue forms.'],
+    'not_started',
     'Add reusable validation helpers with tests'
   ),
 
-  'react-day-05': tasksFor('react-day-05', ['Build the assessed Leave Request interface']),
+  'react-day-05': tasksFor(
+    'react-day-05',
+    ['Build the assessed Leave Request interface'],
+    'not_started'
+  ),
 
   'react-day-06': tasksFor(
     'react-day-06',
     ['Add routes for login, projects, issues, profile and not-found states'],
+    'not_started',
     'Add breadcrumb navigation derived from routes'
   ),
 
   'react-day-07': tasksFor(
     'react-day-07',
     ['Connect project and issue lists to the backend'],
+    'not_started',
     'Add request cancellation when navigating away'
   ),
 
   'react-day-08': tasksFor(
     'react-day-08',
     ['Create useProjects, useIssues, useIssue, useDebounce and useDocumentTitle'],
+    'not_started',
     'Add simple hook tests'
   ),
 
   'react-day-09': tasksFor(
     'react-day-09',
     ['Implement login, authentication context, session restore, logout and protected routes'],
+    'not_started',
     'Handle expired sessions globally'
   ),
 
@@ -538,6 +605,7 @@ export const mockTasksByDay: Record<string, DayTask[]> = {
     [
       'Test login, filtering, issue form, empty/error states, retry, protected routes and navigation',
     ],
+    'not_started',
     'Add a reusable render helper with router and auth providers'
   ),
 };

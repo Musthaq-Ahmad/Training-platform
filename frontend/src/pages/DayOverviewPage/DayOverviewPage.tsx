@@ -15,6 +15,7 @@ import TaskModal from '../../components/TaskModal';
 import styles from './DayOverviewPage.module.css';
 import StateMessage from '../../components/StateMessage';
 import { ApiError } from '../../api/errors';
+import Loader from '../../components/Common/LoadingState';
 
 type LoadResult =
   | { dayId: string; tasks: DayTask[]; status: DayCurrentStatus; journalResponse: string }
@@ -87,10 +88,11 @@ export default function DayOverviewPage() {
   if (isLoading) {
     return (
       <>
-        <Header />
+        {/* <Header />
         <main className={styles.dayOverview}>
           <p>Loading...</p>
-        </main>
+        </main> */}
+        <Loader />
       </>
     );
   }
