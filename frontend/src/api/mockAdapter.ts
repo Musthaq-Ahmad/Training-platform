@@ -23,6 +23,7 @@ import {
   taskCodeFixture,
   taskFixture,
 } from '../test/fixtures/task';
+import { mockUser } from '../test/fixtures/user';
 
 const MOCK_DELAY_MS = 300;
 
@@ -189,6 +190,10 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   if (method === 'post' && url === '/sql/execute') {
     const body = JSON.parse(config.data as string) as SqlExecuteRequest;
     return respond(config, 200, executeSqlMock(body));
+  }
+
+  if (method === 'get' && url === '/auth/me') {
+    return respond(config, 200, mockUser);
   }
 
   return errorResponse(config, 404, 'NOT_FOUND', 'Not found.');
