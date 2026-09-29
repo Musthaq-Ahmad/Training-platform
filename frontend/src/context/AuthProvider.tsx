@@ -2,15 +2,15 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import type { MeResponse } from '@itp/types';
 import { getMe, logout as logoutRequest, startGoogleLogin } from '../api/auth';
 import { setUnauthorizedHandler } from '../api/client';
-import { toApiError } from '../api/errors';
+import { ApiError } from '../api/errors';
 import { AuthContext, type AuthContextValue, type AuthStatus } from './AuthContext';
 
 async function fetchSession(): Promise<MeResponse | null> {
   try {
     return await getMe();
   } catch (error) {
-    // 401 is the normal "not logged in" answer; anything else is worth a log
-    if (toApiError(error).status !== 401) {
+    const status = error instanceof ApiError ? error.status : 0;
+    if (status !== 401) {
       console.error('Failed to load session', error);
     }
     return null;

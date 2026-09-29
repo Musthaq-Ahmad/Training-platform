@@ -13,15 +13,10 @@ vi.mock('../../api/auth', () => ({
 
 // Spy on handler registration so the test can simulate the interceptor reporting a 401
 vi.mock('../../api/client', () => ({ setUnauthorizedHandler: vi.fn() }));
+import { ApiError } from '../../api/errors';
 
-// Decouple from the real error normalizer: errors in these tests just carry a `status`
-vi.mock('../../api/errors', () => ({
-  toApiError: (error: unknown) => error as { status?: number },
-}));
-
+const httpError = (status: number) => new ApiError(status, 'NETWORK_ERROR', `HTTP ${status}`);
 const trainee = { id: 'u1', email: 'trainee@vonnue.com', name: 'Test Trainee' };
-
-const httpError = (status: number) => Object.assign(new Error(`HTTP ${status}`), { status });
 
 function Probe() {
   const { status, user, login, logout: doLogout, refresh } = useAuth();
