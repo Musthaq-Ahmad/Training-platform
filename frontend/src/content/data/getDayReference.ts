@@ -25,7 +25,7 @@ import {
   stylelintTopics,
   stylelintGettingStartedTopics,
 } from '../topics/css';
-
+import * as jsTopics from '../topics/js';
 import { dayReferences } from './dayReferences';
 
 const courseTopics: Record<string, ContentTopic[]> = {
@@ -54,6 +54,9 @@ const courseTopics: Record<string, ContentTopic[]> = {
     ...Object.values(stylelintTopics),
     ...Object.values(stylelintGettingStartedTopics),
   ],
+  js: Object.values(jsTopics).flatMap(
+    (topicCollection) => Object.values(topicCollection) as ContentTopic[]
+  ),
 };
 
 export function getDayReference(dayId: string): DayReferenceContent | null {
