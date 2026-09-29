@@ -1,0 +1,114 @@
+/* =========================================================
+   Overlay loader
+   ========================================================= */
+
+.overlay {
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-overlay-scrim);
+}
+
+/* Covers the whole screen */
+.fullPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-page);
+}
+
+/* Covers the nearest positioned parent (give the parent `position: relative`) */
+.contained {
+  position: absolute;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 170px;
+  padding: 18px 26px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid var(--color-accent-spinner-track);
+  border-top-color: var(--color-accent-spinner);
+  animation: spin 0.8s linear infinite;
+}
+
+.label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.description {
+  margin: -6px 0 0;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* =========================================================
+   Skeleton
+   ========================================================= */
+
+.skeleton {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--color-bg-button-secondary);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--color-overlay-highlight-8), transparent);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/* =========================================================
+   Motion
+   ========================================================= */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2s;
+  }
+
+  .skeleton::after {
+    animation: none;
+  }
+}
