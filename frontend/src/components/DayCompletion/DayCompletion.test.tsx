@@ -155,7 +155,7 @@ describe('DayOverviewPage', () => {
 
     renderWithDayId('day-01');
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
   it('fetches tasks, status and journal with the dayId from the URL, unchanged', async () => {
