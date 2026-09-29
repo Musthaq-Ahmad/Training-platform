@@ -1,0 +1,103 @@
+.body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.view {
+  flex: 1;
+  min-height: 0;
+}
+
+.view[hidden] {
+  display: none;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background-color: var(--color-bg-pill-inactive);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.pillReady {
+  background-color: var(--color-bg-green-fill);
+  color: var(--color-text-green);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background-color: currentColor;
+}
+
+.spinner {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent-spinner-track);
+  border-top-color: var(--color-accent-spinner);
+  animation: node-runtime-spin 700ms linear infinite;
+}
+
+@keyframes node-runtime-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.cardText {
+  max-width: 420px;
+  font-size: 14px;
+}
+
+.errorBanner {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  background-color: var(--color-status-error-tint);
+  color: var(--color-status-error-text);
+  border-bottom: 1px solid var(--color-border-divider);
+}
+
+.retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--color-status-error-text);
+  text-decoration: underline;
+}

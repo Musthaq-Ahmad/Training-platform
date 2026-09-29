@@ -1,0 +1,42 @@
+.preview {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--color-border-divider);
+  color: var(--color-text-secondary);
+}
+
+.address {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  margin-right: auto;
+}
+
+.iconButton {
+  display: flex;
+  padding: 4px;
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+}
+
+.iconButton:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-surface-2);
+}
+
+/* Server pages assume a browser's default white page (same approach as the browser runtime). */
+.frame {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  color-scheme: light;
+  background-color: Canvas;
+}
