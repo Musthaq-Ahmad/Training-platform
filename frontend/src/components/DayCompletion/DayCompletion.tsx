@@ -27,8 +27,8 @@ export default function DayCompletion({
         </div>
 
         <p className={styles.dayCompletionDescription}>
-          Clicking &quot;Submit Day&quot; verifies checklist items and task completions to mark Day
-          01 complete and unlock Day 02.
+          Clicking &quot;Submit Day&quot; verifies checklist items and task completions to mark
+          current day complete and unlock next day.
         </p>
       </div>
 
@@ -51,7 +51,7 @@ export default function DayCompletion({
         >
           <polyline points="20 6 9 17 4 12" />
         </svg>
-        <span>{isCompleted ? 'DAY SUBMITTED' : 'SUBMIT DAY'}</span>
+        <span>{isCompleted ? 'Day completed' : 'SUBMIT DAY'}</span>
       </button>
     </section>
   );

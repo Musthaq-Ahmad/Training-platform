@@ -114,7 +114,7 @@
 
 .daySummaryButtonSecondary {
   color: var(--color-text-primary);
-  background-color: var(-color-overlay-highlight-6);
+  background-color: var(--color-overlay-highlight-6);
 }
 
 .daySummaryButtonSecondary:hover {
