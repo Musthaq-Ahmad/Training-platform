@@ -39,7 +39,11 @@ export default function Header({ leading, status }: HeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        {leading ?? <span className={styles.appName}>In-House Trainee Training Platform</span>}
+        {leading ?? (
+          <span className={styles.appName}>
+            Vink<span className={styles.up}>Up</span>
+          </span>
+        )}
 
         <div className={styles.end}>
           {status}

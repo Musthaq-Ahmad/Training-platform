@@ -23,7 +23,7 @@ afterEach(() => {
 describe('Header', () => {
   it('renders the app name, dashboard link, and user name', () => {
     render(<Header />);
-    expect(screen.getByText('In-House Trainee Training Platform')).toBeInTheDocument();
+    expect(screen.getByText('Vink')).toHaveTextContent('VinkUp');
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Rahul Sharma')).toBeInTheDocument();
   });
@@ -39,7 +39,7 @@ describe('Header', () => {
     render(<Header leading={<span>Custom crumb</span>} />);
 
     expect(screen.getByText('Custom crumb')).toBeInTheDocument();
-    expect(screen.queryByText(/in-house trainee training platform/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('Vink')).not.toBeInTheDocument();
   });
 
   it('renders the status slot before the nav', () => {

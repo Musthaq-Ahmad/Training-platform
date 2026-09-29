@@ -13,9 +13,12 @@
 }
 
 .appName {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 900;
   color: var(--color-text-primary);
+}
+.up {
+  color: var(--color-accent-purple);
 }
 
 .end {

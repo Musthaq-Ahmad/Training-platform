@@ -1,0 +1,243 @@
+import type { DayReferenceConfig } from '../types';
+
+export const dayReferences: DayReferenceConfig[] = [
+  {
+    id: 'html-day-01',
+    courseId: 'html',
+    dayNumber: 1,
+    videoAtStart: true,
+    videos: [
+      {
+        title: 'HTML Tutorial',
+        embedUrl: 'https://www.youtube.com/embed/salY_Sm6mv4',
+      },
+    ],
+    topicIds: [
+      'html-what-is-html',
+      'html-anatomy-of-an-html-element',
+      'html-attributes',
+      'html-anatomy-of-an-html-document',
+      'html-whitespace-in-html',
+      'html-character-references-including-special-characters-in-html',
+      'html-html-comments',
+    ],
+  },
+  {
+    id: 'html-day-02',
+    courseId: 'html',
+    dayNumber: 2,
+    topicIds: [
+      'html-html-and-accessibility',
+      'html-good-semantics',
+      'html-accessible-data-tables',
+      'html-text-alternatives',
+      'html-more-on-links',
+      'html-aria-role-types',
+    ],
+  },
+  {
+    id: 'html-day-03',
+    courseId: 'html',
+    dayNumber: 3,
+    topicIds: [
+      // Forms
+      'web-forms-prerequisites',
+      'web-forms-introductory-tutorials',
+      'web-forms-the-different-form-controls',
+      'web-forms-form-styling-tutorials',
+      'web-forms-validating-and-submitting-form-data',
+      'web-forms-additional-tutorials',
+
+      // <input>
+      'html-input-input-types',
+      'html-input-attributes',
+      'html-input-methods',
+      'html-input-css',
+      'html-input-additional-features',
+      'html-input-accessibility',
+    ],
+  },
+  {
+    id: 'html-day-04',
+    courseId: 'html',
+    dayNumber: 4,
+    topicIds: [
+      'html-table-basics-what-is-a-table',
+      'html-table-basics-creating-your-first-table',
+      'html-table-basics-adding-headers-with-th-elements',
+      'html-table-basics-allowing-cells-to-span-multiple-rows-and-columns',
+      'html-table-basics-grouping-columns-with-colgroup-and-col',
+
+      'html-video-and-audio-video-and-audio-on-the-web',
+      'html-video-and-audio-the-video-element',
+      'html-video-and-audio-using-multiple-source-formats-to-improve-compatibility',
+      'html-video-and-audio-other-video-features',
+      'html-video-and-audio-the-audio-element',
+      'html-video-and-audio-displaying-video-text-tracks',
+      'html-video-and-audio-embedding-your-own-audio-and-video',
+
+      'responsive-images-why-responsive-images',
+      'responsive-images-how-do-you-create-responsive-images',
+      'responsive-images-implementing-your-own-responsive-images',
+    ],
+  },
+  {
+    id: 'html-day-05',
+    courseId: 'html',
+    dayNumber: 5,
+    topicIds: [
+      'whatIsAUrl-summary',
+      'whatIsAUrl-basics-anatomy-of-a-url',
+      'whatIsAUrl-scheme',
+      'whatIsAUrl-authority',
+      'whatIsAUrl-path-to-resource',
+      'whatIsAUrl-parameters',
+      'whatIsAUrl-anchor',
+      'whatIsAUrl-how-to-use-urls',
+      'whatIsAUrl-absolute-urls-vs-relative-urls',
+      'whatIsAUrl-url-usernames-and-passwords',
+      'whatIsAUrl-semantic-urls',
+    ],
+  },
+  {
+    id: 'css-day-01',
+    courseId: 'css',
+    dayNumber: 1,
+    videoAfterTopicId: 'cssBasicSelectors-summary',
+    videos: [
+      {
+        title: 'CSS Basic Selectors',
+        embedUrl: 'https://www.youtube.com/embed/PHO6TBq_auI',
+      },
+    ],
+
+    topicIds: [
+      'cssGettingStarted-starting-with-some-html',
+      'cssGettingStarted-adding-css-to-our-document',
+      'cssGettingStarted-using-common-selectors',
+      'cssGettingStarted-other-css-syntax-features',
+      'cssGettingStarted-summary',
+
+      'cssBasicSelectors-what-is-a-selector',
+      'cssBasicSelectors-type-selectors',
+      'cssBasicSelectors-class-selectors',
+      'cssBasicSelectors-id-selectors',
+      'cssBasicSelectors-selector-lists',
+      'cssBasicSelectors-the-universal-selector',
+      'cssBasicSelectors-summary',
+
+      'cssCustomProperties-declaring-custom-properties',
+      'cssCustomProperties-first-steps-with-custom-properties',
+      'cssCustomProperties-using-the-root-pseudo-class',
+      'cssCustomProperties-inheritance-of-custom-properties',
+      'cssCustomProperties-custom-property-fallback-values',
+      'cssCustomProperties-invalid-custom-properties',
+      'cssCustomProperties-values-in-javascript',
+    ],
+  },
+  {
+    id: 'css-day-02',
+    courseId: 'css',
+    dayNumber: 2,
+
+    videoAtStart: true,
+
+    videos: [
+      {
+        title: 'CSS Flexbox',
+        embedUrl: 'https://www.youtube.com/embed/u044iM9xsWU',
+      },
+    ],
+
+    topicIds: [
+      'cssFlexbox-why-flexbox',
+      'cssFlexbox-introducing-a-simple-example',
+      'cssFlexbox-specifying-what-elements-to-lay-out-as-flexible-boxes',
+      'cssFlexbox-the-flex-model',
+      'cssFlexbox-columns-or-rows',
+      'cssFlexbox-wrapping',
+      'cssFlexbox-flex-flow-shorthand',
+      'cssFlexbox-flexible-sizing-of-flex-items',
+      'cssFlexbox-flex-shorthand-versus-longhand',
+      'cssFlexbox-horizontal-and-vertical-alignment',
+      'cssFlexbox-ordering-flex-items',
+      'cssFlexbox-nested-flex-boxes',
+      'cssFlexbox-summary',
+    ],
+  },
+  {
+    id: 'css-day-03',
+    courseId: 'css',
+    dayNumber: 3,
+
+    videoAtStart: true,
+
+    videos: [
+      {
+        title: 'CSS Grid',
+        embedUrl: 'https://www.youtube.com/embed/rg7Fvvl3taU',
+      },
+    ],
+
+    topicIds: [
+      'cssGrid-what-is-grid-layout',
+      'cssGrid-creating-your-grid-in-css',
+      'cssGrid-line-based-placement',
+      'cssGrid-positioning-with-grid-template-areas',
+      'cssGrid-nesting-grids-and-subgrid',
+      'cssGrid-grid-frameworks',
+      'cssGrid-summary',
+    ],
+  },
+  {
+    id: 'css-day-04',
+    courseId: 'css',
+    dayNumber: 4,
+    videoAfterTopicId: 'cssResponsiveDesign-summary',
+    videos: [
+      {
+        title: 'Mobile-first CSS',
+        embedUrl: 'https://www.youtube.com/embed/0ohtVzCSHqs',
+      },
+    ],
+
+    topicIds: [
+      'cssResponsiveDesign-precursor-to-responsive-design-mobile-web-design',
+      'cssResponsiveDesign-introducing-responsive-web-design',
+      'cssResponsiveDesign-media-queries',
+      'cssResponsiveDesign-responsive-layout-technologies',
+      'cssResponsiveDesign-responsive-images-media',
+      'cssResponsiveDesign-responsive-typography',
+      'cssResponsiveDesign-the-viewport-meta-tag',
+      'cssResponsiveDesign-summary',
+
+      'cssAnimations-configuring-an-animation',
+      'cssAnimations-defining-an-animation-sequence-using-keyframes',
+      'cssAnimations-using-the-animation-shorthand',
+      'cssAnimations-setting-multiple-animation-property-values',
+      'cssAnimations-examples',
+
+      'cssPrefersReducedMotion-syntax',
+      'cssPrefersReducedMotion-user-preferences',
+      'cssPrefersReducedMotion-examples',
+
+      'cssClamp-syntax',
+      'cssClamp-formal-syntax',
+      'cssClamp-examples',
+      'cssClamp-accessibility',
+    ],
+  },
+  {
+    id: 'css-day-05',
+    courseId: 'css',
+    dayNumber: 5,
+    topicIds: [
+      'stylelint-overview',
+      'stylelintGettingStarted-linting-css',
+      'stylelintGettingStarted-manual-setup',
+      'stylelintGettingStarted-linting-css-like-languages-and-css-within-containers',
+      'stylelintGettingStarted-using-a-custom-syntax-directly',
+      'stylelintGettingStarted-using-more-than-one-custom-syntax',
+    ],
+  },
+];

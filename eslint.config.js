@@ -93,6 +93,13 @@ export default tseslint.config(
     },
     rules: {},
   },
+  {
+    files: ['frontend/scripts/**/*.mjs'],
+    languageOptions: {
+      globals: globals.node,
+    },
+    rules: {},
+  },
 
   eslintConfigPrettier
 );
