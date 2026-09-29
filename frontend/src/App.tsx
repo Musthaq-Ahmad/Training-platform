@@ -10,7 +10,18 @@ import DayOverviewPage from './pages/DayOverviewPage';
 import TaskPageSkeleton from './components/TaskPageSkeleton';
 
 const TaskPage = lazy(() => import('./pages/TaskPage'));
+import ReferencePage from './pages/ReferencePage';
+import { useParams } from 'react-router';
 
+function ReferenceRoute() {
+  const { dayId } = useParams();
+
+  if (!dayId) {
+    return null;
+  }
+
+  return <ReferencePage dayId={dayId} />;
+}
 export default function App() {
   return (
     <AuthProvider>
@@ -27,6 +38,7 @@ export default function App() {
             }
           />
           <Route path="/days/:dayId" element={<DayOverviewPage />} />
+          <Route path="/days/:dayId/references" element={<ReferenceRoute />} />
         </Route>
         <Route element={<PublicOnlyRoute />}>
           <Route path="/login" element={<LoginPage />} />

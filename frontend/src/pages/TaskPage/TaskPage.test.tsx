@@ -134,7 +134,8 @@ describe('TaskPage', () => {
 
     renderTaskPage('not-found');
 
-    expect(await screen.findByText(/in-house trainee training platform/i)).toBeInTheDocument();
+    const brand = await screen.findByText('Vink');
+    expect(brand).toHaveTextContent('VinkUp');
   });
 
   it('sets the browser tab title while the task is open', async () => {
