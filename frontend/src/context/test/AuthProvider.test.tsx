@@ -13,19 +13,6 @@ vi.mock('../../api/auth', () => ({
 
 // Spy on handler registration so the test can simulate the interceptor reporting a 401
 vi.mock('../../api/client', () => ({ setUnauthorizedHandler: vi.fn() }));
-
-// Decouple from the real error normalizer: errors in these tests just carry a `status`
-vi.mock('../../api/errors', () => {
-  class ApiError extends Error {
-    status: number;
-    constructor(status: number, message: string) {
-      super(message);
-      this.name = 'ApiError';
-      this.status = status;
-    }
-  }
-  return { ApiError };
-});
 import { ApiError } from '../../api/errors';
 
 const httpError = (status: number) => new ApiError(status, 'NETWORK_ERROR', `HTTP ${status}`);
