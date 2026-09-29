@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ExternalLink, Globe, RefreshCw } from 'lucide-react';
+import { Globe, RefreshCw } from 'lucide-react';
 import styles from './NodePreview.module.css';
 
 type NodePreviewProps = { url: string; port: number };
@@ -21,16 +21,6 @@ export default function NodePreview({ url, port }: NodePreviewProps) {
         >
           <RefreshCw size={14} aria-hidden="true" />
         </button>
-        <a
-          className={styles.iconButton}
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Open in new tab"
-          title="Open in new tab"
-        >
-          <ExternalLink size={14} aria-hidden="true" />
-        </a>
       </div>
       {/* WebContainer serves this URL from its own origin, already separate from the platform,
           so it needs no sandbox (unlike the browser runtime's srcdoc preview). */}
