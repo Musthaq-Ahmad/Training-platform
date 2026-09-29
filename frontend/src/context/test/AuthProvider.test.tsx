@@ -15,13 +15,21 @@ vi.mock('../../api/auth', () => ({
 vi.mock('../../api/client', () => ({ setUnauthorizedHandler: vi.fn() }));
 
 // Decouple from the real error normalizer: errors in these tests just carry a `status`
-vi.mock('../../api/errors', () => ({
-  toApiError: (error: unknown) => error as { status?: number },
-}));
+vi.mock('../../api/errors', () => {
+  class ApiError extends Error {
+    status: number;
+    constructor(status: number, message: string) {
+      super(message);
+      this.name = 'ApiError';
+      this.status = status;
+    }
+  }
+  return { ApiError };
+});
+import { ApiError } from '../../api/errors';
 
+const httpError = (status: number) => new ApiError(status, 'NETWORK_ERROR', `HTTP ${status}`);
 const trainee = { id: 'u1', email: 'trainee@vonnue.com', name: 'Test Trainee' };
-
-const httpError = (status: number) => Object.assign(new Error(`HTTP ${status}`), { status });
 
 function Probe() {
   const { status, user, login, logout: doLogout, refresh } = useAuth();
