@@ -9,6 +9,7 @@ import ScheduleGrid from '../../components/ScheduleGrid';
 import StatsRow from '../../components/StatsRow';
 import styles from './DashboardPage.module.css';
 import LoaderOverlay from '../../components/Common/LoadingState';
+import { ErrorState } from '../../components/Common/ErrorState';
 
 const DEFAULT_COURSE_ID = 'course-html';
 
@@ -17,21 +18,51 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [activeCourseId, setActiveCourseId] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    getDashboard()
+    let cancelled = false;
+
+    void getDashboard()
       .then((data) => {
+        if (cancelled) return;
         setDashboard(data);
         // New trainee (no currentDay yet) starts on HTML, not whatever
         // currentCourseId the API happened to send.
         setActiveCourseId(data.currentDay ? data.currentCourseId : DEFAULT_COURSE_ID);
       })
-      .catch((err: Error) => setError(err))
-      .finally(() => setIsLoading(false));
-  }, []);
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err : new Error('Something went wrong'));
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
 
-  if (isLoading) return <LoaderOverlay fullPage={true} />;
-  if (error) return <p className={styles.status}>{error.message}</p>;
+    return () => {
+      cancelled = true; // ignore the response if the page unmounts or retries
+    };
+  }, [attempt]);
+
+  // Runs from a click, so setting state here is fine
+  const handleRetry = () => {
+    setIsLoading(true);
+    setError(null);
+    setAttempt((n) => n + 1);
+  };
+
+  if (isLoading) return <LoaderOverlay fullPage />;
+  if (error) {
+    return (
+      <ErrorState
+        fullPage
+        title="Unable to load the dashboard"
+        message={error.message}
+        onRetry={handleRetry}
+      />
+    );
+  }
+
   if (!dashboard) return null;
 
   const activeTrack =
