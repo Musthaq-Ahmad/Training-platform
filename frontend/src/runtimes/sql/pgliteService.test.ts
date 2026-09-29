@@ -135,6 +135,33 @@ describe('createSqlDatabase', { timeout: 30000 }, () => {
       /^The task's setup SQL failed: syntax error at or near "tabel"/
     );
   });
+
+  it.each([null, '', '   \n\t'])('creates a database with setupSql=%s', async (sql) => {
+    const db = await createSqlDatabase(sql);
+
+    try {
+      const result = await db.run('select 1 as value');
+      expect(okResults(result)[0].rows).toEqual([['1']]);
+    } finally {
+      await db.close();
+    }
+  });
+
+  it('runs multiple setup statements in order', async () => {
+    const db = await createSqlDatabase(`
+    create table setup_test (id int primary key);
+    insert into setup_test values (1);
+    insert into setup_test values (2);
+  `);
+
+    try {
+      const [result] = okResults(await db.run('select id from setup_test order by id'));
+
+      expect(result.rows).toEqual([['1'], ['2']]);
+    } finally {
+      await db.close();
+    }
+  });
 });
 
 describe('toDisplayText', () => {
