@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { mockDayContents } from '../../api/dayOverview';
+import type { DayTask, DayContent } from '@itp/types';
+import { getDayTasks, getDayContent } from '../../api/days';
 import DaySummary from '../../components/DaySummary/DaySummary';
 import LessonSummary from '../../components/LessonSummary/LessonSummary';
 import LearningObjectives from '../../components/LearningObjectives/LearningObjectives';
@@ -12,25 +13,58 @@ import DayBreadcrumb from '../../components/DayBreadcrumb/DayBreadcrumb';
 import TaskModal from '../../components/TaskModal';
 import styles from './DayOverviewPage.module.css';
 import StateMessage from '../../components/StateMessage';
+import { ApiError } from '../../api/errors';
+
+type LoadResult =
+  { dayId: string; day: DayContent; tasks: DayTask[] } | { dayId: string; error: ApiError };
 
 export default function DayOverviewPage() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isJournalSaved, setIsJournalSaved] = useState(false);
-  const navigate = useNavigate();
-
+  const [result, setResult] = useState<LoadResult | null>(null);
   const isSavingJournal = false;
 
+  // dayId is an opaque string. Never parse or build it here.
   const { dayId } = useParams();
+  const navigate = useNavigate();
 
-  let formattedKey = dayId;
+  // Hooks must run before any early return.
+  useEffect(() => {
+    if (!dayId) return;
+    let isCancelled = false; // ignore late responses after navigating away
 
-  if (dayId && !dayId.startsWith('day-')) {
-    formattedKey = `day-${dayId.padStart(2, '0')}`;
+    Promise.all([getDayContent(dayId), getDayTasks(dayId)])
+      .then(([day, tasks]) => {
+        if (!isCancelled) setResult({ dayId, day, tasks });
+      })
+      .catch((error: ApiError) => {
+        if (!isCancelled) setResult({ dayId, error });
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [dayId]);
+
+  // Only trust a result that belongs to the current dayId; otherwise we're loading.
+  const current = result && result.dayId === dayId ? result : null;
+  const isLoading = Boolean(dayId) && current === null;
+  const error = current && 'error' in current ? current.error : null;
+  const day = current && 'day' in current ? current.day : null;
+  const tasks = current && 'tasks' in current ? current.tasks : [];
+
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <main className={styles.dayOverview}>
+          <p>Loading...</p>
+        </main>
+      </>
+    );
   }
 
-  const day = formattedKey ? mockDayContents[formattedKey] : undefined;
-
-  if (!day) {
+  if (error?.code === 'NOT_FOUND' || (!error && !day)) {
     return (
       <>
         <Header />
@@ -47,8 +81,7 @@ export default function DayOverviewPage() {
     );
   }
 
-  // Handle locked day
-  if (day.isLocked) {
+  if (error?.code === 'DAY_LOCKED') {
     return (
       <>
         <Header />
@@ -65,35 +98,35 @@ export default function DayOverviewPage() {
     );
   }
 
-  // Count completed required tasks
-  const completedTasks = day.tasks.filter(
+  if (!day) return null;
+
+  const completedTasks = tasks.filter(
     (task) => task.status === 'completed' && !task.isStretchGoal
   ).length;
-
-  const requiredTasks = day.tasks.filter((task) => !task.isStretchGoal).length;
+  const requiredTasks = tasks.filter((task) => !task.isStretchGoal).length;
 
   return (
     <>
       <Header />
 
       <main className={styles.dayOverview}>
-        <DayBreadcrumb courseTitle="CSS" dayNumber={day.dayNumber} />
+        <DayBreadcrumb courseTitle={day.courseTitle} dayNumber={day.dayNumber} />
 
         <DaySummary
+          courseTitle={day.courseTitle}
           dayNumber={day.dayNumber}
           totalDays={day.totalDays}
           title={day.title}
           description={day.subtitle}
           completedTasks={completedTasks}
           totalTasks={requiredTasks}
-          onReferences={() => console.log('References clicked')}
+          onReferences={() => void navigate(`/days/${day.dayId}/references`)}
           onTasks={() => setIsTaskModalOpen(true)}
         />
 
         <div className={styles.grid}>
           <div className={styles.left}>
             <LessonSummary summary={day.lessonSummary} />
-
             <LearningObjectives objectives={day.learningObjectives} />
           </div>
 
@@ -126,11 +159,11 @@ export default function DayOverviewPage() {
       <TaskModal
         isOpen={isTaskModalOpen}
         dayNumber={day.dayNumber}
-        tasks={day.tasks}
+        tasks={tasks}
         onClose={() => setIsTaskModalOpen(false)}
         onSelectTask={(task) => {
           setIsTaskModalOpen(false);
-          void navigate(`/tasks/${task.id}`);
+          console.log('Selected task:', task.id);
         }}
       />
     </>

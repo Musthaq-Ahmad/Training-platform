@@ -1,6 +1,8 @@
 import styles from './DaySummary.module.css';
 import { HiOutlineBookOpen } from 'react-icons/hi2';
+
 interface DaySummaryProps {
+  courseTitle: string;
   dayNumber: number;
   totalDays: number;
   title: string;
@@ -12,6 +14,7 @@ interface DaySummaryProps {
 }
 
 export default function DaySummary({
+  courseTitle,
   dayNumber,
   totalDays,
   title,
@@ -26,7 +29,8 @@ export default function DaySummary({
       {/* 1. Left container for all titles and text */}
       <div className={styles.daySummaryContent}>
         <span className={styles.daySummaryLabel}>
-          CSS - DAY {String(dayNumber).padStart(2, '0')} OF {totalDays}
+          {courseTitle.toUpperCase()} - DAY {String(dayNumber).padStart(2, '0')} OF{' '}
+          {String(totalDays).padStart(2, '0')}
         </span>
 
         <h1 className={styles.daySummaryTitle}>{title}</h1>
@@ -50,7 +54,7 @@ export default function DaySummary({
           className={`${styles.daySummaryButton} ${styles.daySummaryButtonPrimary}`}
           onClick={onTasks}
         >
-          Tasks ({completedTasks}/{totalTasks + 1}) →
+          Tasks ({completedTasks}/{totalTasks}) →
         </button>
       </div>
     </section>

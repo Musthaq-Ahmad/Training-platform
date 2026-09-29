@@ -20,16 +20,10 @@ export interface DayTask {
   status: 'not_started' | 'in_progress' | 'completed';
   isStretchGoal: boolean;
 }
-
-export interface DayReference {
-  id: string;
-  label: string;
-  url: string;
-}
-
 export interface DayContent {
   dayId: string;
   courseSlug: string;
+  courseTitle: string;
   dayNumber: number;
   totalDays: number;
   title: string;
@@ -37,8 +31,6 @@ export interface DayContent {
   lessonSummary: string;
   learningObjectives: LearningObjective[];
   selfCheckItems: SelfCheckItem[];
-  tasks: DayTask[];
-  references: DayReference[];
   journalPrompt: string;
   journalResponse: string | null;
   isLocked: boolean;

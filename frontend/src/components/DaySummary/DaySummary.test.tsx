@@ -8,6 +8,7 @@ afterEach(() => {
 
 describe('DaySummary', () => {
   const defaultProps = {
+    courseTitle: 'CSS',
     dayNumber: 1,
     totalDays: 10,
     title: 'Introduction to CSS',
@@ -18,17 +19,22 @@ describe('DaySummary', () => {
     onTasks: vi.fn(),
   };
 
-  it('renders the day label with a two-digit day number', () => {
+  it('renders the uppercased course title with a two-digit day number', () => {
     render(<DaySummary {...defaultProps} />);
 
     expect(screen.getByText('CSS - DAY 01 OF 10')).toBeInTheDocument();
+  });
+
+  it('uppercases a mixed-case course title', () => {
+    render(<DaySummary {...defaultProps} courseTitle="CSS Fundamentals" />);
+
+    expect(screen.getByText('CSS FUNDAMENTALS - DAY 01 OF 10')).toBeInTheDocument();
   });
 
   it('renders the title and description', () => {
     render(<DaySummary {...defaultProps} />);
 
     expect(screen.getByRole('heading', { name: 'Introduction to CSS' })).toBeInTheDocument();
-
     expect(screen.getByText('Learn the fundamentals of CSS styling.')).toBeInTheDocument();
   });
 
@@ -38,10 +44,16 @@ describe('DaySummary', () => {
     expect(screen.getByRole('button', { name: /references/i })).toBeInTheDocument();
   });
 
-  it('renders the Tasks button with the correct task count', () => {
+  it('renders the Tasks button with completed and total task counts', () => {
     render(<DaySummary {...defaultProps} />);
 
-    expect(screen.getByRole('button', { name: /tasks \(2\/5\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /tasks \(2\/4\)/i })).toBeInTheDocument();
+  });
+
+  it('renders zero progress when no tasks are completed', () => {
+    render(<DaySummary {...defaultProps} completedTasks={0} totalTasks={3} />);
+
+    expect(screen.getByRole('button', { name: /tasks \(0\/3\)/i })).toBeInTheDocument();
   });
 
   it('calls onReferences when the References button is clicked', () => {
@@ -64,6 +76,16 @@ describe('DaySummary', () => {
     expect(onTasks).toHaveBeenCalledTimes(1);
   });
 
+  it('does not call onReferences when the Tasks button is clicked', () => {
+    const onReferences = vi.fn();
+
+    render(<DaySummary {...defaultProps} onReferences={onReferences} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /tasks/i }));
+
+    expect(onReferences).not.toHaveBeenCalled();
+  });
+
   it('formats a single-digit day number with a leading zero', () => {
     render(<DaySummary {...defaultProps} dayNumber={5} />);
 
@@ -71,8 +93,8 @@ describe('DaySummary', () => {
   });
 
   it('renders a two-digit day number without changing it', () => {
-    render(<DaySummary {...defaultProps} dayNumber={12} />);
+    render(<DaySummary {...defaultProps} dayNumber={12} totalDays={20} />);
 
-    expect(screen.getByText('CSS - DAY 12 OF 10')).toBeInTheDocument();
+    expect(screen.getByText('CSS - DAY 12 OF 20')).toBeInTheDocument();
   });
 });

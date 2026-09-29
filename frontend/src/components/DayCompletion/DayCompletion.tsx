@@ -27,8 +27,8 @@ export default function DayCompletion({
         </div>
 
         <p className={styles.dayCompletionDescription}>
-          Clicking &quot;Submit Day&quot; verifies checklist items and task completions to mark Day
-          01 complete and unlock Day 02.
+          Clicking &quot;Submit Day&quot; verifies checklist items and task completions to mark
+          current day complete and unlock next day.
         </p>
       </div>
 

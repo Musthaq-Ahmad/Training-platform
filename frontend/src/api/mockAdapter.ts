@@ -25,6 +25,9 @@ import {
 } from '../test/fixtures/task';
 import { mockUser } from '../test/fixtures/user';
 
+import { mockTasksByDay } from '../test/fixtures/dayTasks';
+import { mockDayContents } from './dayOverview';
+
 const MOCK_DELAY_MS = 300;
 
 const savedFiles = new Map<string, TaskFile[]>();
@@ -130,6 +133,8 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   const taskMatch = /^\/tasks\/([^/]+)$/.exec(url);
   const submitMatch = /^\/tasks\/([^/]+)\/submit$/.exec(url);
   const activityMatch = /^\/activity\/([^/]+)\/events$/.exec(url);
+  const dayTasksMatch = /^\/days\/([^/]+)\/tasks$/.exec(url);
+  const dayMatch = /^\/days\/([^/]+)$/.exec(url);
 
   if (method === 'get' && codeMatch) {
     const taskId = codeMatch[1];
@@ -194,6 +199,24 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
 
   if (method === 'get' && url === '/auth/me') {
     return respond(config, 200, mockUser);
+  }
+  if (method === 'get' && dayTasksMatch) {
+    const dayId = dayTasksMatch[1];
+    const day = mockDayContents[dayId];
+    if (!day) return errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
+    if (day.isLocked) {
+      return errorResponse(config, 403, 'DAY_LOCKED', "This day isn't unlocked yet.");
+    }
+    return respond(config, 200, mockTasksByDay[dayId] ?? []);
+  }
+
+  if (method === 'get' && dayMatch) {
+    const day = mockDayContents[dayMatch[1]];
+    if (!day) return errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
+    if (day.isLocked) {
+      return errorResponse(config, 403, 'DAY_LOCKED', "This day isn't unlocked yet.");
+    }
+    return respond(config, 200, day);
   }
 
   return errorResponse(config, 404, 'NOT_FOUND', 'Not found.');

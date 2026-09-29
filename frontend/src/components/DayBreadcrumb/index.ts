@@ -1,1 +1,1 @@
-export { default } from './SelfCheckChecklist';
+export { default } from './DayBreadcrumb';

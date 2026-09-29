@@ -5,8 +5,12 @@ import type {
   TaskCodeResponse,
   TaskResponse,
   TraineeDatabaseResponse,
+  DayContent,
+  DayTask,
 } from '@itp/types';
 import { installMockAdapter } from './mockAdapter';
+import { mockDayContents } from './dayOverview';
+import { mockTasksByDay } from '../test/fixtures/dayTasks';
 
 function createClient() {
   const client = axios.create();
@@ -57,5 +61,61 @@ describe('mockAdapter', () => {
     expect(first.data.status).toBe('provisioning');
     expect(second.data.status).toBe('provisioning');
     expect(third.data.status).toBe('ready');
+  });
+
+  it('returns day content for GET /days/:dayId', async () => {
+    const dayId = Object.keys(mockDayContents).find((id) => !mockDayContents[id].isLocked);
+
+    if (!dayId) throw new Error('No unlocked day fixture found');
+
+    const res = await client.get<DayContent>(`/days/${dayId}`);
+
+    expect(res.status).toBe(200);
+    expect(res.data).toEqual(mockDayContents[dayId]);
+  });
+
+  it('returns tasks for GET /days/:dayId/tasks', async () => {
+    const dayId = Object.keys(mockDayContents).find((id) => !mockDayContents[id].isLocked);
+
+    if (!dayId) throw new Error('No unlocked day fixture found');
+
+    const res = await client.get<DayTask[]>(`/days/${dayId}/tasks`);
+
+    expect(res.status).toBe(200);
+    expect(res.data).toEqual(mockTasksByDay[dayId] ?? []);
+  });
+
+  it('rejects GET /days/missing/tasks with 404 NOT_FOUND', async () => {
+    await expect(client.get('/days/missing/tasks')).rejects.toMatchObject({
+      response: {
+        status: 404,
+        data: { error: { code: 'NOT_FOUND' } },
+      },
+    });
+  });
+  it('rejects GET /days/:dayId with 403 DAY_LOCKED for a locked day', async () => {
+    const dayId = Object.keys(mockDayContents).find((id) => mockDayContents[id].isLocked);
+
+    if (!dayId) throw new Error('No locked day fixture found');
+
+    await expect(client.get(`/days/${dayId}`)).rejects.toMatchObject({
+      response: {
+        status: 403,
+        data: { error: { code: 'DAY_LOCKED' } },
+      },
+    });
+  });
+
+  it('rejects GET /days/:dayId/tasks with 403 DAY_LOCKED for a locked day', async () => {
+    const dayId = Object.keys(mockDayContents).find((id) => mockDayContents[id].isLocked);
+
+    if (!dayId) throw new Error('No locked day fixture found');
+
+    await expect(client.get(`/days/${dayId}/tasks`)).rejects.toMatchObject({
+      response: {
+        status: 403,
+        data: { error: { code: 'DAY_LOCKED' } },
+      },
+    });
   });
 });
