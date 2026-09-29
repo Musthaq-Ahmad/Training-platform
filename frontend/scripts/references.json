@@ -1,0 +1,320 @@
+[
+  {
+    "day": "js-day-01",
+    "slug": "js-fundamentals",
+    "title": "javascript.info: Variables, types, conversions, comparisons",
+    "urls": [
+      "https://javascript.info/variables",
+      "https://javascript.info/types",
+      "https://javascript.info/type-conversions",
+      "https://javascript.info/comparison"
+    ]
+  },
+  {
+    "day": "js-day-01",
+    "slug": "js-functions-closures",
+    "title": "javascript.info: Functions and closures",
+    "urls": [
+      "https://javascript.info/function-basics",
+      "https://javascript.info/function-expressions",
+      "https://javascript.info/arrow-functions-basics",
+      "https://javascript.info/closure"
+    ]
+  },
+  {
+    "day": "js-day-01",
+    "slug": "mdn-data-structures",
+    "title": "MDN: JavaScript data types and structures",
+    "urls": ["https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures"]
+  },
+  {
+    "day": "js-day-01",
+    "slug": "ydkjs-get-started-ch2",
+    "title": "You Don't Know JS: Get Started, Ch.2",
+    "mode": "skip",
+    "reason": "CC BY-NC-ND (no derivatives)",
+    "urls": ["https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/get-started/ch2.md"]
+  },
+  {
+    "day": "js-day-01",
+    "slug": "jsv9000",
+    "title": "JavaScript Visualizer 9000",
+    "mode": "skip",
+    "reason": "Interactive tool, cannot be copied",
+    "urls": ["https://www.jsv9000.app/"]
+  },
+
+  {
+    "day": "js-day-02",
+    "slug": "js-browser-events",
+    "title": "javascript.info: Browser events",
+    "urls": [
+      "https://javascript.info/introduction-browser-events",
+      "https://javascript.info/bubbling-and-capturing",
+      "https://javascript.info/event-delegation"
+    ]
+  },
+  {
+    "day": "js-day-02",
+    "slug": "js-ui-events",
+    "title": "javascript.info: Mouse and keyboard events",
+    "urls": [
+      "https://javascript.info/mouse-events-basics",
+      "https://javascript.info/keyboard-events"
+    ]
+  },
+  {
+    "day": "js-day-02",
+    "slug": "js-error-handling",
+    "title": "javascript.info: Error handling",
+    "urls": ["https://javascript.info/try-catch", "https://javascript.info/custom-errors"]
+  },
+  {
+    "day": "js-day-02",
+    "slug": "mdn-intersection-observer",
+    "title": "MDN: IntersectionObserver API",
+    "urls": ["https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver"]
+  },
+  {
+    "day": "js-day-02",
+    "slug": "mdn-add-event-listener",
+    "title": "MDN: EventTarget.addEventListener()",
+    "urls": ["https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener"]
+  },
+
+  {
+    "day": "js-day-03",
+    "slug": "js-classes",
+    "title": "javascript.info: Classes",
+    "urls": [
+      "https://javascript.info/class",
+      "https://javascript.info/class-inheritance",
+      "https://javascript.info/static-properties-methods",
+      "https://javascript.info/private-protected-properties-methods"
+    ]
+  },
+  {
+    "day": "js-day-03",
+    "slug": "js-array-methods",
+    "title": "javascript.info: Array methods",
+    "urls": ["https://javascript.info/array-methods"]
+  },
+  {
+    "day": "js-day-03",
+    "slug": "eloquent-js-ch6",
+    "title": "Eloquent JavaScript: The Secret Life of Objects",
+    "urls": ["https://eloquentjavascript.net/06_object.html"]
+  },
+  {
+    "day": "js-day-03",
+    "slug": "mdn-drag-and-drop",
+    "title": "MDN: HTML Drag and Drop API",
+    "urls": ["https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API"]
+  },
+
+  {
+    "day": "js-day-04",
+    "slug": "js-promises-async",
+    "title": "javascript.info: Promises and async/await",
+    "urls": [
+      "https://javascript.info/callbacks",
+      "https://javascript.info/promise-basics",
+      "https://javascript.info/promise-chaining",
+      "https://javascript.info/promise-error-handling",
+      "https://javascript.info/promise-api",
+      "https://javascript.info/async-await"
+    ]
+  },
+  {
+    "day": "js-day-04",
+    "slug": "mdn-fetch",
+    "title": "MDN: Using the Fetch API",
+    "urls": ["https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch"]
+  },
+  {
+    "day": "js-day-04",
+    "slug": "open-meteo-docs",
+    "title": "Open-Meteo: Forecast API docs",
+    "urls": ["https://open-meteo.com/en/docs"]
+  },
+  {
+    "day": "js-day-04",
+    "slug": "loupe",
+    "title": "Loupe: event loop visualiser",
+    "mode": "skip",
+    "reason": "Interactive tool, cannot be copied",
+    "urls": ["http://latentflip.com/loupe/"]
+  },
+  {
+    "day": "js-day-04",
+    "slug": "jsv9000",
+    "title": "JavaScript Visualizer 9000",
+    "mode": "skip",
+    "reason": "Interactive tool, cannot be copied",
+    "urls": ["https://www.jsv9000.app/"]
+  },
+
+  {
+    "day": "js-day-05",
+    "slug": "js-modules",
+    "title": "javascript.info: Modules",
+    "urls": [
+      "https://javascript.info/modules-intro",
+      "https://javascript.info/import-export",
+      "https://javascript.info/modules-dynamic-imports"
+    ]
+  },
+  {
+    "day": "js-day-05",
+    "slug": "eslint-getting-started",
+    "title": "ESLint: Getting started",
+    "urls": ["https://eslint.org/docs/latest/use/getting-started"]
+  },
+  {
+    "day": "js-day-05",
+    "slug": "github-pages",
+    "title": "GitHub Docs: Creating a GitHub Pages site",
+    "urls": [
+      "https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site"
+    ]
+  },
+
+  {
+    "day": "js-day-06",
+    "slug": "js-closure-deep-dive",
+    "title": "javascript.info: Variable scope, closure",
+    "urls": ["https://javascript.info/closure"]
+  },
+  {
+    "day": "js-day-06",
+    "slug": "patterns-dev",
+    "title": "Patterns.dev: Observer, Module and Factory patterns",
+    "urls": [
+      "https://www.patterns.dev/vanilla/observer-pattern/",
+      "https://www.patterns.dev/vanilla/module-pattern/",
+      "https://www.patterns.dev/vanilla/factory-pattern/"
+    ]
+  },
+  {
+    "day": "js-day-06",
+    "slug": "mdn-js-modules",
+    "title": "MDN: JavaScript modules",
+    "urls": ["https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules"]
+  },
+  {
+    "day": "js-day-06",
+    "slug": "ydkjs-closures-ch7",
+    "title": "You Don't Know JS: Scope and Closures, Ch.7",
+    "mode": "skip",
+    "reason": "CC BY-NC-ND (no derivatives)",
+    "urls": ["https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/scope-closures/ch7.md"]
+  },
+
+  {
+    "day": "js-day-07",
+    "slug": "mdn-web-storage",
+    "title": "MDN: Web Storage API",
+    "urls": ["https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API"]
+  },
+  {
+    "day": "js-day-07",
+    "slug": "mdn-service-workers",
+    "title": "MDN: Using Service Workers",
+    "urls": [
+      "https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers"
+    ]
+  },
+  {
+    "day": "js-day-07",
+    "slug": "webdev-pwa",
+    "title": "web.dev: Learn PWA (service workers, caching, manifest)",
+    "urls": [
+      "https://web.dev/learn/pwa/service-workers",
+      "https://web.dev/learn/pwa/caching",
+      "https://web.dev/learn/pwa/web-app-manifest"
+    ]
+  },
+  {
+    "day": "js-day-07",
+    "slug": "mdn-web-manifest",
+    "title": "MDN: Web app manifests",
+    "urls": ["https://developer.mozilla.org/en-US/docs/Web/Manifest"]
+  },
+
+  {
+    "day": "js-day-08",
+    "slug": "jest-getting-started",
+    "title": "Jest: Getting started and matchers",
+    "urls": ["https://jestjs.io/docs/getting-started", "https://jestjs.io/docs/using-matchers"]
+  },
+  {
+    "day": "js-day-08",
+    "slug": "jest-mock-functions",
+    "title": "Jest: Mock functions",
+    "urls": ["https://jestjs.io/docs/mock-functions"]
+  },
+  {
+    "day": "js-day-08",
+    "slug": "jest-timer-mocks",
+    "title": "Jest: Timer mocks",
+    "urls": ["https://jestjs.io/docs/timer-mocks"]
+  },
+  {
+    "day": "js-day-08",
+    "slug": "jest-coverage",
+    "title": "Jest: CLI and code coverage",
+    "urls": ["https://jestjs.io/docs/cli"]
+  },
+  {
+    "day": "js-day-08",
+    "slug": "testing-javascript",
+    "title": "Testing JavaScript (Kent C. Dodds)",
+    "mode": "skip",
+    "reason": "Video course, cannot be copied",
+    "urls": ["https://testingjavascript.com/"]
+  },
+
+  {
+    "day": "js-day-09",
+    "slug": "webdev-rendering-performance",
+    "title": "web.dev: Rendering performance",
+    "urls": ["https://web.dev/articles/rendering-performance"]
+  },
+  {
+    "day": "js-day-09",
+    "slug": "mdn-request-animation-frame",
+    "title": "MDN: requestAnimationFrame",
+    "urls": ["https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame"]
+  },
+  {
+    "day": "js-day-09",
+    "slug": "mdn-canvas-tutorial",
+    "title": "MDN: Canvas API tutorial",
+    "urls": [
+      "https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Basic_usage",
+      "https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes",
+      "https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors"
+    ]
+  },
+  {
+    "day": "js-day-09",
+    "slug": "devtools-performance",
+    "title": "Chrome DevTools: Performance panel",
+    "urls": ["https://developer.chrome.com/docs/devtools/performance/"]
+  },
+
+  {
+    "day": "js-day-10",
+    "slug": "mdn-history-api",
+    "title": "MDN: History API",
+    "urls": ["https://developer.mozilla.org/en-US/docs/Web/API/History_API"]
+  },
+  {
+    "day": "js-day-10",
+    "slug": "github-pages",
+    "title": "GitHub Docs: Creating a GitHub Pages site",
+    "urls": [
+      "https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site"
+    ]
+  }
+]

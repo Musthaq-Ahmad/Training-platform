@@ -1,0 +1,212 @@
+[
+  {
+    "day": "js-day-01",
+    "slug": "js-fundamentals",
+    "title": "javascript.info: Variables, types, conversions, comparisons",
+    "source": ["javascript.info"]
+  },
+  {
+    "day": "js-day-01",
+    "slug": "js-functions-closures",
+    "title": "javascript.info: Functions and closures",
+    "source": ["javascript.info"]
+  },
+  {
+    "day": "js-day-01",
+    "slug": "mdn-data-structures",
+    "title": "MDN: JavaScript data types and structures",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-02",
+    "slug": "js-browser-events",
+    "title": "javascript.info: Browser events",
+    "source": ["javascript.info"]
+  },
+  {
+    "day": "js-day-02",
+    "slug": "js-ui-events",
+    "title": "javascript.info: Mouse and keyboard events",
+    "source": ["javascript.info"]
+  },
+  {
+    "day": "js-day-02",
+    "slug": "js-error-handling",
+    "title": "javascript.info: Error handling",
+    "source": ["javascript.info"]
+  },
+  {
+    "day": "js-day-02",
+    "slug": "mdn-intersection-observer",
+    "title": "MDN: IntersectionObserver API",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-02",
+    "slug": "mdn-add-event-listener",
+    "title": "MDN: EventTarget.addEventListener()",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-03",
+    "slug": "js-classes",
+    "title": "javascript.info: Classes",
+    "source": ["javascript.info"]
+  },
+  {
+    "day": "js-day-03",
+    "slug": "js-array-methods",
+    "title": "javascript.info: Array methods",
+    "source": ["javascript.info"]
+  },
+  {
+    "day": "js-day-03",
+    "slug": "eloquent-js-ch6",
+    "title": "Eloquent JavaScript: The Secret Life of Objects",
+    "source": ["eloquentjavascript.net"]
+  },
+  {
+    "day": "js-day-03",
+    "slug": "mdn-drag-and-drop",
+    "title": "MDN: HTML Drag and Drop API",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-04",
+    "slug": "js-promises-async",
+    "title": "javascript.info: Promises and async/await",
+    "source": ["javascript.info"]
+  },
+  {
+    "day": "js-day-04",
+    "slug": "mdn-fetch",
+    "title": "MDN: Using the Fetch API",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-04",
+    "slug": "open-meteo-docs",
+    "title": "Open-Meteo: Forecast API docs",
+    "source": ["open-meteo.com"]
+  },
+  {
+    "day": "js-day-05",
+    "slug": "js-modules",
+    "title": "javascript.info: Modules",
+    "source": ["javascript.info"]
+  },
+  {
+    "day": "js-day-05",
+    "slug": "eslint-getting-started",
+    "title": "ESLint: Getting started",
+    "source": ["eslint.org"]
+  },
+  {
+    "day": "js-day-05",
+    "slug": "github-pages",
+    "title": "GitHub Docs: Creating a GitHub Pages site",
+    "source": ["docs.github.com"]
+  },
+  {
+    "day": "js-day-06",
+    "slug": "js-closure-deep-dive",
+    "title": "javascript.info: Variable scope, closure",
+    "source": ["javascript.info"]
+  },
+  {
+    "day": "js-day-06",
+    "slug": "patterns-dev",
+    "title": "Patterns.dev: Observer, Module and Factory patterns",
+    "source": ["www.patterns.dev"]
+  },
+  {
+    "day": "js-day-06",
+    "slug": "mdn-js-modules",
+    "title": "MDN: JavaScript modules",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-07",
+    "slug": "mdn-web-storage",
+    "title": "MDN: Web Storage API",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-07",
+    "slug": "mdn-service-workers",
+    "title": "MDN: Using Service Workers",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-07",
+    "slug": "webdev-pwa",
+    "title": "web.dev: Learn PWA (service workers, caching, manifest)",
+    "source": ["web.dev"]
+  },
+  {
+    "day": "js-day-07",
+    "slug": "mdn-web-manifest",
+    "title": "MDN: Web app manifests",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-08",
+    "slug": "jest-getting-started",
+    "title": "Jest: Getting started and matchers",
+    "source": ["jestjs.io"]
+  },
+  {
+    "day": "js-day-08",
+    "slug": "jest-mock-functions",
+    "title": "Jest: Mock functions",
+    "source": ["jestjs.io"]
+  },
+  {
+    "day": "js-day-08",
+    "slug": "jest-timer-mocks",
+    "title": "Jest: Timer mocks",
+    "source": ["jestjs.io"]
+  },
+  {
+    "day": "js-day-08",
+    "slug": "jest-coverage",
+    "title": "Jest: CLI and code coverage",
+    "source": ["jestjs.io"]
+  },
+  {
+    "day": "js-day-09",
+    "slug": "webdev-rendering-performance",
+    "title": "web.dev: Rendering performance",
+    "source": ["web.dev"]
+  },
+  {
+    "day": "js-day-09",
+    "slug": "mdn-request-animation-frame",
+    "title": "MDN: requestAnimationFrame",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-09",
+    "slug": "mdn-canvas-tutorial",
+    "title": "MDN: Canvas API tutorial",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-09",
+    "slug": "devtools-performance",
+    "title": "Chrome DevTools: Performance panel",
+    "source": ["developer.chrome.com"]
+  },
+  {
+    "day": "js-day-10",
+    "slug": "mdn-history-api",
+    "title": "MDN: History API",
+    "source": ["developer.mozilla.org"]
+  },
+  {
+    "day": "js-day-10",
+    "slug": "github-pages",
+    "title": "GitHub Docs: Creating a GitHub Pages site",
+    "source": ["docs.github.com"]
+  }
+]

@@ -7,9 +7,12 @@ import DailyActivityTable from '../../components/DailyActivityTable';
 import styles from './ProfilePage.module.css';
 import Header from '../../components/Header';
 import LoaderOverlay from '../../components/Common/LoadingState';
+import { ErrorState } from '../../components/Common/ErrorState';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const [error, setError] = useState<Error | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -24,7 +27,9 @@ export default function ProfilePage() {
           setProfile(data);
         }
       } catch (error) {
-        console.log(error);
+        if (isMounted) {
+          setError(error instanceof Error ? error : new Error('Something went wrong'));
+        }
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -37,7 +42,12 @@ export default function ProfilePage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [attempt]);
+  const handleRetry = () => {
+    setIsLoading(true);
+    setError(null);
+    setAttempt((n) => n + 1);
+  };
 
   if (isLoading) {
     return (
@@ -55,9 +65,12 @@ export default function ProfilePage() {
       <>
         <Header />
         <main className={styles.page}>
-          <div className={styles.error} role="alert">
-            Unable to load profile.
-          </div>
+          <ErrorState
+            fullPage
+            message={`${error?.message}. Please try again.`}
+            title="Unable to load profile"
+            onRetry={handleRetry}
+          />
         </main>
       </>
     );
