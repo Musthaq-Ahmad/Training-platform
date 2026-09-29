@@ -8,7 +8,7 @@ import TrackTabs from '../../components/TrackTabs';
 import ScheduleGrid from '../../components/ScheduleGrid';
 import StatsRow from '../../components/StatsRow';
 import styles from './DashboardPage.module.css';
-import { LoaderOverlay } from '../../components/Common/LoadingState/Loader';
+import LoaderOverlay from '../../components/Common/LoadingState';
 
 const DEFAULT_COURSE_ID = 'course-html';
 

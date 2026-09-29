@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router';
 import { useAuth } from '../context/Useauth';
-import { LoaderOverlay } from '../components/Common/LoadingState/Loader';
+import LoaderOverlay from '../components/Common/LoadingState/Loader';
 
 /** Layout route for pages like /login: signed-in users are sent to the home page. */
 export function PublicOnlyRoute() {
