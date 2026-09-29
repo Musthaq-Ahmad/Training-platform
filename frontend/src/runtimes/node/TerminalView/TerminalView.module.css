@@ -1,0 +1,5 @@
+.terminal {
+  height: 100%;
+  padding: 8px 0 0 12px;
+  background-color: var(--color-bg-base);
+}
