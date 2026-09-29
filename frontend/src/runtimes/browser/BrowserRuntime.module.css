@@ -1,0 +1,143 @@
+.view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.view[hidden] {
+  display: none;
+}
+
+.frameArea {
+  flex: 1;
+  min-height: 0;
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.banner {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  background-color: var(--color-status-error-tint);
+  color: var(--color-status-error-text);
+  border-bottom: 1px solid var(--color-border-divider);
+}
+
+/* Toolbar: URL field + reload */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.urlField {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.lockIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--color-text-dim);
+  pointer-events: none;
+}
+
+.urlSelect {
+  max-width: 320px;
+  height: 28px;
+  padding: 0 14px 0 30px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background-color: var(--color-bg-sunken);
+  color: var(--color-text-secondary);
+  text-overflow: ellipsis;
+}
+
+.urlSelect:disabled {
+  color: var(--color-text-dim);
+}
+
+.iconButton {
+  display: flex;
+  padding: 6px;
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+}
+
+.iconButton:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-surface-2);
+}
+
+.iconButton:disabled {
+  color: var(--color-text-dim);
+  cursor: not-allowed;
+}
+
+/* Footer */
+
+.footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.status {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+}
+
+.statusError {
+  color: var(--color-status-error-text);
+}
+
+.systemTag {
+  color: var(--color-accent-label);
+}
+
+.statusError .systemTag {
+  color: var(--color-status-error-text);
+}
+
+.ready {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-dim);
+}
+
+.readyDone {
+  color: var(--color-text-green);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background-color: currentColor;
+}

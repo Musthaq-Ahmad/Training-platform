@@ -5,7 +5,8 @@ import { useToast } from '../../components/Toast';
 import ResultPaneFrame from '../../components/ResultPaneFrame';
 import { useRegisterRunner } from '../runnerContext';
 
-type SqlRuntimeProps = { task: TaskResponse };
+// isVisible is accepted and not used yet.
+type SqlRuntimeProps = { task: TaskResponse; isVisible: boolean };
 
 export default function SqlRuntime({ task: _task }: SqlRuntimeProps) {
   const { show } = useToast();

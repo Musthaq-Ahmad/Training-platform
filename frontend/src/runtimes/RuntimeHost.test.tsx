@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { taskFixture, nodeTaskFixture, sqlTaskFixture } from '../test/fixtures/task';
+import {
+  taskFixture,
+  taskCodeFixture,
+  nodeTaskFixture,
+  sqlTaskFixture,
+} from '../test/fixtures/task';
+import { WorkspaceProvider } from '../pages/TaskPage/state/WorkspaceContext';
 import { ToastProvider } from '../components/Toast';
 import { RunnerProvider } from './runnerContext';
 import RuntimeHost from './RuntimeHost';
@@ -8,9 +14,12 @@ import RuntimeHost from './RuntimeHost';
 function renderHost(task: typeof taskFixture) {
   return render(
     <ToastProvider>
-      <RunnerProvider>
-        <RuntimeHost task={task} />
-      </RunnerProvider>
+      <WorkspaceProvider code={taskCodeFixture}>
+        <RunnerProvider>
+          {/* Not visible, so the browser runtime doesn't start a build */}
+          <RuntimeHost task={task} isVisible={false} />
+        </RunnerProvider>
+      </WorkspaceProvider>
     </ToastProvider>
   );
 }
