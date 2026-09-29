@@ -6,6 +6,7 @@ import StatsSummary from '../../components/StatsSummary';
 import DailyActivityTable from '../../components/DailyActivityTable';
 import styles from './ProfilePage.module.css';
 import Header from '../../components/Header';
+import LoaderOverlay from '../../components/Common/LoadingState';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -43,9 +44,7 @@ export default function ProfilePage() {
       <>
         <main className={styles.page}>
           <Header />
-          <div className={styles.loading} role="status" aria-label="Loading profile">
-            Loading profile...
-          </div>
+          <LoaderOverlay />
         </main>
       </>
     );

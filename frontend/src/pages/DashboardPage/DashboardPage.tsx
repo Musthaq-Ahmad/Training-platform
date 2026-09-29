@@ -8,6 +8,7 @@ import TrackTabs from '../../components/TrackTabs';
 import ScheduleGrid from '../../components/ScheduleGrid';
 import StatsRow from '../../components/StatsRow';
 import styles from './DashboardPage.module.css';
+import LoaderOverlay from '../../components/Common/LoadingState';
 
 const DEFAULT_COURSE_ID = 'course-html';
 
@@ -29,7 +30,7 @@ export default function DashboardPage() {
       .finally(() => setIsLoading(false));
   }, []);
 
-  if (isLoading) return <p className={styles.status}>Loading...</p>;
+  if (isLoading) return <LoaderOverlay fullPage={true} />;
   if (error) return <p className={styles.status}>{error.message}</p>;
   if (!dashboard) return null;
 
