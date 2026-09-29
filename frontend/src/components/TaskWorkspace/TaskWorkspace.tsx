@@ -182,7 +182,7 @@ export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
           }
           data-testid="result-pane"
         >
-          <RuntimeHost task={task} />
+          <RuntimeHost task={task} isVisible={state.visiblePanes.result} />
         </div>
       </div>
 

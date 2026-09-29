@@ -1,0 +1,137 @@
+.panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-base);
+}
+
+.header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--color-border-divider);
+  color: var(--color-text-secondary);
+}
+
+.headerLabel {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.headerActions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.headerActions button {
+  display: flex;
+  padding: 4px;
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+}
+
+.headerActions button:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-surface-2);
+}
+
+.list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.empty {
+  padding: 16px 12px;
+  font-size: 13px;
+  color: var(--color-text-dim);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 110px 84px 1fr;
+  align-items: start;
+  padding: 8px;
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid var(--color-border-divider);
+  color: var(--color-text-primary);
+}
+
+.time {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--color-text-dim);
+}
+
+.tagCell {
+  line-height: 20px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 18px;
+  text-transform: uppercase;
+  background-color: var(--color-bg-pill-inactive);
+  color: var(--color-text-secondary);
+}
+
+.message {
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 20px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.source {
+  color: var(--color-text-dim);
+}
+
+.info .tag {
+  background-color: var(--color-bg-surface-2);
+  color: var(--color-text-secondary);
+}
+
+.info .message {
+  color: var(--color-text-secondary);
+}
+
+.warn {
+  background-color: var(--color-status-warning-bg);
+  border-left-color: var(--color-status-warning);
+}
+
+.warn .tag {
+  background-color: var(--color-status-warning-border);
+  color: var(--color-status-warning);
+}
+
+.warn .message {
+  color: var(--color-status-warning);
+}
+
+.error {
+  background-color: var(--color-status-error-tint);
+  border-left-color: var(--color-status-error-icon);
+}
+
+.error .tag {
+  background-color: var(--color-status-error-tint);
+  color: var(--color-status-error-text);
+}
+
+.error .message {
+  color: var(--color-status-error-text);
+}

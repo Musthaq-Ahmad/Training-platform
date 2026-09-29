@@ -15,6 +15,7 @@
     "@itp/types": "^1.0.0",
     "@monaco-editor/react": "^4.7.0",
     "axios": "^1.20.0",
+    "esbuild-wasm": "^0.28.2",
     "lucide-react": "^1.48.0",
     "monaco-editor": "^0.57.0",
     "react": "^19.2.8",
