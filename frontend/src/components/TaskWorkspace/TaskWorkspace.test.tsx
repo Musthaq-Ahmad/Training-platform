@@ -10,8 +10,16 @@ import { ToastProvider } from '../../components/Toast';
 import { taskFixture, taskCodeFixture } from '../../test/fixtures/task';
 import { saveTaskCode } from '../../api/tasks';
 import { ApiError } from '../../api/errors';
+import { buildPreviewDocument } from '../../runtimes/browser/buildPreviewDocument';
 
 vi.mock('../../api/tasks');
+
+// The real builder, wrapped so tests can count builds.
+vi.mock('../../runtimes/browser/buildPreviewDocument', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../../runtimes/browser/buildPreviewDocument')>();
+  return { ...actual, buildPreviewDocument: vi.fn(actual.buildPreviewDocument) };
+});
 
 const navigateMock = vi.fn();
 vi.mock('react-router', async () => {
@@ -62,8 +70,21 @@ describe('TaskWorkspace', () => {
     const user = userEvent.setup();
     renderWorkspace();
     await user.click(screen.getByRole('button', { name: /run/i }));
-    // BrowserRuntime's FE-06 placeholder shows this toast when run() fires.
-    expect(await screen.findByText('Coming in FE-07.')).toBeInTheDocument();
+    // BrowserRuntime's run() builds the page and shows it in the preview iframe.
+    expect(await screen.findByTitle('Preview of services.html')).toBeInTheDocument();
+  });
+
+  it('builds the preview once when Run opens the hidden Result pane', async () => {
+    const user = userEvent.setup();
+    vi.mocked(buildPreviewDocument).mockClear();
+    renderWorkspace();
+    expect(buildPreviewDocument).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: /run/i }));
+    await screen.findByTitle('Preview of services.html');
+
+    // Run and "the pane just became visible" must not both start a build.
+    expect(buildPreviewDocument).toHaveBeenCalledTimes(1);
   });
 
   it('Ctrl+Enter runs, even outside the editor', async () => {
@@ -73,7 +94,7 @@ describe('TaskWorkspace', () => {
     await user.keyboard('{Control>}{Enter}{/Control}');
 
     expect(screen.getByTestId('result-pane').className).not.toMatch(/paneHidden/);
-    expect(await screen.findByText('Coming in FE-07.')).toBeInTheDocument();
+    expect(await screen.findByTitle('Preview of services.html')).toBeInTheDocument();
   });
 
   it('keeps the editor mounted but hidden when Code is toggled off', async () => {
