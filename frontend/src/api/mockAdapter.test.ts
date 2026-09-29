@@ -1,11 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import axios from 'axios';
-import type {
-  SqlExecuteResponse,
-  TaskCodeResponse,
-  TaskResponse,
-  TraineeDatabaseResponse,
-} from '@itp/types';
+import type { TaskCodeResponse, TaskResponse } from '@itp/types';
 import { installMockAdapter } from './mockAdapter';
 
 function createClient() {
@@ -40,22 +35,9 @@ describe('mockAdapter', () => {
     expect(res.data.files).toEqual(files);
   });
 
-  it('returns ok: false with a position when the query contains "error"', async () => {
-    const res = await client.post<SqlExecuteResponse>('/sql/execute', {
-      taskId: 't-sql',
-      query: 'select error;',
+  it('no longer answers the removed /sql routes (SQL runs in the browser now)', async () => {
+    await expect(client.get('/sql/database')).rejects.toMatchObject({
+      response: { status: 404 },
     });
-    expect(res.data.ok).toBe(false);
-    expect(res.data.ok === false && res.data.error.position).toBe('select '.length + 1);
-  });
-
-  it('goes provisioning, provisioning, then ready across three calls', async () => {
-    const first = await client.get<TraineeDatabaseResponse>('/sql/database');
-    const second = await client.get<TraineeDatabaseResponse>('/sql/database');
-    const third = await client.get<TraineeDatabaseResponse>('/sql/database');
-
-    expect(first.data.status).toBe('provisioning');
-    expect(second.data.status).toBe('provisioning');
-    expect(third.data.status).toBe('ready');
   });
 });
