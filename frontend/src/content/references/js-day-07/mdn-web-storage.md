@@ -19,7 +19,7 @@ Asynchronous alternatives, such as [IndexedDB](https://developer.mozilla.org/en-
 
 Each origin has its own storage — this is true for both web storage and [shared storage](https://developer.mozilla.org/en-US/docs/Web/API/Shared_Storage_API). However, access of third-party (i.e., embedded) code to shared storage depends on its [browsing context](https://developer.mozilla.org/en-US/docs/Glossary/Browsing_context). The context in which a third-party code from another origin runs determines the storage access of the third-party code.
 
-![A box diagram showing a top-level browsing context called publisher.com, with third-party content embedded in it](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/embedded-content.png)
+![A box diagram showing a top-level browsing context called publisher.com, with third-party content embedded in it](/src/content/assets/js/embedded-content.png)
 
 Third-party code can be added to another site by injecting it with a [`<script>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script) element or by setting the source of an [`<iframe>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe) to a site that contains third-party code. The method used for integrating third-party code determines the browsing context of the code.
 

@@ -226,6 +226,7 @@ export const jsUiEventsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: ['Window-relative: clientX and clientY.', 'Document-relative: pageX and pageY.'],
       },
       {
@@ -318,7 +319,7 @@ export const jsUiEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'If you try to copy a piece of text in the &lt;div&gt;, that won’t work, because the default action oncopy is prevented.',
+        text: 'If you try to copy a piece of text in the <div>, that won’t work, because the default action oncopy is prevented.',
       },
       {
         type: 'paragraph',
@@ -352,7 +353,7 @@ export const jsUiEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'So if we want to track any input into an &lt;input&gt; field, then keyboard events are not enough. There’s another event named input to track changes of an &lt;input&gt; field, by any means. And it may be a better choice for such task. We’ll cover it later in the chapter Events: change, input, cut, copy, paste.',
+        text: 'So if we want to track any input into an <input> field, then keyboard events are not enough. There’s another event named input to track changes of an <input> field, by any means. And it may be a better choice for such task. We’ll cover it later in the chapter Events: change, input, cut, copy, paste.',
       },
       {
         type: 'paragraph',
@@ -455,8 +456,8 @@ export const jsUiEventsTopics = {
         type: 'list',
         ordered: false,
         items: [
-          'Letter keys have codes "Key&lt;letter&gt;": "KeyA", "KeyB" etc.',
-          'Digit keys have codes: "Digit&lt;number&gt;": "Digit0", "Digit1" etc.',
+          'Letter keys have codes "Key<letter>": "KeyA", "KeyB" etc.',
+          'Digit keys have codes: "Digit<number>": "Digit0", "Digit1" etc.',
           'Special keys are coded by their names: "Enter", "Backspace", "Tab" etc.',
         ],
       },
@@ -598,7 +599,7 @@ export const jsUiEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'For instance, the &lt;input&gt; below expects a phone number, so it does not accept keys except digits, +, () or -:',
+        text: 'For instance, the <input> below expects a phone number, so it does not accept keys except digits, +, () or -:',
       },
       {
         type: 'code',
@@ -614,7 +615,7 @@ export const jsUiEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'As we know, the false value returned from the event handler, assigned using a DOM property or an attribute, such as above, prevents the default action, so nothing appears in the &lt;input&gt; for keys that don’t pass the test. (The true value returned doesn’t affect anything, only returning false matters)',
+        text: 'As we know, the false value returned from the event handler, assigned using a DOM property or an attribute, such as above, prevents the default action, so nothing appears in the <input> for keys that don’t pass the test. (The true value returned doesn’t affect anything, only returning false matters)',
       },
       {
         type: 'paragraph',
@@ -642,7 +643,7 @@ export const jsUiEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'The alternative approach would be to track the oninput event – it triggers after any modification. There we can check the new input.value and modify it/highlight the &lt;input&gt; when it’s invalid. Or we can use both event handlers together.',
+        text: 'The alternative approach would be to track the oninput event – it triggers after any modification. There we can check the new input.value and modify it/highlight the <input> when it’s invalid. Or we can use both event handlers together.',
       },
       {
         type: 'paragraph',

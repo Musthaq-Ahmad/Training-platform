@@ -28,10 +28,11 @@ export const githubPagesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'In the upper-right corner of any page, select , then click New repository.',
           'Use the Owner dropdown menu to select the account you want to own the repository.',
-          "Type a name for your repository and an optional description. If you're creating a user or organization site, your repository must be named &lt;user&gt;.github.io or &lt;organization&gt;.github.io. If your user or organization name contains uppercase letters, you must lowercase the letters. For more information, see What is GitHub Pages?.",
+          "Type a name for your repository and an optional description. If you're creating a user or organization site, your repository must be named <user>.github.io or <organization>.github.io. If your user or organization name contains uppercase letters, you must lowercase the letters. For more information, see What is GitHub Pages?.",
           'Choose a repository visibility. For more information, see About repositories.',
           'Toggle Add README to On.',
           'Click Create repository.',
@@ -52,6 +53,7 @@ export const githubPagesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           "On GitHub, navigate to your site's repository.",
           'Decide which publishing source you want to use. See Configuring a publishing source for your GitHub Pages site.',
@@ -63,6 +65,7 @@ export const githubPagesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Under your repository name, click Settings. If you cannot see the "Settings" tab, select the dropdown menu, then click Settings.',
           'In the "Code, planning, and automation" section of the sidebar, click Pages.',
@@ -115,7 +118,7 @@ export const githubPagesTopics = {
       },
       {
         type: 'paragraph',
-        text: 'You can add more pages to your site by creating more new files. Each file will be available on your site in the same directory structure as your publishing source. For example, if the publishing source for your project site is the gh-pages branch, and you create a new file called /about/contact-us.md on the gh-pages branch, the file will be available at https://&lt;user&gt;.github.io/&lt;repository&gt;/about/contact-us.html.',
+        text: 'You can add more pages to your site by creating more new files. Each file will be available on your site in the same directory structure as your publishing source. For example, if the publishing source for your project site is the gh-pages branch, and you create a new file called /about/contact-us.md on the gh-pages branch, the file will be available at https://<user>.github.io/<repository>/about/contact-us.html.',
       },
       {
         type: 'paragraph',

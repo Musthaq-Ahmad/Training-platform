@@ -3,7 +3,7 @@ import type { ContentTopic } from '../../../types';
 export const mdnCanvasTutorialTopics = {
   'mdn-canvas-tutorial': {
     id: 'mdn-canvas-tutorial',
-    heading: 'The &lt;canvas&gt; element',
+    heading: 'The <canvas> element',
     blocks: [
       {
         type: 'code',
@@ -15,19 +15,19 @@ export const mdnCanvasTutorialTopics = {
       },
       {
         type: 'paragraph',
-        text: "At first sight a &lt;canvas&gt; looks like the &lt;img&gt; element, with the only clear difference being that it doesn't have the src and alt attributes. Indeed, the &lt;canvas&gt; element has only two attributes, width and height. These are both optional and can also be set using DOM properties. When no width and height attributes are specified, the canvas will initially be 300 pixels wide and 150 pixels high. The element can be sized arbitrarily by CSS, but during rendering the image is scaled to fit its layout size: if the CSS sizing doesn't respect the ratio of the initial canvas, it will appear distorted.",
+        text: "At first sight a <canvas> looks like the <img> element, with the only clear difference being that it doesn't have the src and alt attributes. Indeed, the <canvas> element has only two attributes, width and height. These are both optional and can also be set using DOM properties. When no width and height attributes are specified, the canvas will initially be 300 pixels wide and 150 pixels high. The element can be sized arbitrarily by CSS, but during rendering the image is scaled to fit its layout size: if the CSS sizing doesn't respect the ratio of the initial canvas, it will appear distorted.",
       },
       {
         type: 'paragraph',
-        text: 'Note: If your renderings seem distorted, try specifying your width and height attributes explicitly in the &lt;canvas&gt; attributes, and not using CSS.',
+        text: 'Note: If your renderings seem distorted, try specifying your width and height attributes explicitly in the <canvas> attributes, and not using CSS.',
       },
       {
         type: 'paragraph',
-        text: "The id attribute isn't specific to the &lt;canvas&gt; element but is one of the global HTML attributes which can be applied to any HTML element (like class for instance). It is always a good idea to supply an id because this makes it much easier to identify it in a script.",
+        text: "The id attribute isn't specific to the <canvas> element but is one of the global HTML attributes which can be applied to any HTML element (like class for instance). It is always a good idea to supply an id because this makes it much easier to identify it in a script.",
       },
       {
         type: 'paragraph',
-        text: "The &lt;canvas&gt; element can be styled just like any normal image (margin, border, background…). These rules, however, don't affect the actual drawing on the canvas. We'll see how this is done in a dedicated chapter of this tutorial. When no styling rules are applied to the canvas it will initially be fully transparent.",
+        text: "The <canvas> element can be styled just like any normal image (margin, border, background…). These rules, however, don't affect the actual drawing on the canvas. We'll see how this is done in a dedicated chapter of this tutorial. When no styling rules are applied to the canvas it will initially be fully transparent.",
       },
       {
         type: 'subheading',
@@ -36,11 +36,11 @@ export const mdnCanvasTutorialTopics = {
       },
       {
         type: 'paragraph',
-        text: "The &lt;canvas&gt; element, like the &lt;img&gt;, &lt;video&gt;, &lt;audio&gt;, and &lt;picture&gt; elements, must be made accessible by providing fallback text to be displayed when the media doesn't load or the user is unable to experience it as intended. You should always provide fallback content, captions, and alternative text, as appropriate for the media type.",
+        text: "The <canvas> element, like the <img>, <video>, <audio>, and <picture> elements, must be made accessible by providing fallback text to be displayed when the media doesn't load or the user is unable to experience it as intended. You should always provide fallback content, captions, and alternative text, as appropriate for the media type.",
       },
       {
         type: 'paragraph',
-        text: "Providing fallback content is very straightforward: just insert the alternate content inside the &lt;canvas&gt; element to be accessed by screen readers, spiders, and other automated bots. Browsers, by default, will ignore the content inside the container, rendering the canvas normally unless &lt;canvas&gt; isn't supported.",
+        text: "Providing fallback content is very straightforward: just insert the alternate content inside the <canvas> element to be accessed by screen readers, spiders, and other automated bots. Browsers, by default, will ignore the content inside the container, rendering the canvas normally unless <canvas> isn't supported.",
       },
       {
         type: 'paragraph',
@@ -65,7 +65,7 @@ export const mdnCanvasTutorialTopics = {
       },
       {
         type: 'paragraph',
-        text: "As a consequence of the way fallback is provided, unlike the &lt;img&gt; element, the &lt;canvas&gt; element requires the closing tag (&lt;/canvas&gt;). If this tag is not present, the rest of the document would be considered the fallback content and wouldn't be displayed.",
+        text: "As a consequence of the way fallback is provided, unlike the <img> element, the <canvas> element requires the closing tag (&lt;/canvas&gt;). If this tag is not present, the rest of the document would be considered the fallback content and wouldn't be displayed.",
       },
       {
         type: 'paragraph',
@@ -73,11 +73,11 @@ export const mdnCanvasTutorialTopics = {
       },
       {
         type: 'paragraph',
-        text: 'The &lt;canvas&gt; element creates a fixed-size drawing surface that exposes one or more rendering contexts, which are used to create and manipulate the content shown. In this tutorial, we focus on the 2D rendering context. Other contexts may provide different types of rendering; for example, WebGL uses a 3D context based on OpenGL ES.',
+        text: 'The <canvas> element creates a fixed-size drawing surface that exposes one or more rendering contexts, which are used to create and manipulate the content shown. In this tutorial, we focus on the 2D rendering context. Other contexts may provide different types of rendering; for example, WebGL uses a 3D context based on OpenGL ES.',
       },
       {
         type: 'paragraph',
-        text: 'The canvas is initially blank. To display something, a script first needs to access the rendering context and draw on it. The &lt;canvas&gt; element has a method called getContext(), used to obtain the rendering context and its drawing functions. getContext() takes one parameter, the type of context. For 2D graphics, such as those covered by this tutorial, you specify "2d" to get a CanvasRenderingContext2D.',
+        text: 'The canvas is initially blank. To display something, a script first needs to access the rendering context and draw on it. The <canvas> element has a method called getContext(), used to obtain the rendering context and its drawing functions. getContext() takes one parameter, the type of context. For 2D graphics, such as those covered by this tutorial, you specify "2d" to get a CanvasRenderingContext2D.',
       },
       {
         type: 'code',
@@ -89,11 +89,11 @@ export const mdnCanvasTutorialTopics = {
       },
       {
         type: 'paragraph',
-        text: 'The first line in the script retrieves the node in the DOM representing the &lt;canvas&gt; element by calling the document.getElementById() method. Once you have the element node, you can access the drawing context using its getContext() method.',
+        text: 'The first line in the script retrieves the node in the DOM representing the <canvas> element by calling the document.getElementById() method. Once you have the element node, you can access the drawing context using its getContext() method.',
       },
       {
         type: 'paragraph',
-        text: 'The fallback content is displayed in browsers which do not support &lt;canvas&gt;. Scripts can also check for support programmatically by testing for the presence of the getContext() method. Our code snippet from above becomes something like this:',
+        text: 'The fallback content is displayed in browsers which do not support <canvas>. Scripts can also check for support programmatically by testing for the presence of the getContext() method. Our code snippet from above becomes something like this:',
       },
       {
         type: 'code',
@@ -169,12 +169,17 @@ export const mdnCanvasTutorialTopics = {
         text: 'Before we can start drawing, we need to talk about the canvas grid or coordinate space. Our HTML skeleton from the previous page had a canvas element 150 pixels wide and 150 pixels high.',
       },
       {
+        type: 'image',
+        src: '/src/content/assets/js/canvas_default_grid.png',
+        alt: 'Canvas grid with a blue square demonstrating coordinates and axes.',
+      },
+      {
         type: 'paragraph',
         text: "Normally 1 unit in the grid corresponds to 1 pixel on the canvas. The origin of this grid is positioned in the top left corner at coordinate (0,0). All elements are placed relative to this origin. So the position of the top left corner of the blue square becomes x pixels from the left and y pixels from the top, at coordinate (x,y). Later in this tutorial we'll see how we can translate the origin to a different position, rotate the grid and even scale it, but for now we'll stick to the default.",
       },
       {
         type: 'paragraph',
-        text: 'Unlike SVG, &lt;canvas&gt; only supports two primitive shapes: rectangles and paths (lists of points connected by lines). All other shapes must be created by combining one or more paths. Luckily, we have an assortment of path drawing functions which make it possible to compose very complex shapes.',
+        text: 'Unlike SVG, <canvas> only supports two primitive shapes: rectangles and paths (lists of points connected by lines). All other shapes must be created by combining one or more paths. Luckily, we have an assortment of path drawing functions which make it possible to compose very complex shapes.',
       },
       {
         type: 'paragraph',
@@ -322,6 +327,11 @@ export const mdnCanvasTutorialTopics = {
         text: 'If you look at the grid diagram above again, you can see that coordinates like 2 or 12 do not identify a pixel, but rather the edge between two pixels. In the images below, the grid represents the canvas coordinate grid. The squares between grid lines are actual on-screen pixels. In the first grid image below, a rectangle from (2,1) to (5,5) is filled. The entire area between them (light red) falls on pixel boundaries, so the resulting filled rectangle will have crisp edges.',
       },
       {
+        type: 'image',
+        src: '/src/content/assets/js/canvas-grid.png',
+        alt: 'Three coordinate grids. The grid lines are actual pixels on the screen. The top left corner of each grid is labeled (0,0). In the first grid, a rectangle from (2,1) to (5,5) is filled in light-red color. In the second grid, (3,1) to (3,5) is joined with a 1-pixel thick royal blue line. The royal-blue line is centered on a grid line, extends from 2.5 to 3.5 on the x access, halfway into the pixels on either side of the graph line, with a light blue background on either side extending from 2 to 4 on the x-access. To avoid the light blue blur extension of the line in the second coordinate grid, the path in, the third coordinate grid is a royal-blue from line (3.5,1) to (3.5,5). The 1 pixel line width ends up completely and precisely filling a single pixel vertical line.',
+      },
+      {
         type: 'paragraph',
         text: 'If you consider a path from (3,1) to (3,5) with a line thickness of 1.0, you end up with the situation in the second image. The actual area to be filled (dark blue) only extends halfway into the pixels on either side of the path. An approximation of this has to be rendered, which means that those pixels being only partially shaded, and results in the entire area (the light blue and dark blue) being filled in with a color only half as dark as the actual stroke color. This is what happens with the 1.0 width line in the strokeRect() call in the rectangle example above.',
       },
@@ -400,6 +410,7 @@ export const mdnCanvasTutorialTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'First, you create the path.',
           'Then you use drawing commands to draw into the path.',
@@ -728,6 +739,11 @@ export const mdnCanvasTutorialTopics = {
         text: 'Draws a cubic Bézier curve from the current pen position to the end point specified by x and y, using the control points specified by (cp1x, cp1y) and (cp2x, cp2y).',
       },
       {
+        type: 'image',
+        src: '/src/content/assets/js/canvas_curves.png',
+        alt: 'Quadratic and Bezier curve comparison.',
+      },
+      {
         type: 'paragraph',
         text: 'The difference between these is that a quadratic Bézier curve has a start and an end point (blue dots) and just one control point (indicated by the red dot) while a cubic Bézier curve uses two control points.',
       },
@@ -1029,7 +1045,7 @@ export const mdnCanvasTutorialTopics = {
       },
       {
         type: 'paragraph',
-        text: "color is a string representing a CSS &lt;color&gt;, a gradient object, or a pattern object. We'll look at gradient and pattern objects later. By default, the stroke and fill color are set to black (CSS color value #000000).",
+        text: "color is a string representing a CSS <color>, a gradient object, or a pattern object. We'll look at gradient and pattern objects later. By default, the stroke and fill color are set to black (CSS color value #000000).",
       },
       {
         type: 'paragraph',
@@ -1037,7 +1053,7 @@ export const mdnCanvasTutorialTopics = {
       },
       {
         type: 'paragraph',
-        text: 'The valid strings you can enter should, according to the specification, be CSS &lt;color&gt; values. Each of the following examples describe the same color.',
+        text: 'The valid strings you can enter should, according to the specification, be CSS <color> values. Each of the following examples describe the same color.',
       },
       {
         type: 'code',
@@ -1473,7 +1489,7 @@ export const mdnCanvasTutorialTopics = {
       },
       {
         type: 'paragraph',
-        text: 'The miterLimit property determines how far the outside connection point can be placed from the inside connection point. If two lines exceed this value, a bevel join gets drawn instead. Note that the maximum miter length is the product of the line width measured in the current coordinate system, by the value of this miterLimit property (whose default value is 10.0 in the HTML &lt;canvas&gt;), so the miterLimit can be set independently from the current display scale or any affine transforms of paths: it only influences the effectively rendered shape of line edges.',
+        text: 'The miterLimit property determines how far the outside connection point can be placed from the inside connection point. If two lines exceed this value, a bevel join gets drawn instead. Note that the maximum miter length is the product of the line width measured in the current coordinate system, by the value of this miterLimit property (whose default value is 10.0 in the HTML <canvas>), so the miterLimit can be set independently from the current display scale or any affine transforms of paths: it only influences the effectively rendered shape of line edges.',
       },
       {
         type: 'paragraph',
@@ -1609,7 +1625,7 @@ export const mdnCanvasTutorialTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Creates a new color stop on the gradient object. The position is a number between 0.0 and 1.0 and defines the relative position of the color in the gradient, and the color argument must be a string representing a CSS &lt;color&gt;, indicating the color the gradient should reach at that offset into the transition.',
+        text: 'Creates a new color stop on the gradient object. The position is a number between 0.0 and 1.0 and defines the relative position of the color in the gradient, and the color argument must be a string representing a CSS <color>, indicating the color the gradient should reach at that offset into the transition.',
       },
       {
         type: 'paragraph',

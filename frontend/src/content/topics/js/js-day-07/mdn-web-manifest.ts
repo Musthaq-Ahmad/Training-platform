@@ -54,7 +54,7 @@ export const mdnWebManifestTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Web app manifests are deployed in your HTML pages using a &lt;link&gt; element in the &lt;head&gt; of a document:',
+        text: 'Web app manifests are deployed in your HTML pages using a <link> element in the <head> of a document:',
       },
       {
         type: 'code',

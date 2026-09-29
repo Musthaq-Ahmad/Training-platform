@@ -152,13 +152,13 @@ export const jestCoverageTopics = {
         items: [
           'Camelcase & dashed args support',
           'Options',
-          'Reference * jest &lt;regexForTestFiles&gt; * --bail[=&lt;n&gt;] * --cache * --changedFilesWithAncestor * --changedSince * --ci * --clearCache * --clearMocks * --collectCoverageFrom=&lt;glob&gt; * --collectTests * --colors * --config=&lt;path&gt; * --coverage[=&lt;boolean&gt;] * --coverageDirectory=&lt;path&gt; * --coverageProvider=&lt;provider&gt; * --debug * --detectOpenHandles * --env=&lt;environment&gt; * --errorOnDeprecated * --expand * --filter=&lt;file&gt; * --findRelatedTests &lt;spaceSeparatedListOfSourceFiles&gt; * --forceExit * --help * --ignoreProjects &lt;project1&gt; ... &lt;projectN&gt; * --injectGlobals * --json * --lastCommit * --listTests * --logHeapUsage * --maxConcurrency=&lt;num&gt; * --maxWorkers=&lt;num&gt;|&lt;string&gt; * --noStackTrace * --notify * --onlyChanged * --onlyFailures * --openHandlesTimeout=&lt;milliseconds&gt; * --outputFile=&lt;filename&gt; * --passWithNoTests * --projects &lt;path1&gt; ... &lt;pathN&gt; * --randomize * --reporters * --resetMocks * --restoreMocks * --roots * --runInBand * --runTestsByPath * --seed=&lt;num&gt; * --selectProjects &lt;project1&gt; ... &lt;projectN&gt; * --setupFilesAfterEnv &lt;path1&gt; ... &lt;pathN&gt; * --shard * --showConfig * --showSeed * --silent * --testEnvironmentOptions=&lt;json string&gt; * --testLocationInResults * --testMatch glob1 ... globN * --testNamePattern=&lt;regex&gt; * --testPathIgnorePatterns=&lt;regex&gt;|[array] * --testPathPatterns=&lt;regex&gt; * --testRunner=&lt;path&gt; * --testSequencer=&lt;path&gt; * --testTimeout=&lt;number&gt; * --updateSnapshot * --useStderr * --verbose * --version * --waitForUnhandledRejections * --watch * --watchAll * --watchman * --workerGracefulExitTimeout=&lt;number&gt; * --workerThreads',
+          'Reference * jest <regexForTestFiles> * --bail[=<n>] * --cache * --changedFilesWithAncestor * --changedSince * --ci * --clearCache * --clearMocks * --collectCoverageFrom=<glob> * --collectTests * --colors * --config=<path> * --coverage[=<boolean>] * --coverageDirectory=<path> * --coverageProvider=<provider> * --debug * --detectOpenHandles * --env=<environment> * --errorOnDeprecated * --expand * --filter=<file> * --findRelatedTests <spaceSeparatedListOfSourceFiles> * --forceExit * --help * --ignoreProjects <project1> ... <projectN> * --injectGlobals * --json * --lastCommit * --listTests * --logHeapUsage * --maxConcurrency=<num> * --maxWorkers=<num>|<string> * --noStackTrace * --notify * --onlyChanged * --onlyFailures * --openHandlesTimeout=<milliseconds> * --outputFile=<filename> * --passWithNoTests * --projects <path1> ... <pathN> * --randomize * --reporters * --resetMocks * --restoreMocks * --roots * --runInBand * --runTestsByPath * --seed=<num> * --selectProjects <project1> ... <projectN> * --setupFilesAfterEnv <path1> ... <pathN> * --shard * --showConfig * --showSeed * --silent * --testEnvironmentOptions=&lt;json string&gt; * --testLocationInResults * --testMatch glob1 ... globN * --testNamePattern=<regex> * --testPathIgnorePatterns=<regex>|[array] * --testPathPatterns=<regex> * --testRunner=<path> * --testSequencer=<path> * --testTimeout=<number> * --updateSnapshot * --useStderr * --verbose * --version * --waitForUnhandledRejections * --watch * --watchAll * --watchman * --workerGracefulExitTimeout=<number> * --workerThreads',
         ],
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'jest &lt;regexForTestFiles&gt;​',
+        text: 'jest <regexForTestFiles>​',
       },
       {
         type: 'paragraph',
@@ -167,7 +167,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--bail[=&lt;n&gt;]​',
+        text: '--bail[=<n>]​',
       },
       {
         type: 'paragraph',
@@ -250,7 +250,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--collectCoverageFrom=&lt;glob&gt;​',
+        text: '--collectCoverageFrom=<glob>​',
       },
       {
         type: 'paragraph',
@@ -318,7 +318,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--config=&lt;path&gt;​',
+        text: '--config=<path>​',
       },
       {
         type: 'paragraph',
@@ -327,16 +327,16 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--coverage[=&lt;boolean&gt;]​',
+        text: '--coverage[=<boolean>]​',
       },
       {
         type: 'paragraph',
-        text: 'Alias: --collectCoverage. Indicates that test coverage information should be collected and reported in the output. Optionally pass &lt;boolean&gt; to override option set in configuration.',
+        text: 'Alias: --collectCoverage. Indicates that test coverage information should be collected and reported in the output. Optionally pass <boolean> to override option set in configuration.',
       },
       {
         type: 'subheading',
         level: 3,
-        text: '--coverageDirectory=&lt;path&gt;​',
+        text: '--coverageDirectory=<path>​',
       },
       {
         type: 'paragraph',
@@ -345,7 +345,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--coverageProvider=&lt;provider&gt;​',
+        text: '--coverageProvider=<provider>​',
       },
       {
         type: 'paragraph',
@@ -372,7 +372,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--env=&lt;environment&gt;​',
+        text: '--env=<environment>​',
       },
       {
         type: 'paragraph',
@@ -399,11 +399,11 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--filter=&lt;file&gt;​',
+        text: '--filter=<file>​',
       },
       {
         type: 'paragraph',
-        text: 'Path to a module exporting a filtering function. This asynchronous function receives a list of test paths which can be manipulated to exclude tests from running and must return an object with shape { filtered: Array&lt;string&gt; } containing the tests that should be run by Jest. Especially useful when used in conjunction with a testing infrastructure to filter known broken tests.',
+        text: 'Path to a module exporting a filtering function. This asynchronous function receives a list of test paths which can be manipulated to exclude tests from running and must return an object with shape { filtered: Array<string> } containing the tests that should be run by Jest. Especially useful when used in conjunction with a testing infrastructure to filter known broken tests.',
       },
       {
         type: 'paragraph',
@@ -450,7 +450,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--ignoreProjects &lt;project1&gt; ... &lt;projectN&gt;​',
+        text: '--ignoreProjects <project1> ... <projectN>​',
       },
       {
         type: 'paragraph',
@@ -520,7 +520,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--maxConcurrency=&lt;num&gt;​',
+        text: '--maxConcurrency=<num>​',
       },
       {
         type: 'paragraph',
@@ -529,7 +529,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--maxWorkers=&lt;num&gt;|&lt;string&gt;​',
+        text: '--maxWorkers=<num>|<string>​',
       },
       {
         type: 'paragraph',
@@ -578,7 +578,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--openHandlesTimeout=&lt;milliseconds&gt;​',
+        text: '--openHandlesTimeout=<milliseconds>​',
       },
       {
         type: 'paragraph',
@@ -587,7 +587,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--outputFile=&lt;filename&gt;​',
+        text: '--outputFile=<filename>​',
       },
       {
         type: 'paragraph',
@@ -605,7 +605,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--projects &lt;path1&gt; ... &lt;pathN&gt;​',
+        text: '--projects <path1> ... <pathN>​',
       },
       {
         type: 'paragraph',
@@ -626,7 +626,7 @@ export const jestCoverageTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Shuffle the order of the tests within a file. The shuffling is based on the seed. See --seed=&lt;num&gt; for more info.',
+        text: 'Shuffle the order of the tests within a file. The shuffling is based on the seed. See --seed=<num> for more info.',
       },
       {
         type: 'paragraph',
@@ -777,7 +777,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--seed=&lt;num&gt;​',
+        text: '--seed=<num>​',
       },
       {
         type: 'paragraph',
@@ -806,7 +806,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--selectProjects &lt;project1&gt; ... &lt;projectN&gt;​',
+        text: '--selectProjects <project1> ... <projectN>​',
       },
       {
         type: 'paragraph',
@@ -815,7 +815,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--setupFilesAfterEnv &lt;path1&gt; ... &lt;pathN&gt;​',
+        text: '--setupFilesAfterEnv <path1> ... <pathN>​',
       },
       {
         type: 'paragraph',
@@ -828,7 +828,7 @@ export const jestCoverageTopics = {
       },
       {
         type: 'paragraph',
-        text: 'The test suite shard to execute in a format of (?&lt;shardIndex&gt;\\d+)/(?&lt;shardCount&gt;\\d+).',
+        text: 'The test suite shard to execute in a format of (?<shardIndex>\\d+)/(?<shardCount>\\d+).',
       },
       {
         type: 'paragraph',
@@ -870,7 +870,7 @@ export const jestCoverageTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Prints the seed value in the test report summary. See --seed=&lt;num&gt; for the details.',
+        text: 'Prints the seed value in the test report summary. See --seed=<num> for the details.',
       },
       {
         type: 'paragraph',
@@ -931,7 +931,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--testNamePattern=&lt;regex&gt;​',
+        text: '--testNamePattern=<regex>​',
       },
       {
         type: 'paragraph',
@@ -948,7 +948,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--testPathIgnorePatterns=&lt;regex&gt;|[array]​',
+        text: '--testPathIgnorePatterns=<regex>|[array]​',
       },
       {
         type: 'paragraph',
@@ -961,7 +961,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--testPathPatterns=&lt;regex&gt;​',
+        text: '--testPathPatterns=<regex>​',
       },
       {
         type: 'paragraph',
@@ -970,7 +970,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--testRunner=&lt;path&gt;​',
+        text: '--testRunner=<path>​',
       },
       {
         type: 'paragraph',
@@ -979,7 +979,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--testSequencer=&lt;path&gt;​',
+        text: '--testSequencer=<path>​',
       },
       {
         type: 'paragraph',
@@ -988,7 +988,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--testTimeout=&lt;number&gt;​',
+        text: '--testTimeout=<number>​',
       },
       {
         type: 'paragraph',
@@ -1093,7 +1093,7 @@ export const jestCoverageTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '--workerGracefulExitTimeout=&lt;number&gt;​',
+        text: '--workerGracefulExitTimeout=<number>​',
       },
       {
         type: 'paragraph',

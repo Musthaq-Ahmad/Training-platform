@@ -3,15 +3,15 @@ import type { ContentTopic } from '../../../types';
 export const webdevPwaTopics = {
   'webdev-pwa': {
     id: 'webdev-pwa',
-    heading: '서비스 워커 등록',
+    heading: 'Register a service worker',
     blocks: [
       {
         type: 'paragraph',
-        text: '서비스 워커가 페이지를 제어하려면 먼저 PWA에 등록해야 합니다. 즉, 사용자가 PWA를 처음 열면 서비스 워커가 아직 페이지를 제어하지 않으므로 모든 네트워크 요청이 서버로 직접 전송됩니다.',
+        text: "Before a service worker takes control of your page, it must be registered for your PWA. That means the first time a user opens your PWA, all its network requests go directly to your server because the service worker doesn't have control of your pages yet.",
       },
       {
         type: 'paragraph',
-        text: '브라우저가 Service Worker API를 지원하는지 확인한 후 PWA는 서비스 워커를 등록할 수 있습니다. 서비스 워커가 로드되면 PWA와 네트워크 사이에 설정되어 요청을 가로채고 해당 응답을 제공합니다.',
+        text: 'After checking whether the browser supports the Service Worker API, your PWA can register a service worker. After it loads, the service worker sets itself up between your PWA and the network, intercepting requests and serving the corresponding responses.',
       },
       {
         type: 'code',
@@ -24,77 +24,84 @@ export const webdevPwaTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '서비스 워커가 등록되었는지 확인',
+        text: 'Verify whether a service worker is registered',
       },
       {
         type: 'paragraph',
-        text: '서비스 워커가 등록되었는지 확인하려면 즐겨 사용하는 브라우저의 개발자 도구를 사용하세요.',
+        text: 'To verify whether a service worker is registered, use developer tools in your favorite browser.',
       },
       {
         type: 'paragraph',
-        text: 'Firefox 및 Chromium 기반 브라우저 (Microsoft Edge, Chrome 또는 Samsung 인터넷)의 경우:',
+        text: 'In Firefox and Chromium-based browsers (Microsoft Edge, Google Chrome, or Samsung Internet):',
       },
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
-          '개발자 도구를 열고 애플리케이션 탭을 클릭합니다.',
-          '왼쪽 창에서 서비스 워커를 선택합니다.',
-          "서비스 워커의 스크립트 URL이 'Activated'(활성화됨) 상태로 표시되는지 확인합니다. 자세한 내용은 수명 주기를 참고하세요. Firefox에서는 상태가 'Running' 또는 'Stopped'일 수 있습니다.",
+          'Open developer tools, then click the Application tab.',
+          'In the left pane, select Service Workers.',
+          'Check that the service worker\'s script URL appears with the status "Activated". (For more information, see Lifecycle). On Firefox, the status can be "Running" or "Stopped".',
         ],
       },
       {
         type: 'paragraph',
-        text: 'Safari:',
+        text: 'In Safari:',
       },
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
-          '개발 &gt; 서비스 워커를 클릭합니다.',
-          '이 메뉴에서 현재 출처가 있는 항목을 확인합니다. 이 항목을 클릭하면 서비스 워커 컨텍스트에 대한 검사기가 열립니다.',
+          'Click Develop &gt; Service Workers.',
+          "Check this menu for an entry with the current origin. Clicking that entry opens an inspector over the service worker's context.",
         ],
       },
       {
+        type: 'image',
+        src: '/src/content/assets/js/service-worker-developer-5ebe49234dc0f.png',
+        alt: 'Service worker developer tools on Chrome, Firefox and Safari.',
+      },
+      {
         type: 'paragraph',
-        text: 'Chrome, Firefox, Safari의 서비스 워커 개발자 도구',
+        text: 'Service worker developer tools on Chrome, Firefox and Safari.',
       },
       {
         type: 'subheading',
         level: 3,
-        text: '범위',
+        text: 'Scope',
       },
       {
         type: 'paragraph',
-        text: "서비스 워커가 있는 폴더에 따라 범위가 결정됩니다. example.com/my-pwa/sw.js에 있는 서비스 워커는 example.com/my-pwa/demos/과 같이 my-pwa 경로 또는 그 아래의 모든 탐색을 제어할 수 있습니다. 서비스 워커는 범위 내의 항목 (페이지, 워커, 총칭하여 '클라이언트')만 제어할 수 있습니다. 이 범위는 브라우저 탭과 PWA 창에 적용됩니다.",
+        text: 'The folder your service worker sits in determines its scope. A service worker that lives at example.com/my-pwa/sw.js can control any navigation at or under the my-pwa path, such as example.com/my-pwa/demos/. Service workers can control only items (pages, workers, collectively "clients") in their scope. This scope applies to browser tabs and PWA windows.',
       },
       {
         type: 'paragraph',
-        text: '범위당 서비스 워커는 _하나_만 허용됩니다. 서비스 워커가 활성 상태이고 실행 중인 경우 메모리에 있는 클라이언트(PWA 창 또는 브라우저 탭)의 수와 관계없이 일반적으로 하나의 인스턴스만 사용할 수 있습니다.',
+        text: 'Only one service worker is allowed per scope. When a service worker is active and running, only one instance is typically available no matter how many clients (PWA windows or browser tabs) are in memory.',
       },
       {
         type: 'paragraph',
-        text: 'Safari에는 파티션이라고 하는 더 복잡한 범위 관리가 있어 범위가 교차 도메인 iframe과 작동하는 방식에 영향을 미칩니다. WebKit 구현에 대해 자세히 알아보려면 블로그 게시물을 참고하세요.',
+        text: "Safari has more complex scope management, known as partitions, affecting how scopes work with cross-domain iframes. To learn more about WebKit's implementation, refer to their blog post.",
       },
       {
         type: 'paragraph',
-        text: '서비스 워커에는 PWA 설치와 별도로 설치 방법을 지정하는 수명 주기가 있습니다.',
+        text: "Service workers have a lifecycle that dictates how they're installed, separately from your PWA installation.",
       },
       {
         type: 'paragraph',
-        text: '서비스 워커 수명 주기는 서비스 워커를 등록하는 것으로 시작됩니다. 그러면 브라우저가 서비스 워커 파일을 다운로드하고 파싱하려고 시도합니다. 파싱에 성공하면 서비스 워커의 install 이벤트가 발생합니다. install 이벤트는 한 번만 실행됩니다.',
+        text: "The service worker lifecycle starts with registering the service worker. The browser then tries to download and parse the service worker file. If parsing succeeds, the service worker's install event is fired. The install event only fires once.",
       },
       {
         type: 'paragraph',
-        text: '서비스 워커 설치는 사용자가 PWA를 설치하지 않더라도 사용자 권한을 요구하지 않고 자동으로 이루어집니다. 서비스 워커 API는 데스크톱 기기의 Safari 및 Firefox와 같이 PWA 설치를 지원하지 않는 플랫폼에서도 사용할 수 있습니다.',
+        text: "Service worker installation happens silently, without requiring user permission, even if the user doesn't install the PWA. The Service Worker API is available even on platforms that don't support PWA installation, such as Safari and Firefox on desktop devices.",
       },
       {
         type: 'paragraph',
-        text: '설치 후 서비스 워커가 PWA를 비롯한 클라이언트를 제어하려면 먼저 활성화해야 합니다. 서비스 워커가 클라이언트를 제어할 준비가 되면 activate 이벤트가 발생합니다. 하지만 기본적으로 활성화된 서비스 워커는 페이지를 새로고침하거나 PWA를 다시 열어 해당 페이지로 이동할 때까지 서비스 워커를 등록한 페이지를 관리할 수 없습니다.',
+        text: "After the installation, the service worker needs to be activated before it can control its clients, including your PWA. When the service worker is ready to control its clients, the activate event fires. However, by default, an activated service worker can't manage the page that registered it until the next time you navigate to that page by reloading the page or reopening the PWA.",
       },
       {
         type: 'paragraph',
-        text: 'self 객체를 사용하여 서비스 워커의 전역 범위에서 이벤트를 수신 대기할 수 있습니다.',
+        text: "You can listen for events in the service worker's global scope using the self object:",
       },
       {
         type: 'paragraph',
@@ -111,113 +118,113 @@ export const webdevPwaTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: '서비스 워커 업데이트',
+        text: 'Update a service worker',
       },
       {
         type: 'paragraph',
-        text: '서비스 워커는 브라우저가 클라이언트를 제어하는 서비스 워커와 서버의 새 버전 서비스 워커 파일이 바이트 단위로 다르다고 감지할 때 업데이트됩니다.',
+        text: 'Service workers get updated when the browser detects that the service worker controlling the client and the new version of the service worker file from the server are byte-different.',
       },
       {
         type: 'paragraph',
-        text: "설치가 완료되면 새 서비스 워커는 이전 서비스 워커가 더 이상 클라이언트를 제어하지 않을 때까지 활성화를 기다립니다. 이 상태를 '대기'라고 하며, 브라우저가 한 번에 하나의 서비스 워커 버전만 실행되도록 하는 방법입니다.",
+        text: 'After a successful installation, the new service worker waits to activate until the old service worker no longer controls any clients. This state is called "waiting", and it\'s how the browser ensures that only one version of your service worker is running at a time.',
       },
       {
         type: 'paragraph',
-        text: '페이지를 새로고침하거나 PWA를 다시 열어도 새 서비스 워커가 제어권을 가져오지 않습니다. 사용자는 현재 서비스 워커를 사용하는 모든 탭과 창을 닫거나 다른 곳으로 이동한 다음 다시 이동하여 새 서비스 워커에 제어 권한을 부여해야 합니다. 자세한 내용은 서비스 워커 수명 주기를 참고하세요.',
+        text: "Refreshing a page or reopening the PWA won't make the new service worker take control. The user must close or navigate away from all tabs and windows using the current service worker and then navigate back to give the new service worker control. For more information, see The service worker lifecycle.",
       },
       {
         type: 'paragraph',
-        text: '설치되고 등록된 서비스 워커는 범위 내의 모든 네트워크 요청을 관리할 수 있습니다. 자체 스레드에서 실행되며 브라우저에서 활성화 및 종료를 제어하므로 PWA가 열리기 전이나 닫힌 후에도 작동할 수 있습니다. 서비스 워커는 자체 스레드에서 실행되지만 서비스 워커 실행 간에 메모리 내 상태가 유지되지 않을 수 있으므로 각 실행에 재사용하려는 항목이 IndexedDB 또는 다른 영구 저장소에 있는지 확인하세요.',
+        text: 'An installed and registered service worker can manage all network request within its scope. It runs on its own thread, with activation and termination controlled by the browser, which lets it work even before your PWA is open or after it closes. Service workers run on their own thread, but in-memory state might not persist between runs of a service worker, so make sure anything you want to reuse for each run is available either in IndexedDB or some other persistent storage.',
       },
       {
         type: 'paragraph',
-        text: '아직 실행되고 있지 않은 경우 서비스 워커는 범위 내에서 네트워크 요청이 전송되거나 주기적인 백그라운드 동기화 또는 푸시 메시지와 같은 트리거링 이벤트를 수신할 때마다 시작됩니다.',
+        text: "If it's not already running, a service worker starts whenever a network request is sent in its scope, or when it receives a triggering event like a periodic background sync or a push message.",
       },
       {
         type: 'paragraph',
-        text: '서비스 워커는 몇 초 동안 유휴 상태이거나 너무 오랫동안 사용 중인 경우 종료됩니다. 이 타이밍은 브라우저마다 다릅니다. 서비스 워커가 종료되었는데 서비스 워커를 시작하는 이벤트가 발생하면 서비스 워커가 다시 시작됩니다.',
+        text: "Service workers are terminated if they've been idle for a few seconds, or if they've been busy for too long. Timings for this vary between browsers. If a service worker has been terminated and an event occurs that would start it up, it restarts.",
       },
       {
         type: 'paragraph',
-        text: '등록되고 활성 상태인 서비스 워커는 PWA의 기본 스레드와 완전히 다른 실행 수명 주기를 가진 스레드를 사용합니다. 하지만 기본적으로 서비스 워커 파일 자체에는 동작이 없습니다. 리소스는 캐시하거나 제공하지 않습니다. 이는 코드에서 해야 하는 작업입니다. 다음 장에서 방법을 알아보세요.',
+        text: "A registered and active service worker uses a thread with a completely different execution lifecycle from your PWA's main thread. However, by default, the service worker file itself has no behavior. It won't cache or serve any resources; these are things your code needs to do. You'll find out how in the following chapters.",
       },
       {
         type: 'paragraph',
-        text: '서비스 워커의 기능은 HTTP 요청을 프록시하거나 처리하는 데만 사용되는 것이 아닙니다. 백그라운드 코드 실행, 웹 푸시 알림, 결제 처리와 같은 다른 목적으로 이 위에 다른 기능을 사용할 수 있습니다. 이러한 추가 사항은 기능에서 설명합니다.',
+        text: "Service worker's capabilities aren't just for proxy or serving HTTP requests. Other features are available on top of it for other purposes, such as background code execution, web push notifications, and process payments. We'll discuss these additions in Capabilities.",
       },
       {
         type: 'list',
         ordered: false,
         items: [
-          '서비스 워커 API (MDN)',
-          '서비스 워커 마인드셋',
+          'Service Worker API (MDN)',
+          'Service Worker mindset',
           'WebKit Workers at your service',
-          '서비스 워커의 ES 모듈',
-          '서비스 워커 수명 주기',
+          'ES Modules in Service Workers',
+          'Service worker lifecycle',
         ],
       },
       {
         type: 'paragraph',
-        text: 'El almacenamiento en caché es una herramienta poderosa. Hace que tus apps dependan menos de las condiciones de red. Con un buen uso de las memorias caché, puedes hacer que tu app web esté disponible sin conexión y publicar tus recursos lo más rápido posible en cualquier condición de red. Como se mencionó en Recursos y datos, puedes decidir la mejor estrategia para almacenar en caché los recursos necesarios. Para administrar la caché con la que interactúa tu trabajador de servicio, usa la API de Cache Storage.',
+        text: 'Die Cache-Speicherung ist ein leistungsstarkes Tool. Dadurch sind Ihre Apps weniger von den Netzwerkbedingungen abhängig. Durch die richtige Verwendung von Caches können Sie Ihre Web-App offline verfügbar machen und Ihre Assets unter allen Netzwerkbedingungen so schnell wie möglich bereitstellen. Wie unter Assets und Daten beschrieben, können Sie die beste Strategie zum Zwischenspeichern der erforderlichen Assets festlegen. Zum Verwalten des Caches, mit dem Ihr Service Worker interagiert, verwenden Sie die Cache Storage API.',
       },
       {
         type: 'paragraph',
-        text: 'La API de Cache Storage está disponible en diferentes contextos:',
+        text: 'Die Cache Storage API ist in verschiedenen Kontexten verfügbar:',
       },
       {
         type: 'list',
         ordered: false,
         items: [
-          'El contexto de la ventana (el subproceso principal de tu AWP).',
-          'Es el service worker.',
-          'Cualquier otro trabajador que uses',
+          'Der Fensterkontext (der Hauptthread Ihrer PWA).',
+          'Der Service Worker.',
+          'Alle anderen Mitarbeiter, die Sie beschäftigen.',
         ],
       },
       {
         type: 'paragraph',
-        text: 'Una ventaja de administrar tu caché con Service Workers es que su ciclo de vida no está vinculado a la ventana, lo que significa que no bloqueas el subproceso principal. Ten en cuenta que, para usar la API de Cache Storage, la mayoría de estos contextos deben estar bajo una conexión TLS.',
+        text: 'Ein Vorteil der Verwaltung Ihres Caches mit Service Workern besteht darin, dass sein Lebenszyklus nicht an das Fenster gebunden ist. Das bedeutet, dass Sie den Hauptthread nicht blockieren. Beachten Sie, dass für die Verwendung der Cache Storage API die meisten dieser Kontexte über eine TLS-Verbindung erfolgen müssen.',
       },
       {
         type: 'paragraph',
-        text: 'La primera pregunta que puedes hacerte sobre el almacenamiento en caché es qué almacenar en caché. Si bien no hay una respuesta única a esa pregunta, puedes comenzar con todos los recursos mínimos que necesitas para renderizar la interfaz de usuario.',
+        text: 'Die erste Frage, die Sie sich zum Caching stellen, ist wahrscheinlich, was gecacht werden soll. Es gibt keine Universallösung für diese Frage. Sie können jedoch mit allen Mindestressourcen beginnen, die zum Rendern der Benutzeroberfläche erforderlich sind.',
       },
       {
         type: 'paragraph',
-        text: 'Esos recursos deben incluir lo siguiente:',
+        text: 'Dazu gehören:',
       },
       {
         type: 'list',
         ordered: false,
         items: [
-          'El código HTML de la página principal (la start_url de tu app).',
-          'Hojas de estilo CSS necesarias para la interfaz de usuario principal.',
-          'Imágenes que se usan en la interfaz de usuario.',
-          'Son los archivos JavaScript necesarios para renderizar la interfaz de usuario.',
-          'Son los datos, como un archivo JSON, necesarios para renderizar una experiencia básica.',
-          'Fuentes web',
-          'En una aplicación de varias páginas, otros documentos HTML que quieras publicar rápidamente o sin conexión',
+          'Der HTML-Code der Hauptseite (die start_url Ihrer App).',
+          'CSS-Stylesheets, die für die Hauptbenutzeroberfläche benötigt werden.',
+          'In der Benutzeroberfläche verwendete Bilder',
+          'JavaScript-Dateien, die zum Rendern der Benutzeroberfläche erforderlich sind.',
+          'Daten wie eine JSON-Datei, die zum Rendern einer einfachen Darstellung erforderlich sind.',
+          'Webfonts',
+          'In einer mehrseitigen Anwendung andere HTML-Dokumente, die schnell oder offline bereitgestellt werden sollen.',
         ],
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Listo para el uso sin conexión',
+        text: 'Für den Offlinezugriff verfügbar',
       },
       {
         type: 'paragraph',
-        text: 'Si bien la capacidad de funcionar sin conexión es uno de los requisitos de una app web progresiva, es fundamental comprender que no todas las AWP necesitan una experiencia sin conexión completa, por ejemplo, las soluciones de juegos en la nube o las apps de criptoactivos. Por lo tanto, está bien ofrecer una interfaz de usuario básica que guíe a los usuarios en esas situaciones.',
+        text: 'Die Offline-Funktionalität ist zwar eine der Anforderungen für eine progressive Web-App, aber nicht jede PWA muss eine vollständige Offline-Funktionalität bieten, z. B. Cloud-Gaming-Lösungen oder Krypto-Assets-Apps. Daher ist es in Ordnung, eine einfache Benutzeroberfläche anzubieten, die Nutzer durch diese Situationen führt.',
       },
       {
         type: 'paragraph',
-        text: 'Tu APW no debe renderizar un mensaje de error del navegador que indique que el motor de renderización web no pudo cargar la página. En su lugar, usa tu Service Worker para mostrar tus propios mensajes y evitar un error genérico y confuso del navegador.',
+        text: 'Ihre PWA sollte keine Fehlermeldung des Browsers rendern, die besagt, dass die Web-Rendering-Engine die Seite nicht laden konnte. Verwenden Sie stattdessen Ihren Service Worker, um Ihre eigenen Mitteilungen anzuzeigen und so einen allgemeinen und verwirrenden Browserfehler zu vermeiden.',
       },
       {
         type: 'paragraph',
-        text: 'Existen muchas estrategias de almacenamiento en caché diferentes que puedes usar según las necesidades de tu PWA. Por eso, es importante diseñar el uso de la caché para brindar una experiencia rápida y confiable. Por ejemplo, si todos los recursos de tu app se descargan rápido, no ocupan mucho espacio y no necesitan actualizarse en cada solicitud, almacenar en caché todos tus recursos sería una estrategia válida. Por otro lado, si tienes recursos que deben ser la versión más reciente, tal vez te convenga no almacenarlos en caché.',
+        text: 'Je nach den Anforderungen Ihrer PWA können Sie viele verschiedene Caching-Strategien verwenden. Daher ist es wichtig, die Cachenutzung so zu gestalten, dass sie eine schnelle und zuverlässige Nutzung ermöglicht. Wenn beispielsweise alle Assets Ihrer App schnell heruntergeladen werden, nicht viel Speicherplatz benötigen und nicht bei jeder Anfrage aktualisiert werden müssen, ist das Caching aller Assets eine sinnvolle Strategie. Wenn Sie hingegen Ressourcen haben, die die neueste Version sein müssen, sollten Sie in Erwägung ziehen, diese Assets überhaupt nicht zu cachen.',
       },
       {
         type: 'paragraph',
-        text: 'Usa la API de Cache Storage para definir un conjunto de cachés dentro de tu origen, cada una identificada con un nombre de cadena que puedes definir. Accede a la API a través del objeto caches, y el método open permite crear o abrir una caché ya creada. El método open devuelve una promesa para el objeto de caché.',
+        text: 'Mit der Cache Storage API können Sie eine Reihe von Caches in Ihrem Ursprung definieren, die jeweils durch einen von Ihnen definierten Stringnamen identifiziert werden. Auf die API wird über das caches-Objekt zugegriffen. Mit der Methode open kann ein Cache erstellt oder ein bereits erstellter Cache geöffnet werden. Die Methode „open“ gibt ein Promise für das Cache-Objekt zurück.',
       },
       {
         type: 'code',
@@ -230,11 +237,11 @@ export const webdevPwaTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: 'Descarga y almacenamiento de recursos',
+        text: 'Assets herunterladen und speichern',
       },
       {
         type: 'paragraph',
-        text: 'Para solicitarle al navegador que descargue y almacene los recursos, usa los métodos add o addAll. El método add realiza una solicitud y almacena una respuesta HTTP, y addAll un grupo de respuestas HTTP como una transacción basada en un array de solicitudes o URLs.',
+        text: 'Verwenden Sie die Methoden add oder addAll, um den Browser aufzufordern, die Assets herunterzuladen und zu speichern. Mit der Methode add wird eine Anfrage gestellt und eine HTTP-Antwort gespeichert. Mit addAll wird eine Gruppe von HTTP-Antworten als Transaktion auf Grundlage eines Arrays von Anfragen oder URLs gespeichert.',
       },
       {
         type: 'code',
@@ -246,47 +253,47 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'La interfaz de almacenamiento de caché almacena la totalidad de una respuesta, incluidos todos los encabezados y el cuerpo. Por lo tanto, puedes recuperarlo más tarde con una solicitud HTTP o una URL como clave. Verás cómo hacerlo en el capítulo sobre la publicación.',
+        text: 'Über die Cache-Speicherschnittstelle wird die gesamte Antwort gespeichert, einschließlich aller Header und des Texts. Sie können sie also später mit einer HTTP-Anfrage oder einer URL als Schlüssel abrufen. Wie das funktioniert, erfahren Sie im Kapitel zum Bereitstellen.',
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Cuándo almacenar en caché',
+        text: 'Wann sollte gecacht werden?',
       },
       {
         type: 'paragraph',
-        text: 'En tu PWA, tú decides cuándo almacenar archivos en caché. Si bien un enfoque es almacenar la mayor cantidad posible de recursos cuando se instala el service worker, por lo general, no es la mejor idea. El almacenamiento en caché de recursos innecesarios desperdicia ancho de banda y espacio de almacenamiento, y podría hacer que tu app publique recursos desactualizados no deseados.',
+        text: 'In Ihrer PWA entscheiden Sie, wann Dateien im Cache gespeichert werden sollen. Eine Möglichkeit besteht darin, beim Installieren des Service Workers so viele Assets wie möglich zu speichern. Das ist aber in der Regel nicht die beste Idee. Das Zwischenspeichern unnötiger Ressourcen verschwendet Bandbreite und Speicherplatz und kann dazu führen, dass Ihre App unbeabsichtigt veraltete Ressourcen bereitstellt.',
       },
       {
         type: 'paragraph',
-        text: 'No es necesario que almacenes en caché todos los recursos a la vez. Puedes hacerlo muchas veces durante el ciclo de vida de tu PWA, por ejemplo:',
+        text: 'Sie müssen nicht alle Assets auf einmal im Cache speichern. Sie können Assets während des Lebenszyklus Ihrer PWA mehrmals im Cache speichern, z. B.:',
       },
       {
         type: 'list',
         ordered: false,
         items: [
-          'En la instalación del service worker',
-          'Después de la primera carga de la página.',
-          'Cuando el usuario navega a una sección o ruta.',
-          'Cuando la red está inactiva.',
+          'Bei der Installation des Service Workers.',
+          'Nach dem ersten Laden der Seite.',
+          'Wenn der Nutzer einen Abschnitt oder eine Route aufruft.',
+          'Wenn das Netzwerk im Leerlauf ist.',
         ],
       },
       {
         type: 'paragraph',
-        text: 'Puedes solicitar que se almacenen en caché archivos nuevos en el subproceso principal o dentro del contexto del service worker.',
+        text: 'Sie können das Caching neuer Dateien im Hauptthread oder im Service Worker-Kontext anfordern.',
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Almacenamiento en caché de recursos en un service worker',
+        text: 'Assets in einem Service Worker im Cache speichern',
       },
       {
         type: 'paragraph',
-        text: 'Una de las situaciones más comunes es almacenar en caché un conjunto mínimo de recursos cuando se instala el service worker. Para ello, puedes usar la interfaz de almacenamiento en caché dentro del evento install en el trabajador de servicio.',
+        text: 'Eines der häufigsten Szenarien ist das Zwischenspeichern einer Mindestanzahl von Assets bei der Installation des Service Workers. Dazu können Sie die Cache-Speicherschnittstelle innerhalb des install-Ereignisses im Service Worker verwenden.',
       },
       {
         type: 'paragraph',
-        text: 'Dado que el subproceso del service worker se puede detener en cualquier momento, puedes solicitarle al navegador que espere a que finalice la promesa addAll para aumentar la oportunidad de almacenar todos los recursos y mantener la coherencia de la app. En el siguiente ejemplo, se muestra cómo hacerlo con el método waitUntil del argumento de evento recibido en el objeto de escucha de eventos del trabajador de servicio.',
+        text: 'Da der Service Worker-Thread jederzeit beendet werden kann, können Sie den Browser anweisen, auf das addAll-Promise zu warten, um die Wahrscheinlichkeit zu erhöhen, dass alle Assets gespeichert werden und die App konsistent bleibt. Im folgenden Beispiel wird gezeigt, wie das mit der Methode waitUntil des Ereignisarguments, das im Service Worker-Ereignis-Listener empfangen wird, funktioniert.',
       },
       {
         type: 'code',
@@ -298,11 +305,11 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'El método waitUntil() recibe una promesa y le pide al navegador que espere a que se resuelva la tarea de la promesa (cumplida o fallida) antes de finalizar el proceso del service worker. Es posible que debas encadenar promesas y devolver las llamadas a add() o addAll() para que un solo resultado llegue al método waitUntil().',
+        text: 'Die waitUntil()-Methode empfängt ein Promise und fordert den Browser auf, zu warten, bis die Aufgabe im Promise abgeschlossen ist (erfüllt oder fehlgeschlagen), bevor der Service Worker-Prozess beendet wird. Möglicherweise müssen Sie Promises verketten und die add()- oder addAll()-Aufrufe zurückgeben, damit ein einzelnes Ergebnis an die waitUntil()-Methode übergeben wird.',
       },
       {
         type: 'paragraph',
-        text: 'También puedes controlar las promesas con la sintaxis async/await. En ese caso, debes crear una función asíncrona que pueda llamar a await y que devuelva una promesa a waitUntil() después de que se la llame, como en el siguiente ejemplo:',
+        text: 'Sie können Promises auch mit der async/await-Syntax verarbeiten. In diesem Fall müssen Sie eine asynchrone Funktion erstellen, die await aufrufen kann und die nach dem Aufruf ein Promise für waitUntil() zurückgibt, wie im folgenden Beispiel:',
       },
       {
         type: 'code',
@@ -315,58 +322,63 @@ export const webdevPwaTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: 'Solicitudes multidominio y respuestas opacas',
+        text: 'Domainübergreifende Anfragen und undurchsichtige Antworten',
       },
       {
         type: 'paragraph',
-        text: 'Tu PWA puede descargar y almacenar en caché recursos de tu origen y de dominios cruzados, como contenido de CDN de terceros. Con una app de varios dominios, la interacción de la caché es muy similar a las solicitudes del mismo origen. Se ejecuta la solicitud y se almacena una copia de la respuesta en la caché. Al igual que con otros recursos almacenados en caché, solo está disponible para usarse en el origen de tu app.',
+        text: 'Ihre PWA kann Assets von Ihrem Ursprung und von domänenübergreifenden Quellen wie Inhalten von Drittanbieter-CDNs herunterladen und im Cache speichern. Bei einer domainübergreifenden App ähnelt die Cache-Interaktion sehr stark der bei Anfragen mit demselben Ursprung. Die Anfrage wird ausgeführt und eine Kopie der Antwort wird in Ihrem Cache gespeichert. Wie bei anderen im Cache gespeicherten Assets kann es nur im Ursprung Ihrer App verwendet werden.',
       },
       {
         type: 'paragraph',
-        text: 'El recurso se almacenará como una respuesta opaca, lo que significa que tu código no podrá ver ni modificar el contenido o los encabezados de esa respuesta. Además, las respuestas opacas no exponen su tamaño real en la API de Storage, lo que afecta las cuotas. Algunos navegadores exponen tamaños grandes, como 7 MB, sin importar si el archivo es de solo 1 KB.',
+        text: 'Das Asset wird als undurchsichtige Antwort gespeichert. Das bedeutet, dass Ihr Code den Inhalt oder die Header dieser Antwort nicht sehen oder ändern kann. Außerdem wird die tatsächliche Größe von intransparenten Antworten in der Storage API nicht offengelegt, was sich auf Kontingente auswirkt. Einige Browser geben große Größen an, z. B. 7 MB, unabhängig davon, ob die Datei nur 1 KB groß ist.',
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Actualiza y borra recursos',
+        text: 'Assets aktualisieren und löschen',
       },
       {
         type: 'paragraph',
-        text: 'Puedes actualizar recursos con cache.put(request, response) y borrarlos con delete(request).',
+        text: 'Sie können Assets mit cache.put(request, response) aktualisieren und mit delete(request) löschen.',
       },
       {
         type: 'paragraph',
-        text: 'Consulta la documentación del objeto Cache para obtener más detalles.',
+        text: 'Weitere Informationen finden Sie in der Dokumentation zum Cache-Objekt.',
       },
       {
         type: 'paragraph',
-        text: 'Muchos navegadores ofrecen una forma de depurar el contenido del almacenamiento en caché dentro de la pestaña Aplicación de sus herramientas para desarrolladores. Allí, puedes ver el contenido de cada caché dentro del origen actual. Hablaremos más sobre estas herramientas en el capítulo Herramientas y depuración.',
+        text: 'Viele Browser bieten die Möglichkeit, den Inhalt des Cache-Speichers auf dem Tab „Anwendung“ der Entwicklertools zu debuggen. Dort sehen Sie den Inhalt jedes Caches im aktuellen Ursprung. Weitere Informationen zu diesen Tools finden Sie im Kapitel „Tools und Debugging“.',
+      },
+      {
+        type: 'image',
+        src: '/src/content/assets/js/chrome-devtools-debugging-865b4a170f79c.png',
+        alt: 'Cache Storage-Inhalte mit den Chrome-Entwicklertools debuggen',
       },
       {
         type: 'list',
         ordered: false,
         items: [
-          'Cache Storage en MDN',
-          'La API de Cache: Una guía rápida',
-          'Guía de soluciones sin conexión',
-          'Desmitificación del almacenamiento en caché: inspecciona, borra y deshabilita las cachés',
+          'Cache Storage auf MDN',
+          'Die Cache API: Eine Kurzanleitung',
+          'The Offline Cookbook',
+          'Caching – ein Überblick: Caches prüfen, leeren und deaktivieren',
         ],
       },
       {
         type: 'paragraph',
-        text: 'Przejdź do głównej treści',
+        text: 'Skip to main content',
       },
       {
         type: 'paragraph',
-        text: 'Manifest aplikacji internetowej to utworzony przez Ciebie plik, który informuje przeglądarkę, jak mają być wyświetlane treści internetowe w systemie operacyjnym. Plik manifestu może zawierać podstawowe informacje, takie jak nazwa aplikacji, ikona i kolor motywu, zaawansowane ustawienia, np. preferowana orientacja i skróty do aplikacji, oraz metadane katalogu, np. zrzuty ekranu.',
+        text: "The web app manifest is a file you create that tells the browser how you want your web content to display as an app in the operating system. The manifest can include basic information such as the app's name, icon, and theme color; advanced preferences, such as desired orientation and app shortcuts; and catalog metadata, such as screenshots.",
       },
       {
         type: 'paragraph',
-        text: 'Każda PWA powinna zawierać jeden plik manifestu na aplikację, zwykle hostowany w folderze głównym i połączony ze wszystkimi stronami HTML, z których można zainstalować PWA. Jego oficjalne rozszerzenie to .webmanifest, więc możesz nazwać plik manifestu np. app.webmanifest.',
+        text: 'Each PWA should include a single manifest per application, typically hosted in the root folder, and linked on all HTML pages your PWA can be installed from. Its official extension is .webmanifest, so you could name your manifest something like app.webmanifest.',
       },
       {
         type: 'paragraph',
-        text: 'Aby utworzyć plik manifestu aplikacji internetowej, najpierw utwórz plik tekstowy z obiektem JSON, który zawiera co najmniej pole name z wartością tekstową:',
+        text: 'To create a web app manifest, first make a text file with a JSON object that contains at least a name field with a string value:',
       },
       {
         type: 'paragraph',
@@ -382,16 +394,16 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Utworzenie pliku to jednak za mało. Przeglądarka musi wiedzieć, że on istnieje.',
+        text: 'But creating the file is not enough, the browser needs to know it exists, too.',
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Linkowanie do pliku manifestu',
+        text: 'Linking to your manifest',
       },
       {
         type: 'paragraph',
-        text: 'Aby przeglądarka mogła rozpoznać plik manifestu aplikacji internetowej, musisz połączyć go z PWA za pomocą elementu HTML &lt;link&gt; i atrybutu rel ustawionego na manifest na wszystkich stronach HTML aplikacji PWA. Działa to podobnie jak łączenie arkusza stylów CSS z dokumentem.',
+        text: "To make the browser aware of your web app manifest, you need to link it to your PWA using a <link> HTML element and the rel attribute set to manifest on all of your PWA's HTML pages. This is similar to how you link a CSS stylesheet to a document.",
       },
       {
         type: 'paragraph',
@@ -408,56 +420,58 @@ export const webdevPwaTopics = {
       {
         type: 'subheading',
         level: 3,
-        text: 'Debugowanie pliku manifestu',
+        text: 'Debugging the manifest',
       },
       {
         type: 'paragraph',
-        text: 'Aby sprawdzić, czy plik manifestu jest prawidłowo skonfigurowany, możesz użyć inspektora w przeglądarce Firefox i narzędzi deweloperskich w każdej przeglądarce opartej na Chromium.',
+        text: 'To ensure the manifest is set up correctly, you can use Inspector in Firefox and DevTools in every Chromium-based browser.',
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Przeglądarki Chromium',
+        text: 'For Chromium browsers',
       },
       {
         type: 'paragraph',
-        text: 'W Narzędziach deweloperskich',
+        text: 'In DevTools',
       },
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
-          'W panelu po lewej stronie w sekcji Aplikacja kliknij Plik manifestu.',
-          'Sprawdź pola pliku manifestu po przetworzeniu przez przeglądarkę.',
+          'In the left pane, under Application, select Manifest.',
+          'Check the fields of the manifest as parsed by the browser.',
         ],
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Firefox',
+        text: 'For Firefox',
       },
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
-          'Otwórz inspektora.',
-          'Otwórz kartę Aplikacja.',
-          'W panelu po lewej stronie wybierz opcję Plik manifestu.',
-          'Sprawdź pola pliku manifestu po przetworzeniu przez przeglądarkę.',
+          'Open the Inspector.',
+          'Go to the Application tab.',
+          'Select the Manifest option in the left panel.',
+          'Check the fields of the manifest as parsed by the browser.',
         ],
       },
       {
         type: 'paragraph',
-        text: 'Po połączeniu progresywnej aplikacji internetowej z jej plikiem manifestu możesz wypełnić pozostałe pola, aby określić sposób korzystania z niej przez użytkowników.',
+        text: "With your PWA now connected to its manifest, it's time to fill out the rest of the fields to define the experience for your users.",
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Pola podstawowe',
+        text: 'Basic fields',
       },
       {
         type: 'paragraph',
-        text: 'Pierwszy zestaw pól zawiera podstawowe informacje o Twojej progresywnej aplikacji internetowej. Służą one do tworzenia ikony i okna zainstalowanej aplikacji PWA oraz określania sposobu jej uruchamiania. Są to:',
+        text: "The first set of fields represents the core information about your PWA. They are used to build the installed PWA's icon and window and determine how it starts up. They are:",
       },
       {
         type: 'paragraph',
@@ -465,7 +479,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Pełna nazwa Twojej progresywnej aplikacji internetowej. Będzie ona widoczna obok ikony na ekranie głównym, w programie uruchamiającym, w docku lub w menu systemu operacyjnego.',
+        text: "Full name of your PWA. It will appear along with the icon in the operating system's home screen, launcher, dock, or menu.",
       },
       {
         type: 'paragraph',
@@ -473,7 +487,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Opcjonalnie, krótsza nazwa progresywnej aplikacji internetowej, używana, gdy nie ma wystarczająco dużo miejsca, aby wyświetlić pełną wartość pola name. Nie przekraczaj 12 znaków, aby zminimalizować ryzyko ucięcia.',
+        text: 'Optional, a shorter name of your PWA, used when there is not enough room to display the full value of the name field. Keep it under 12 characters to minimize the possibility of truncation.',
       },
       {
         type: 'paragraph',
@@ -481,7 +495,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Tablica obiektów ikon z polami src, type, sizes i opcjonalnym polem purpose, które opisują, jakie obrazy powinny reprezentować PWA.',
+        text: 'Array of icon objects with src, type, sizes, and optional purpose fields, describing what images should represent the PWA.',
       },
       {
         type: 'paragraph',
@@ -489,7 +503,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Adres URL, który powinna wczytać progresywna aplikacja internetowa, gdy użytkownik uruchomi ją za pomocą zainstalowanej ikony. Zalecana jest ścieżka bezwzględna, więc jeśli strona główna Twojej progresywnej aplikacji internetowej jest katalogiem głównym witryny, możesz ustawić tę wartość na „/”, aby otwierać ją po uruchomieniu aplikacji. Jeśli nie podasz adresu URL startowego, przeglądarka może użyć adresu URL, z którego zainstalowano aplikację PWA. Może to być precyzyjny link, np. do szczegółów produktu zamiast do ekranu głównego.',
+        text: "The URL the PWA should load when the user starts it from the installed icon. An absolute path is recommended, so if your PWA's home page is the root of your site, you could set this to ‘/' to open it when your app starts. If you don't provide a start URL, the browser can use the URL the PWA was installed from as a start. It can be a deep link, such as the details of a product instead of your home screen.",
       },
       {
         type: 'paragraph',
@@ -497,7 +511,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Jedna z wartości fullscreen, standalone, minimal-ui lub browser określająca, jak system operacyjny ma rysować okno aplikacji PWA. Więcej informacji o różnych trybach wyświetlania znajdziesz w rozdziale poświęconym projektowaniu aplikacji. W większości przypadków użycia wdrażana jest funkcja standalone.',
+        text: 'One of fullscreen, standalone, minimal-ui, or browser, describing how the OS should draw the PWA window. You can read more about the different display modes in the App Design chapter. Most use cases implement standalone.',
       },
       {
         type: 'paragraph',
@@ -505,20 +519,20 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Ciąg znaków, który jednoznacznie identyfikuje tę PWA na tle innych aplikacji, które mogą być hostowane w tym samym źródle. Jeśli nie jest ustawiona, jako wartość zastępcza zostanie użyta wartość start_url. Pamiętaj, że jeśli w przyszłości zmienisz start_url (np. wartość ciągu zapytania), możesz uniemożliwić przeglądarce wykrycie, że PWA jest już zainstalowana.',
+        text: "A string that uniquely identifies this PWA against others that may be hosted on the same origin. If it's not set, the start_url will be used as a fallback value. Keep in mind that by changing the start_url in the future (such as when changing a query string value) you may be removing the browser's ability to detect that a PWA is already installed.",
       },
       {
         type: 'subheading',
         level: 4,
-        text: 'Ikony',
+        text: 'Icons',
       },
       {
         type: 'paragraph',
-        text: 'Ikona PWA jest jej wizualną tożsamością na urządzeniach użytkowników po zainstalowaniu, dlatego ważne jest, aby zdefiniować co najmniej jedną. Ponieważ właściwość icons to zbiór obiektów ikon, możesz zdefiniować kilka ikon w różnych formatach, aby zapewnić użytkownikom jak najlepsze wrażenia. Każda przeglądarka wybierze co najmniej 1 ikonę w zależności od swoich potrzeb i systemu operacyjnego, na którym jest zainstalowana. Wybierane są ikony najbardziej zbliżone do wymaganych specyfikacji.',
+        text: "Your PWA's icon is its visual identity across your users' devices when installed, so it's important to define at least one. Because the icons property is a collection of icon objects, you can define several icons in different formats to provide the best icon experience for your users. Each browser will pick one or more icons based on its needs and the operating system it's installed on, the icons closer to the specifications needed.",
       },
       {
         type: 'paragraph',
-        text: 'Jeśli musisz wybrać tylko jeden rozmiar ikony, powinien on wynosić 512 x 512 pikseli. Zalecamy jednak podanie większej liczby rozmiarów, w tym obrazów o rozmiarach 192 x 192, 384 x 384 i 1024 x 1024 piksele.',
+        text: 'If you need to pick only one icon size, it should be 512 by 512 pixels. However, providing more sizes is recommended including 192 by 192, 384 by 384, and 1024 by 1024 pixel-sized images, too.',
       },
       {
         type: 'code',
@@ -530,36 +544,51 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Jeśli nie podasz ikony lub ikony nie będą miały zalecanych rozmiarów, na niektórych platformach nie spełnisz kryteriów instalacji. Na innych platformach ikona będzie generowana automatycznie, np. na podstawie zrzutu ekranu PWA lub przy użyciu ogólnej ikony.',
+        text: "If you don't provide an icon or the icons are not in the recommended sizes, on some platforms you won't pass installation criteria. On other platforms, the icon will be automatically generated, for instance from a screenshot of the PWA or by using a generic icon.",
       },
       {
         type: 'subheading',
         level: 5,
-        text: 'Ikony z możliwością maskowania',
+        text: 'Maskable icons',
       },
       {
         type: 'paragraph',
-        text: 'Niektóre systemy operacyjne, np. Android, dostosowują ikony do różnych rozmiarów i kształtów. Na przykład w Androidzie 12 różni producenci lub ustawienia mogą zmieniać kształt ikon z okrągłych na kwadratowe lub kwadratowe z zaokrąglonymi rogami. Aby obsługiwać takie ikony adaptacyjne, możesz podać ikonę z możliwością maskowania za pomocą pola purpose.',
+        text: 'Some operating systems, such as Android, adapt icons to different sizes and shapes. For example, on Android 12, different manufacturers or settings can change the shape of icons from circles to squares to rounded-corner squares. To support these kinds of adaptive icons, you can provide a maskable icon using the purpose field.',
       },
       {
         type: 'paragraph',
-        text: 'W tym celu prześlij kwadratowy plik obrazu, którego główna ikona znajduje się w „bezpiecznym obszarze”, czyli w okręgu wyśrodkowanym w ikonie o promieniu równym 40% szerokości ikony. (Zobacz obraz poniżej). Urządzenia obsługujące ikony z maską będą w razie potrzeby maskować Twoją ikonę.',
+        text: 'To do so, provide a square image file that has its main icon contained within a “safe zone”, a circle centered in the icon with a radius of 40 percent of the width of the icon. (See the image below.) Devices that support maskable icons will mask your icon as needed.',
+      },
+      {
+        type: 'image',
+        src: '/src/content/assets/js/the-safe-area-marked-a-4-06cd30afb47b2.png',
+        alt: 'The safe area marked as a 40 percent radius centered circle within the square icon',
       },
       {
         type: 'paragraph',
-        text: 'Oto przykład ikony z maską w kilku często używanych kształtach:',
+        text: "Here's an example of a maskable icon rendered in a number of commonly used shapes:",
       },
       {
         type: 'paragraph',
-        text: 'Jeśli na poniższym obrazie użyjesz ikony po lewej stronie jako ikony z maskowaniem, na urządzeniach, na których zastosowano maskę kształtu, uzyskasz słabe wyniki.',
+        text: 'In the following image, if you use the icon at the left as a maskable icon, you will end up with poor results on devices when a shape mask is applied.',
+      },
+      {
+        type: 'image',
+        src: '/src/content/assets/js/an-icon-is-suitable-a-554e022a4bec.png',
+        alt: 'An icon that is not suitable for a maskable icon.',
       },
       {
         type: 'paragraph',
-        text: 'Ten obraz mógłby być bardziej użyteczny, gdyby miał więcej marginesów.',
+        text: 'This image could be made usable with more padding.',
+      },
+      {
+        type: 'image',
+        src: '/src/content/assets/js/the-icon-more-padding-is-9057ce1028452.png',
+        alt: 'The icon with more padding is suitable for masks.',
       },
       {
         type: 'paragraph',
-        text: 'Ikony z maskowaniem powinny mieć co najmniej 512 x 512 pikseli. Po utworzeniu kolekcji możesz dodać ją do icons, aby zwiększyć komfort korzystania z obsługiwanych urządzeń:',
+        text: 'Maskable icons should be 512 by 512 at least. With one created, you can add it to your icons collection to improve the experience for supported devices:',
       },
       {
         type: 'code',
@@ -571,20 +600,20 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'W większości przypadków, jeśli ikona z maską nie wyświetla się prawidłowo, możesz ją poprawić, dodając więcej dopełnienia. Maskable.app to bezpłatne narzędzie online do testowania i tworzenia wersji ikony z maską.',
+        text: "In most cases, if your maskable icon isn't displaying well, you can improve it by adding more padding. Maskable.app is a free online tool to test and create a maskable version of your icon.",
       },
       {
         type: 'paragraph',
-        text: 'Jeśli ikona służy do ogólnych i maskowalnych celów, możesz ustawić pole purpose na "any maskable". Szczegółowe informacje znajdziesz w dokumentacji MDN Web App Manifest.',
+        text: 'If your icon serves general and maskable purposes, you can set the purpose field to "any maskable". Refer to the MDN Web App Manifest documentation for details.',
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Pola zalecane',
+        text: 'Recommended fields',
       },
       {
         type: 'paragraph',
-        text: 'Kolejny zestaw pól, które warto uwzględnić, to te, które poprawią wrażenia użytkownika, mimo że nie są wymagane do zainstalowania aplikacji.',
+        text: "The next set of fields to include are ones that will improve your user's experience, even though they're not required for installability.",
       },
       {
         type: 'paragraph',
@@ -592,7 +621,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Domyślny kolor aplikacji, który czasami wpływa na sposób wyświetlania witryny przez system operacyjny (np. kolor okna i paska tytułu na komputerze lub kolor paska stanu na urządzeniach mobilnych). Ten kolor można zastąpić elementem HTML theme-color &lt;meta&gt;.',
+        text: 'Default color for the application, sometimes affecting how the OS displays the site (for instance, the window and title bar color on desktop, or the status bar color on mobile devices). This color can be overridden by the HTML theme-color <meta> element.',
       },
       {
         type: 'paragraph',
@@ -600,7 +629,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Kolor zastępczy, który ma być wyświetlany w tle aplikacji, zanim zostanie wczytany arkusz stylów. Safari w systemach iOS i iPadOS oraz większość przeglądarek na komputery ignoruje obecnie to pole.',
+        text: "Placeholder color to display in the application's background before its stylesheet is loaded. Safari on iOS and iPadOS and most desktop browsers currently ignore this field.",
       },
       {
         type: 'paragraph',
@@ -608,45 +637,55 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Zmienia zakres nawigacji w PWA, umożliwiając określenie, co ma być wyświetlane w oknie zainstalowanej aplikacji, a co nie. Jeśli na przykład utworzysz link do strony spoza zakresu, zostanie ona wyświetlona w przeglądarce w aplikacji, a nie w oknie PWA. Nie zmieni to jednak zakresu działania service workera.',
+        text: "Changes the navigation scope of the PWA, allowing you to define what is and isn't displayed within the installed app's window. For example, if you link to a page outside of the scope, it will be rendered in an in-app browser instead of within your PWA window. This will not, however, change the scope of your service worker.",
       },
       {
         type: 'paragraph',
-        text: 'Kolejny obraz pokazuje, jak pole theme_color jest używane na pasku tytułu na komputerze po zainstalowaniu aplikacji PWA.',
+        text: 'The next image shows how the theme_color field is used for the title bar on a desktop device when you install a PWA.',
+      },
+      {
+        type: 'image',
+        src: '/src/content/assets/js/the-same-pwa-installed-d-584337198daf1.png',
+        alt: 'The same PWA installed on desktop with a different theme color.',
       },
       {
         type: 'paragraph',
-        text: 'Podczas definiowania kolorów w manifeście, np. w elementach theme_color i background_color, używaj nazw kolorów CSS, np. salmon lub orange, kolorów RGB, np. #FF5500, lub funkcji kolorów bez przezroczystości, np. rgb() lub hsl(). Więcej informacji znajdziesz w rozdziale o projektowaniu aplikacji.',
+        text: 'When defining colors in the manifest, such as within theme_color and background_color, you should use CSS named colors, such as salmon or orange, RGB colors such as #FF5500, or color functions without transparency such as rgb() or hsl(). Check the App design chapter for more information.',
       },
       {
         type: 'subheading',
         level: 4,
-        text: 'Ekran powitalny',
+        text: 'Splash screens',
       },
       {
         type: 'paragraph',
-        text: 'Na niektórych urządzeniach podczas ładowania progresywnej aplikacji internetowej renderowany jest obraz statyczny, aby użytkownik od razu widział, że aplikacja się wczytuje.',
+        text: 'On some devices, a static image is rendered while your PWA is being loaded to provide immediate feedback to the user.',
       },
       {
         type: 'paragraph',
-        text: 'Android używa wartości theme_color, background_color i icon do wygenerowania ekranu powitalnego.',
+        text: 'Android uses the theme_color, background_color, and icon values to generate the splash screen.',
       },
       {
         type: 'paragraph',
-        text: 'Gdy zainstalujesz PWA na Androidzie, urządzenie wygeneruje ekran powitalny z informacjami pochodzącymi z pliku manifestu, jak widać na poniższym diagramie.',
+        text: 'When you install a PWA on Android, the device will generate a splash screen with the information that comes from your manifest as seen in the following diagram.',
+      },
+      {
+        type: 'image',
+        src: '/src/content/assets/js/a-pwa-android-splash-scr-fb6e3edede13e.png',
+        alt: 'A PWA on Android splash screen taking different values from the manifest.',
       },
       {
         type: 'paragraph',
-        text: 'Safari na iOS i iPadOS nie używa pliku manifestu aplikacji internetowej do generowania ekranów powitalnych. Zamiast tego używają obrazu połączonego z zastrzeżonym elementem &lt;link&gt;, podobnie jak w przypadku ikon. Więcej informacji znajdziesz w rozdziale o ulepszeniach.',
+        text: "Safari on iOS and iPadOS, on the other hand, doesn't use the web app manifest to generate splash screens. Instead, they use an image linked from a proprietary <link> element similar to how they handle icons. Check the Enhancement chapter for more details.",
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Pola rozszerzone',
+        text: 'Extended fields',
       },
       {
         type: 'paragraph',
-        text: 'Kolejne pola zawierają dodatkowe informacje o Twojej progresywnej aplikacji internetowej. Wszystkie są opcjonalne.',
+        text: 'The next set of fields offers additional information about your PWA. They are all optional.',
       },
       {
         type: 'paragraph',
@@ -654,7 +693,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Tag języka określający język główny wartości w pliku manifestu, np. en w przypadku języka angielskiego, pt-BR w przypadku portugalskiego (brazylijskiego) lub in w przypadku hindi.',
+        text: "A language tag specifying the primary language of the manifest's values, such as en for English, pt-BR for Brazilian Portuguese, or in for Hindi.",
       },
       {
         type: 'paragraph',
@@ -662,7 +701,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Kierunek wyświetlania pól pliku manifestu obsługujących kierunek pisowni (np. name, short_name i description). Prawidłowe wartości to auto, ltr (od lewej do prawej) i rtl (od prawej do lewej).',
+        text: 'The direction to display direction-capable manifest fields (such as name, short_name, and description). Valid values are auto, ltr (left-to-right), and rtl (right-to-left).',
       },
       {
         type: 'paragraph',
@@ -670,16 +709,16 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Orientacja aplikacji po zainstalowaniu. Gra może ustawić tę wartość, aby zażądać orientacji tylko poziomej. Akceptowanych jest kilka wartości, ale jeśli są one uwzględnione, zwykle jest to portrait lub landscape.',
+        text: "Desired orientation for the app once installed. A game may set this to request a landscape-only orientation. Several values are accepted, but if included it's typically portrait or landscape explicitly.",
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Pola promocyjne',
+        text: 'Promotional fields',
       },
       {
         type: 'paragraph',
-        text: 'Czwarty zestaw pól umożliwia podanie informacji promocyjnych o progresywnej aplikacji internetowej, np. w procesach instalacji, informacjach o aplikacji i wynikach wyszukiwania.',
+        text: 'The fourth set of fields lets you provide promotional information about your PWA, for instance, in install flows, listings, and search results.',
       },
       {
         type: 'paragraph',
@@ -687,7 +726,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Wyjaśnienie, co robi aplikacja PWA.',
+        text: 'An explanation of what the PWA does.',
       },
       {
         type: 'paragraph',
@@ -695,7 +734,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Tablica obiektów zrzutów ekranu z właściwościami src, type i sizes (podobnymi do obiektu icons) przeznaczona do prezentowania PWA. Nie ma ograniczeń rozmiaru.',
+        text: 'Array of screenshot objects with src, type, and sizes (similar to the icons object) intended to showcase the PWA. There are no size restrictions.',
       },
       {
         type: 'paragraph',
@@ -703,7 +742,7 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Tablica kategorii, do których powinna należeć progresywna aplikacja internetowa, używana jako wskazówki dotyczące wpisów, opcjonalnie z listy znanych kategorii. Te wartości są zwykle pisane małymi literami.',
+        text: 'Array of categories the PWA should belong to be used as hints for listings, optionally from the list of known categories. These values are typically lowercase.',
       },
       {
         type: 'paragraph',
@@ -711,46 +750,46 @@ export const webdevPwaTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Kod certyfikatu International Age Rating Coalition dla PWA, jeśli go masz. Ma ona służyć do określania, dla jakich grup wiekowych jest odpowiednia Twoja progresywna aplikacja internetowa.',
+        text: 'The International Age Rating Coalition certification code for the PWA, if you have one. It is intended to be used to determine which ages your PWA is appropriate for.',
       },
       {
         type: 'paragraph',
-        text: 'Możesz już dziś zobaczyć te pola promocyjne w działaniu. Jeśli na przykład w Androidzie Twoja progresywna aplikacja internetowa jest instalowalna i podasz wartości co najmniej w polach description i screenshots, okno instalacji zmieni się z prostego paska informacyjnego „Dodaj do ekranu głównego” w bardziej rozbudowane okno instalacji podobne do tego ze sklepu z aplikacjami.',
+        text: 'You can see these promotional fields in action today. On Android, for example, if your PWA is installable and you provide values for at least the description and screenshots fields, the installation dialog experience transforms from a simple "Add to the home screen" info bar, to a richer installation dialog similar to the one from an app store.',
       },
       {
         type: 'paragraph',
-        text: 'Na Androidzie możesz uzyskać lepszy interfejs instalacji, jeśli podasz wartości w polach promocyjnych, jak widać na filmie poniżej.',
+        text: 'On Android, you can get a nicer installation UI if you provide values for the promotional fields, as you can see in the next video',
       },
       {
         type: 'subheading',
         level: 3,
-        text: 'Pola dotyczące funkcji',
+        text: 'Capabilities Fields',
       },
       {
         type: 'paragraph',
-        text: 'Oprócz tego istnieje wiele pól związanych z różnymi funkcjami, których aplikacja PWA może używać w obsługiwanych przeglądarkach, np. pola shortcuts, share_target i display_override, o których piszemy w rozdziale o funkcjach. Istnieją też pola, takie jak related_apps i prefer_related_apps (więcej informacji znajdziesz w rozdziale o wykrywaniu), które umożliwiają połączenie PWA z zainstalowanymi aplikacjami, często ze sklepu z aplikacjami.',
+        text: 'Finally, there are a number of fields related to different capabilities that your PWA can use in supported browsers, such as the shortcuts, share_target, display_override fields as we cover in the Capabilities chapter. There are also fields, like related_apps and prefer_related_apps (see the Detection chapter for more information), to connect your PWA to installed apps, often from an app store.',
       },
       {
         type: 'paragraph',
-        text: 'W przyszłości może pojawić się wiele nowych pól, ponieważ przeglądarki będą dodawać więcej funkcji do progresywnych aplikacji internetowych.',
+        text: 'Many new fields may appear in the future while browsers add more capabilities to Progressive Web Apps.',
       },
       {
         type: 'list',
         ordered: false,
         items: [
-          'Dodawanie manifestu aplikacji internetowej',
-          'Obsługa ikon adaptacyjnych w PWA z ikonami z możliwością maskowania',
-          'Poszerzony interfejs instalacji PWA',
+          'Add a Web App Manifest',
+          'Adaptive icon support in PWAs with maskable icons',
+          'Richer PWA installation UI',
           'MDN: Web App Manifest',
         ],
       },
       {
         type: 'paragraph',
-        text: 'O ile nie stwierdzono inaczej, treść tej strony jest objęta licencją Creative Commons – uznanie autorstwa 4.0, a fragmenty kodu są dostępne na licencji Apache 2.0. Szczegółowe informacje na ten temat zawierają zasady dotyczące witryny Google Developers. Java jest zastrzeżonym znakiem towarowym firmy Oracle i jej podmiotów stowarzyszonych.',
+        text: 'Except as otherwise noted, the content of this page is licensed under the Creative Commons Attribution 4.0 License, and code samples are licensed under the Apache 2.0 License. For details, see the Google Developers Site Policies. Java is a registered trademark of Oracle and/or its affiliates.',
       },
       {
         type: 'paragraph',
-        text: 'Ostatnia aktualizacja: 2024-12-09 UTC.',
+        text: 'Last updated 2024-12-09 UTC.',
       },
     ],
   },

@@ -37,6 +37,7 @@ export const mdnServiceWorkersTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'The service worker code is fetched and then registered. If successful, the service worker is executed in a ServiceWorkerGlobalScope; this is basically a special kind of worker context, running off the main script execution thread, with no DOM access. The service worker is now ready to process events.',
           'Installation takes place. An install event is always the first one sent to a service worker (this can be used to start the process of populating an IndexedDB, and caching site assets). During this step, the application is preparing to make everything available for use offline.',
@@ -57,6 +58,7 @@ export const mdnServiceWorkersTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Whenever a new version of a service worker is fetched, this cycle happens again. The previous version remains active and continues to control its clients.',
           'Installation takes place for the new version. Its install handler can populate a new cache while the old version continues to use its existing cache.',
@@ -84,6 +86,11 @@ export const mdnServiceWorkersTopics = {
         text: "To demonstrate just the very basics of registering and installing a service worker, we have created a demo called simple service worker, which is a simple Star Wars Lego image gallery. It uses a promise-powered function to read image data from a JSON object and load the images using fetch(), before displaying the images in a line down the page. We've kept things static for now. It also registers, installs, and activates a service worker.",
       },
       {
+        type: 'image',
+        src: '/src/content/assets/js/demo-screenshot.png',
+        alt: 'The words Star Wars followed by an image of a Lego version of the Darth Vader character',
+      },
+      {
         type: 'paragraph',
         text: 'You can see the source code on GitHub, and the simple service worker running live.',
       },
@@ -107,6 +114,7 @@ export const mdnServiceWorkersTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'The if-block performs a feature detection test to make sure service workers are supported before trying to register one.',
           "Next, we use the ServiceWorkerContainer.register() function to register the service worker for this site. The service worker code is in a JavaScript file residing inside our app (note this is the file's URL relative to the origin, not the JS file that references it.)",
@@ -173,6 +181,7 @@ export const mdnServiceWorkersTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Here we add an install event listener to the service worker (hence self), and then chain an ExtendableEvent.waitUntil() method onto the event — this ensures that the service worker will not install until the code inside waitUntil() has successfully occurred.',
           "Inside addResourcesToCache() we use the caches.open() method to create a new cache called v1, which will be version 1 of our site resources cache. Then we call a function addAll() on the created cache, which for its parameter takes an array of URLs to all the resources you want to cache. The URLs are relative to the worker's location.",
@@ -200,11 +209,17 @@ export const mdnServiceWorkersTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'A fetch event fires every time any resource controlled by a service worker is fetched, which includes the documents inside the specified scope, and any resources referenced in those documents (for example if index.html makes a cross-origin request to embed an image, that still goes through its service worker.)',
           'You can attach a fetch event listener to the service worker, then call the respondWith() method on the event to hijack our HTTP responses and update them with your own content. js self.addEventListener("fetch", (event) =&gt; { event.respondWith(/* custom content goes here */); });',
           'We could start by responding with the resource whose URL matches that of the network request, in each case: js self.addEventListener("fetch", (event) =&gt; { event.respondWith(caches.match(event.request)); }); caches.match(event.request) allows us to match each resource requested from the network with the equivalent resource available in the cache, if there is a matching one available. The matching is done via URL and various headers, just like with normal HTTP requests.',
         ],
+      },
+      {
+        type: 'image',
+        src: '/src/content/assets/js/sw-fetch.svg',
+        alt: 'Fetch event diagram',
       },
       {
         type: 'paragraph',
@@ -297,6 +312,7 @@ export const mdnServiceWorkersTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Check cache',
           'Wait on event.preloadResponse, which is passed as preloadResponsePromise to the cacheFirst() function. Cache the result if it returns.',

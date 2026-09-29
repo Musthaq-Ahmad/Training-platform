@@ -19,7 +19,7 @@ export const mdnJsModulesTopics = {
       },
       {
         type: 'paragraph',
-        text: "To demonstrate usage of modules, we've created a set of examples that you can find on GitHub. These examples demonstrate a set of modules that create a &lt;canvas&gt; element on a webpage, and then draw (and report information about) different shapes on the canvas.",
+        text: "To demonstrate usage of modules, we've created a set of examples that you can find on GitHub. These examples demonstrate a set of modules that create a <canvas> element on a webpage, and then draw (and report information about) different shapes on the canvas.",
       },
       {
         type: 'paragraph',
@@ -49,7 +49,7 @@ export const mdnJsModulesTopics = {
         type: 'list',
         ordered: false,
         items: [
-          "canvas.js — contains functions related to setting up the canvas: * create() — creates a canvas with a specified width and height inside a wrapper &lt;div&gt; with a specified ID, which is itself appended inside a specified parent element. Returns an object containing the canvas's 2D context and the wrapper's ID. * createReportList() — creates an unordered list appended inside a specified wrapper element, which can be used to output report data into. Returns the list's ID.",
+          "canvas.js — contains functions related to setting up the canvas: * create() — creates a canvas with a specified width and height inside a wrapper <div> with a specified ID, which is itself appended inside a specified parent element. Returns an object containing the canvas's 2D context and the wrapper's ID. * createReportList() — creates an unordered list appended inside a specified wrapper element, which can be used to output report data into. Returns the list's ID.",
           "square.js — contains: * name — a constant containing the string 'square'. * draw() — draws a square on a specified canvas, with a specified size, position, and color. Returns an object containing the square's size, position, and color. * reportArea() — writes a square's area to a specific report list, given its length. * reportPerimeter() — writes a square's perimeter to a specific report list, given its length.",
         ],
       },
@@ -228,7 +228,7 @@ export const mdnJsModulesTopics = {
       },
       {
         type: 'paragraph',
-        text: 'The import map is defined using a JSON object inside a &lt;script&gt; element with the type attribute set to importmap. Note that an import map only applies to the document — the specification does not cover how to apply an import map in a worker or worklet context.',
+        text: 'The import map is defined using a JSON object inside a <script> element with the type attribute set to importmap. Note that an import map only applies to the document — the specification does not cover how to apply an import map in a worker or worklet context.',
       },
       {
         type: 'paragraph',
@@ -487,7 +487,7 @@ export const mdnJsModulesTopics = {
       },
       {
         type: 'paragraph',
-        text: 'First of all, you need to include type="module" in the &lt;script&gt; element, to declare this script as a module. To import the main.js script, we use this:',
+        text: 'First of all, you need to include type="module" in the <script> element, to declare this script as a module. To import the main.js script, we use this:',
       },
       {
         type: 'code',
@@ -499,7 +499,7 @@ export const mdnJsModulesTopics = {
       },
       {
         type: 'paragraph',
-        text: "You can also embed the module's script directly into the HTML file by placing the JavaScript code within the body of the &lt;script&gt; element:",
+        text: "You can also embed the module's script directly into the HTML file by placing the JavaScript code within the body of the <script> element:",
       },
       {
         type: 'code',
@@ -511,7 +511,7 @@ export const mdnJsModulesTopics = {
       },
       {
         type: 'paragraph',
-        text: 'You can only use import and export statements inside modules, not regular scripts. An error will be thrown if your &lt;script&gt; element doesn\'t have the type="module" attribute and attempts to import other modules. For example:',
+        text: 'You can only use import and export statements inside modules, not regular scripts. An error will be thrown if your <script> element doesn\'t have the type="module" attribute and attempts to import other modules. For example:',
       },
       {
         type: 'code',
@@ -527,7 +527,7 @@ export const mdnJsModulesTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Note: Modules and their dependencies can be preloaded by specifying them in &lt;link&gt; elements with rel="modulepreload". This can significantly reduce load time when the modules are used.',
+        text: 'Note: Modules and their dependencies can be preloaded by specifying them in <link> elements with rel="modulepreload". This can significantly reduce load time when the modules are used.',
       },
       {
         type: 'list',
@@ -535,8 +535,8 @@ export const mdnJsModulesTopics = {
         items: [
           "You need to pay attention to local testing — if you try to load the HTML file locally (i.e., with a file:// URL), you'll run into CORS errors due to JavaScript module security requirements. You need to do your testing through a server.",
           'Also, note that you might get different behavior from sections of script defined inside modules as opposed to in classic scripts. This is because modules use strict mode automatically.',
-          'There is no need to use the defer attribute (see &lt;script&gt; attributes) when loading a module script; modules are deferred automatically.',
-          'Modules are only executed once, even if they have been referenced in multiple &lt;script&gt; tags.',
+          'There is no need to use the defer attribute (see <script> attributes) when loading a module script; modules are deferred automatically.',
+          'Modules are only executed once, even if they have been referenced in multiple <script> tags.',
           "Last but not least, let's make this clear — module features are imported into the scope of a single script — they aren't available in the global scope. Therefore, you will only be able to access imported features in the script they are imported into, and you won't be able to access them from the JavaScript console, for example. You'll still get syntax errors shown in the DevTools, but you'll not be able to use some of the debugging techniques you might have expected to use.",
         ],
       },
@@ -978,7 +978,7 @@ export const mdnJsModulesTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Another advantage of dynamic imports is that they are always available, even in script environments. Therefore, if you have an existing &lt;script&gt; tag in your HTML that doesn\'t have type="module", you can still reuse code distributed as modules by dynamically importing it.',
+        text: 'Another advantage of dynamic imports is that they are always available, even in script environments. Therefore, if you have an existing <script> tag in your HTML that doesn\'t have type="module", you can still reuse code distributed as modules by dynamically importing it.',
       },
       {
         type: 'code',

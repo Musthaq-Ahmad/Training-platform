@@ -880,6 +880,7 @@ export const jsArrayMethodsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'On the first run, sum is the initial value (the last argument of reduce), equals 0, and current is the first array element, equals 1. So the function result is 1.',
           'On the second run, sum = 1, we add the second array element (2) to it and return.',

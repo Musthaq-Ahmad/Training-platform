@@ -84,6 +84,7 @@ export const jsPromisesAsyncTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'The first argument of the callback is reserved for an error if it occurs. Then callback(err) is called.',
           'The second argument (and the next ones if needed) are for the successful result. Then callback(null, result1, result2…) is called.',
@@ -116,6 +117,7 @@ export const jsPromisesAsyncTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'We load 1.js, then if there’s no error…',
           'We load 2.js, then if there’s no error…',
@@ -189,6 +191,7 @@ export const jsPromisesAsyncTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'A “producing code” that does something and takes time. For instance, some code that loads the data over a network. That’s a “singer”.',
           'A “consuming code” that wants the result of the “producing code” once it’s ready. Many functions may need that result. These are the “fans”.',
@@ -274,6 +277,7 @@ export const jsPromisesAsyncTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'The executor is called automatically and immediately (by new Promise).',
           'The executor receives two arguments: resolve and reject. These functions are pre-defined by the JavaScript engine, so we don’t need to create them. We should only call one of them when ready. After one second of “processing”, the executor calls resolve("done") to produce the result. This changes the state of the promise object:',
@@ -512,6 +516,7 @@ export const jsPromisesAsyncTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'A finally handler has no arguments. In finally we don’t know whether the promise is successful or not. That’s all right, as our task is usually to perform “general” finalizing procedures. Please take a look at the example above: as you can see, the finally handler has no arguments, and the promise outcome is handled by the next handler.',
           'A finally handler “passes through” the result or error to the next suitable handler. For instance, here the result is passed through finally to then: new Promise((resolve, reject) =&gt; { setTimeout(() =&gt; resolve("value"), 2000); }) .finally(() =&gt; alert("Promise ready")) // triggers first .then(result =&gt; alert(result)); // &lt;-- .then shows "value" As you can see, the value returned by the first promise is passed through finally to the next then. That’s very convenient, because finally is not meant to process a promise result. As said, it’s a place to do generic cleanup, no matter what the outcome was. And here’s an example of an error, for us to see how it’s passed through finally to catch: new Promise((resolve, reject) =&gt; { throw new Error("error"); }) .finally(() =&gt; alert("Promise ready")) // triggers first .catch(err =&gt; alert(err)); // &lt;-- .catch shows the error',
@@ -672,6 +677,7 @@ export const jsPromisesAsyncTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'The initial promise resolves in 1 second (*),',
           'Then the .then handler is called (**), which in turn creates a new promise (resolved with 2 value).',
@@ -1568,6 +1574,7 @@ export const jsPromisesAsyncTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Promise.all(promises) – waits for all promises to resolve and returns an array of their results. If any of the given promises rejects, it becomes the error of Promise.all, and all other results are ignored.',
           'Promise.allSettled(promises) (recently added method) – waits for all promises to settle and returns their results as an array of objects with: * status: "fulfilled" or "rejected" * value (if fulfilled) or reason (if rejected).',
@@ -1696,6 +1703,7 @@ export const jsPromisesAsyncTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'We’ll need to replace .then calls with await.',
           'Also we should make the function async for them to work.',
@@ -1904,6 +1912,7 @@ export const jsPromisesAsyncTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: ['Makes it always return a promise.', 'Allows await to be used in it.'],
       },
       {
@@ -1913,6 +1922,7 @@ export const jsPromisesAsyncTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'If it’s an error, an exception is generated — same as if throw error were called at that very place.',
           'Otherwise, it returns the result.',

@@ -21,6 +21,33 @@ type IndexEntry = {
 };
 
 const OUT_DIR = 'src/content/references';
+const ASSETS_DIR = 'src/content/assets/js';
+async function downloadImage(imageUrl: string): Promise<string> {
+  const url = new URL(imageUrl);
+
+  const pathname = url.pathname;
+  const originalName = pathname.split('/').pop() || 'image';
+
+  const safeName = originalName.replace(/[^a-zA-Z0-9._-]/g, '-');
+
+  const response = await fetch(imageUrl);
+
+  if (!response.ok) {
+    throw new Error(`Image HTTP ${response.status}: ${imageUrl}`);
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+
+  await mkdir(ASSETS_DIR, {
+    recursive: true,
+  });
+
+  const outputPath = `${ASSETS_DIR}/${safeName}`;
+
+  await writeFile(outputPath, buffer);
+
+  return `/src/content/assets/js/${safeName}`;
+}
 
 const turndown = new TurndownService({
   codeBlockStyle: 'fenced',
@@ -28,7 +55,7 @@ const turndown = new TurndownService({
 });
 turndown.use(gfm);
 
-turndown.remove(['script', 'style', 'iframe', 'nav', 'img']);
+turndown.remove(['script', 'style', 'iframe', 'nav']);
 
 async function urlToMarkdown(url: string): Promise<string> {
   const response = await fetch(url);
@@ -47,7 +74,33 @@ async function urlToMarkdown(url: string): Promise<string> {
     throw new Error('No readable content');
   }
 
-  return turndown.turndown(article.content);
+  const articleDom = new JSDOM(article.content, { url });
+
+  const images = articleDom.window.document.querySelectorAll('img');
+
+  for (const image of images) {
+    const src = image.getAttribute('src') || image.getAttribute('data-src');
+
+    if (!src) {
+      continue;
+    }
+
+    try {
+      const absoluteUrl = new URL(src, url).href;
+
+      const localSrc = await downloadImage(absoluteUrl);
+
+      image.setAttribute('src', localSrc);
+
+      image.removeAttribute('srcset');
+
+      console.log(`image ${absoluteUrl} -> ${localSrc}`);
+    } catch (error) {
+      console.log(`IMAGE FAIL ${src} (${(error as Error).message})`);
+    }
+  }
+
+  return turndown.turndown(articleDom.window.document.body.innerHTML);
 }
 
 async function main() {

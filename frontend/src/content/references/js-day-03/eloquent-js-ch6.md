@@ -1,6 +1,6 @@
 > [](#p-YG3CSlP9V6)An abstract data type is realized by writing a special kind of program \[…\] which defines the type in terms of the operations which can be performed on it.
 
-![Illustration of a rabbit next to its prototype, a schematic representation of a rabbit](https://eloquentjavascript.net/img/chapter_picture_6.jpg)
+![Illustration of a rabbit next to its prototype, a schematic representation of a rabbit](/src/content/assets/js/chapter_picture_6.jpg)
 
 [](#p-Fhc38BpV1K)[Chapter 4](https://eloquentjavascript.net/04_data.html) introduced JavaScript’s objects as containers that hold other data. In programming culture, _object-oriented programming_ is a set of techniques that use objects as the central principle of program organization. Though no one really agrees on its precise definition, object-oriented programming has shaped the design of many programming languages, including JavaScript. This chapter describes the way these ideas can be applied in JavaScript.
 
@@ -216,7 +216,7 @@ console.log(Rabbit.prototype.teeth);
 
 [](#p-HM5YtS3KgJ)The following diagram sketches the situation after this code has run. The `Rabbit` and `Object` prototypes lie behind `killerRabbit` as a kind of backdrop, where properties that are not found in the object itself can be looked up.
 
-![A diagram showing the object structure of rabbits and their prototypes. There is a box for the 'killerRabbit' instance (holding instance properties like 'type'), with its two prototypes, 'Rabbit.prototype' (holding the 'speak' method) and 'Object.prototype' (holding methods like 'toString') stacked behind it.](https://eloquentjavascript.net/img/rabbits.svg)
+![A diagram showing the object structure of rabbits and their prototypes. There is a box for the 'killerRabbit' instance (holding instance properties like 'type'), with its two prototypes, 'Rabbit.prototype' (holding the 'speak' method) and 'Object.prototype' (holding methods like 'toString') stacked behind it.](/src/content/assets/js/rabbits.svg)
 
 [](#p-or3/lz1DV8)Overriding properties that exist in a prototype can be a useful thing to do. As the rabbit teeth example shows, overriding can be used to express exceptional properties in instances of a more generic class of objects while letting the nonexceptional objects take a standard value from their prototype.
 

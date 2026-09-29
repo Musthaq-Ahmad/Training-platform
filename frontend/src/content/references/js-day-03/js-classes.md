@@ -1245,11 +1245,11 @@ Usually, devices that we’re using are quite complex. But delimiting the intern
 
 For instance, a coffee machine. Simple from outside: a button, a display, a few holes…And, surely, the result – great coffee! :)
 
-![](https://javascript.info/article/private-protected-properties-methods/coffee.jpg)
+![](/src/content/assets/js/coffee.jpg)
 
 But inside… (a picture from the repair manual)
 
-![](https://javascript.info/article/private-protected-properties-methods/coffee-inside.jpg)
+![](/src/content/assets/js/coffee-inside.jpg)
 
 A lot of details. But we can use it without knowing anything.
 

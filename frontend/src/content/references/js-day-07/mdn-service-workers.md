@@ -20,23 +20,23 @@ In this example, two pages are already open before the first service worker is r
 
 1.  The service worker code is fetched and then registered. If successful, the service worker is executed in a [`ServiceWorkerGlobalScope`](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope); this is basically a special kind of worker context, running off the main script execution thread, with no DOM access. The service worker is now ready to process events.
 
-    ![Registration of the first service worker, showing its parsed state, scope, and two open, uncontrolled clients.](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/sw-registration.svg)
+    ![Registration of the first service worker, showing its parsed state, scope, and two open, uncontrolled clients.](/src/content/assets/js/sw-registration.svg)
 
 2.  Installation takes place. An `install` event is always the first one sent to a service worker (this can be used to start the process of populating an IndexedDB, and caching site assets). During this step, the application is preparing to make everything available for use offline.
 
-    ![The install event populates a cache while the same two clients remain open.](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/sw-installation.svg)
+    ![The install event populates a cache while the same two clients remain open.](/src/content/assets/js/sw-installation.svg)
 
 3.  When installation completes successfully, the service worker is considered installed.
 
-    ![The service worker is installed, with a populated cache, but does not yet control clients.](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/sw-installed.svg)
+    ![The service worker is installed, with a populated cache, but does not yet control clients.](/src/content/assets/js/sw-installed.svg)
 
 4.  Because this is the first service worker, it receives an `activate` event without waiting for open pages to close. The `activate` handler can finish setting up the service worker.
 
-    ![The activate event finishes setup while the same two existing clients remain open.](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/sw-activation.svg)
+    ![The activate event finishes setup while the same two existing clients remain open.](/src/content/assets/js/sw-activation.svg)
 
 5.  After activation, the service worker will control pages opened within its scope. Existing documents will have to be reloaded to actually be controlled, because a document starts life with or without a service worker and maintains that for its lifetime. To override this default behavior and adopt open pages, a service worker can call [`clients.claim()`](https://developer.mozilla.org/en-US/docs/Web/API/Clients/claim).
 
-    ![A new client opens and is controlled by the activated service worker, while the two existing clients remain open and uncontrolled.](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/sw-activated.svg)
+    ![A new client opens and is controlled by the activated service worker, while the two existing clients remain open and uncontrolled.](/src/content/assets/js/sw-activated.svg)
 
 ### [Replacing an existing service worker](#replacing_an_existing_service_worker)
 
@@ -44,25 +44,25 @@ This independent example starts with one open client controlled by version 1. It
 
 1.  Whenever a new version of a service worker is fetched, this cycle happens again. The previous version remains active and continues to control its clients.
 
-    ![The open client calls register(), and version 2 is parsed while version 1 remains activated and controls the client.](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/sw-replacement-fetched.svg)
+    ![The open client calls register(), and version 2 is parsed while version 1 remains activated and controls the client.](/src/content/assets/js/sw-replacement-fetched.svg)
 
 2.  Installation takes place for the new version. Its `install` handler can populate a new cache while the old version continues to use its existing cache.
 
-    ![Version 2 receives the install event and populates a new cache while version 1 continues to control the same client.](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/sw-replacement-installation.svg)
+    ![Version 2 receives the install event and populates a new cache while version 1 continues to control the same client.](/src/content/assets/js/sw-replacement-installation.svg)
 
 3.  When installation completes successfully, the new version waits while the old version is still controlling clients. The new version is not yet active.
 
-    ![Version 2 is installed and waiting, with its new cache ready, while version 1 still controls the open client.](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/sw-replacement-waiting.svg)
+    ![Version 2 is installed and waiting, with its new cache ready, while version 1 still controls the open client.](/src/content/assets/js/sw-replacement-waiting.svg)
 
 4.  Once all pages controlled by the old version of the service worker have closed and the old version has finished handling pending events, it's safe to retire the old version, and the newly installed service worker receives an `activate` event. The primary use of `activate` is to clean up resources used in previous versions of the service worker, such as the old cache in this example.
 
     The new service worker can call [`skipWaiting()`](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/skipWaiting) to ask to be activated without waiting for open pages to be closed. It then takes over the pages controlled by the old version.
 
-    ![The client controlled by version 1 closes. Version 1 is retired, and version 2 receives activate and deletes the old cache.](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/sw-replacement-activation.svg)
+    ![The client controlled by version 1 closes. Version 1 is retired, and version 2 receives activate and deletes the old cache.](/src/content/assets/js/sw-replacement-activation.svg)
 
 5.  After activation, newly opened pages within the registration's scope are controlled by the new version.
 
-    ![A new client opens and is controlled by version 2, which uses its new cache.](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/sw-replacement-activated.svg)
+    ![A new client opens and is controlled by version 2, which uses its new cache.](/src/content/assets/js/sw-replacement-activated.svg)
 
 ### [Service worker events](#service_worker_events)
 
@@ -80,7 +80,7 @@ Here is a summary of the available service worker events:
 
 To demonstrate just the very basics of registering and installing a service worker, we have created a demo called [simple service worker](https://github.com/mdn/dom-examples/tree/main/service-worker/simple-service-worker 'External link (opens in new tab)'), which is a simple Star Wars Lego image gallery. It uses a promise-powered function to read image data from a JSON object and load the images using [`fetch()`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch), before displaying the images in a line down the page. We've kept things static for now. It also registers, installs, and activates a service worker.
 
-![The words Star Wars followed by an image of a Lego version of the Darth Vader character](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/demo-screenshot.png)
+![The words Star Wars followed by an image of a Lego version of the Darth Vader character](/src/content/assets/js/demo-screenshot.png)
 
 You can see the [source code on GitHub](https://github.com/mdn/dom-examples/tree/main/service-worker/simple-service-worker 'External link (opens in new tab)'), and the [simple service worker running live](https://bncb2v.csb.app/ 'External link (opens in new tab)').
 
@@ -201,7 +201,7 @@ Now you've got your site assets cached, you need to tell service workers to do s
 
     `caches.match(event.request)` allows us to match each resource requested from the network with the equivalent resource available in the cache, if there is a matching one available. The matching is done via URL and various headers, just like with normal HTTP requests.
 
-![Fetch event diagram](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers/sw-fetch.svg)
+![Fetch event diagram](/src/content/assets/js/sw-fetch.svg)
 
 ## [Recovering failed requests](#recovering_failed_requests)
 

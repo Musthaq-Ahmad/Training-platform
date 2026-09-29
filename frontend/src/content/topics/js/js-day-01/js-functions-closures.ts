@@ -762,6 +762,7 @@ export const jsFunctionsClosuresTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'The Function Declaration (1) creates the function and puts it into the variable named sayHi.',
           'Line (2) copies it into the variable func. Please note again: there are no parentheses after sayHi. If there were, then func = sayHi() would write the result of the call sayHi() into func, not the function sayHi itself.',
@@ -1214,6 +1215,7 @@ export const jsFunctionsClosuresTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Without curly braces: (...args) =&gt; expression – the right side is an expression: the function evaluates it and returns the result. Parentheses can be omitted, if there’s only a single argument, e.g. n =&gt; n*2.',
           'With curly braces: (...args) =&gt; { body } – brackets allow us to write multiple statements inside the function, but we need an explicit return to return something.',
@@ -1444,6 +1446,7 @@ export const jsFunctionsClosuresTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Environment Record – an object that stores all local variables as its properties (and some other information like the value of this).',
           'A reference to the outer lexical environment, the one associated with the outer code.',
@@ -1480,6 +1483,7 @@ export const jsFunctionsClosuresTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'When the script starts, the Lexical Environment is pre-populated with all declared variables. * Initially, they are in the “Uninitialized” state. That’s a special internal state, it means that the engine knows about the variable, but it cannot be referenced until it has been declared with let. It’s almost the same as if the variable didn’t exist.',
           'Then let phrase definition appears. There’s no assignment yet, so its value is undefined. We can use the variable from this point forward.',

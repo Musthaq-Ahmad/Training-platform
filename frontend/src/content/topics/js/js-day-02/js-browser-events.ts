@@ -24,7 +24,7 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'A handler can be set in HTML with an attribute named on&lt;event&gt;.',
+        text: 'A handler can be set in HTML with an attribute named on<event>.',
       },
       {
         type: 'paragraph',
@@ -73,7 +73,7 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'We can assign a handler using a DOM property on&lt;event&gt;.',
+        text: 'We can assign a handler using a DOM property on<event>.',
       },
       {
         type: 'paragraph',
@@ -102,9 +102,10 @@ export const jsBrowserEventsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Only HTML: &lt;input type="button" onclick="alert(\'Click!\')" value="Button"&gt;',
-          'HTML + JS: &lt;input type="button" id="button" value="Button"&gt; &lt;script&gt; button.onclick = function() { alert(\'Click!\'); }; &lt;/script&gt;',
+          'HTML + JS: &lt;input type="button" id="button" value="Button"&gt; <script> button.onclick = function() { alert(\'Click!\'); }; &lt;/script&gt;',
         ],
       },
       {
@@ -531,6 +532,7 @@ export const jsBrowserEventsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'HTML attribute: onclick="...".',
           'DOM property: elem.onclick = function.',
@@ -563,7 +565,7 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'This handler is assigned to &lt;div&gt;, but also runs if you click any nested tag like &lt;em&gt; or &lt;code&gt;:',
+        text: 'This handler is assigned to <div>, but also runs if you click any nested tag like <em> or <code>:',
       },
       {
         type: 'code',
@@ -575,7 +577,7 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Isn’t it a bit strange? Why does the handler on &lt;div&gt; run if the actual click was on &lt;em&gt;?',
+        text: 'Isn’t it a bit strange? Why does the handler on <div> run if the actual click was on <em>?',
       },
       {
         type: 'paragraph',
@@ -599,21 +601,22 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'A click on the inner &lt;p&gt; first runs onclick:',
+        text: 'A click on the inner <p> first runs onclick:',
       },
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
-          'On that &lt;p&gt;.',
-          'Then on the outer &lt;div&gt;.',
-          'Then on the outer &lt;form&gt;.',
+          'On that <p>.',
+          'Then on the outer <div>.',
+          'Then on the outer <form>.',
           'And so on upwards till the document object.',
         ],
       },
       {
         type: 'paragraph',
-        text: 'So if we click on &lt;p&gt;, then we’ll see 3 alerts: p → div → form.',
+        text: 'So if we click on <p>, then we’ll see 3 alerts: p → div → form.',
       },
       {
         type: 'paragraph',
@@ -653,7 +656,7 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'For instance, if we have a single handler form.onclick, then it can “catch” all clicks inside the form. No matter where the click happened, it bubbles up to &lt;form&gt; and runs the handler.',
+        text: 'For instance, if we have a single handler form.onclick, then it can “catch” all clicks inside the form. No matter where the click happened, it bubbles up to <form> and runs the handler.',
       },
       {
         type: 'paragraph',
@@ -663,7 +666,7 @@ export const jsBrowserEventsTopics = {
         type: 'list',
         ordered: false,
         items: [
-          'this (=event.currentTarget) is the &lt;form&gt; element, because the handler runs on it.',
+          'this (=event.currentTarget) is the <form> element, because the handler runs on it.',
           'event.target is the actual element inside the form that was clicked.',
         ],
       },
@@ -713,11 +716,11 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'It’s possible that event.target could equal this – it happens when the click is made directly on the &lt;form&gt; element.',
+        text: 'It’s possible that event.target could equal this – it happens when the click is made directly on the <form> element.',
       },
       {
         type: 'paragraph',
-        text: 'A bubbling event goes from the target element straight up. Normally it goes upwards till &lt;html&gt;, and then to document object, and some events even reach window, calling all handlers on the path.',
+        text: 'A bubbling event goes from the target element straight up. Normally it goes upwards till <html>, and then to document object, and some events even reach window, calling all handlers on the path.',
       },
       {
         type: 'paragraph',
@@ -729,7 +732,7 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'For instance, here body.onclick doesn’t work if you click on &lt;button&gt;:',
+        text: 'For instance, here body.onclick doesn’t work if you click on <button>:',
       },
       {
         type: 'code',
@@ -774,6 +777,7 @@ export const jsBrowserEventsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'We create a nested menu. Each submenu handles clicks on its elements and calls stopPropagation so that the outer menu won’t trigger.',
           "Later we decide to catch clicks on the whole window, to track users’ behavior (where people click). Some analytic systems do that. Usually the code uses document.addEventListener('click'…) to catch all clicks.",
@@ -795,6 +799,7 @@ export const jsBrowserEventsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Capturing phase – the event goes down to the element.',
           'Target phase – the event reached the target element.',
@@ -803,11 +808,11 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Here’s the picture, taken from the specification, of the capturing (1), target (2) and bubbling (3) phases for a click event on a &lt;td&gt; inside a table:',
+        text: 'Here’s the picture, taken from the specification, of the capturing (1), target (2) and bubbling (3) phases for a click event on a <td> inside a table:',
       },
       {
         type: 'paragraph',
-        text: 'That is: for a click on &lt;td&gt; the event first goes through the ancestors chain down to the element (capturing phase), then it reaches the target and triggers there (target phase), and then it goes up (bubbling phase), calling handlers on its way.',
+        text: 'That is: for a click on <td> the event first goes through the ancestors chain down to the element (capturing phase), then it reaches the target and triggers there (target phase), and then it goes up (bubbling phase), calling handlers on its way.',
       },
       {
         type: 'paragraph',
@@ -815,7 +820,7 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'In fact, the capturing phase was invisible for us, because handlers added using on&lt;event&gt;-property or using HTML attributes or using two-argument addEventListener(event, handler) don’t know anything about capturing, they only run on the 2nd and 3rd phases.',
+        text: 'In fact, the capturing phase was invisible for us, because handlers added using on<event>-property or using HTML attributes or using two-argument addEventListener(event, handler) don’t know anything about capturing, they only run on the 2nd and 3rd phases.',
       },
       {
         type: 'paragraph',
@@ -863,11 +868,12 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'If you click on &lt;p&gt;, then the sequence is:',
+        text: 'If you click on <p>, then the sequence is:',
       },
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'HTML → BODY → FORM → DIV -&gt; P (capturing phase, the first listener):',
           'P → DIV → FORM → BODY → HTML (bubbling phase, the second listener).',
@@ -927,7 +933,7 @@ export const jsBrowserEventsTopics = {
         items: [
           'Then the event moves down from the document root to event.target, calling handlers assigned with addEventListener(..., true) on the way (true is a shorthand for {capture: true}).',
           'Then handlers are called on the target element itself.',
-          'Then the event bubbles up from event.target to the root, calling handlers assigned using on&lt;event&gt;, HTML attributes and addEventListener without the 3rd argument or with the 3rd argument false/{capture:false}.',
+          'Then the event bubbles up from event.target to the root, calling handlers assigned using on<event>, HTML attributes and addEventListener without the 3rd argument or with the 3rd argument false/{capture:false}.',
         ],
       },
       {
@@ -957,7 +963,7 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'The same for event handlers. The code that set the handler on a particular element knows maximum details about the element and what it does. A handler on a particular &lt;td&gt; may be suited for that exactly &lt;td&gt;, it knows everything about it, so it should get the chance first. Then its immediate parent also knows about the context, but a little bit less, and so on till the very top element that handles general concepts and runs the last one.',
+        text: 'The same for event handlers. The code that set the handler on a particular element knows maximum details about the element and what it does. A handler on a particular <td> may be suited for that exactly <td>, it knows everything about it, so it should get the chance first. Then its immediate parent also knows about the context, but a little bit less, and so on till the very top element that handles general concepts and runs the last one.',
       },
       {
         type: 'paragraph',
@@ -1001,11 +1007,11 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Our task is to highlight a cell &lt;td&gt; on click.',
+        text: 'Our task is to highlight a cell <td> on click.',
       },
       {
         type: 'paragraph',
-        text: 'Instead of assign an onclick handler to each &lt;td&gt; (can be many) – we’ll setup the “catch-all” handler on &lt;table&gt; element.',
+        text: 'Instead of assign an onclick handler to each <td> (can be many) – we’ll setup the “catch-all” handler on <table> element.',
       },
       {
         type: 'paragraph',
@@ -1025,7 +1031,7 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Such a code doesn’t care how many cells there are in the table. We can add/remove &lt;td&gt; dynamically at any time and the highlighting will still work.',
+        text: 'Such a code doesn’t care how many cells there are in the table. We can add/remove <td> dynamically at any time and the highlighting will still work.',
       },
       {
         type: 'paragraph',
@@ -1033,11 +1039,11 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'The click may occur not on the &lt;td&gt;, but inside it.',
+        text: 'The click may occur not on the <td>, but inside it.',
       },
       {
         type: 'paragraph',
-        text: 'In our case if we take a look inside the HTML, we can see nested tags inside &lt;td&gt;, like &lt;strong&gt;:',
+        text: 'In our case if we take a look inside the HTML, we can see nested tags inside <td>, like <strong>:',
       },
       {
         type: 'code',
@@ -1049,11 +1055,11 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'Naturally, if a click happens on that &lt;strong&gt; then it becomes the value of event.target.',
+        text: 'Naturally, if a click happens on that <strong> then it becomes the value of event.target.',
       },
       {
         type: 'paragraph',
-        text: 'In the handler table.onclick we should take such event.target and find out whether the click was inside &lt;td&gt; or not.',
+        text: 'In the handler table.onclick we should take such event.target and find out whether the click was inside <td> or not.',
       },
       {
         type: 'paragraph',
@@ -1074,16 +1080,17 @@ export const jsBrowserEventsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
-          'The method elem.closest(selector) returns the nearest ancestor that matches the selector. In our case we look for &lt;td&gt; on the way up from the source element.',
-          'If event.target is not inside any &lt;td&gt;, then the call returns immediately, as there’s nothing to do.',
-          'In case of nested tables, event.target may be a &lt;td&gt;, but lying outside of the current table. So we check if that’s actually our table’s &lt;td&gt;.',
+          'The method elem.closest(selector) returns the nearest ancestor that matches the selector. In our case we look for <td> on the way up from the source element.',
+          'If event.target is not inside any <td>, then the call returns immediately, as there’s nothing to do.',
+          'In case of nested tables, event.target may be a <td>, but lying outside of the current table. So we check if that’s actually our table’s <td>.',
           'And, if it’s so, then highlight it.',
         ],
       },
       {
         type: 'paragraph',
-        text: 'As the result, we have a fast, efficient highlighting code, that doesn’t care about the total number of &lt;td&gt; in the table.',
+        text: 'As the result, we have a fast, efficient highlighting code, that doesn’t care about the total number of <td> in the table.',
       },
       {
         type: 'paragraph',
@@ -1148,6 +1155,7 @@ export const jsBrowserEventsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'We add a custom attribute to an element that describes its behavior.',
           'A document-wide handler tracks events, and if an event happens on an attributed element – performs the action.',
@@ -1184,7 +1192,7 @@ export const jsBrowserEventsTopics = {
       },
       {
         type: 'paragraph',
-        text: 'When we assign an event handler to the document object, we should always use addEventListener, not document.on&lt;event&gt;, because the latter will cause conflicts: new handlers overwrite old ones.',
+        text: 'When we assign an event handler to the document object, we should always use addEventListener, not document.on<event>, because the latter will cause conflicts: new handlers overwrite old ones.',
       },
       {
         type: 'paragraph',
@@ -1238,6 +1246,7 @@ export const jsBrowserEventsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Put a single handler on the container.',
           'In the handler – check the source element event.target.',

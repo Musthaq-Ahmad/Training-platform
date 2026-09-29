@@ -617,7 +617,7 @@ export const mdnAddEventListenerTopics = {
       },
       {
         type: 'paragraph',
-        text: 'The following example shows the effect of setting passive. It includes a &lt;div&gt; that contains some text, and a checkbox.',
+        text: 'The following example shows the effect of setting passive. It includes a <div> that contains some text, and a checkbox.',
       },
       {
         type: 'subheading',

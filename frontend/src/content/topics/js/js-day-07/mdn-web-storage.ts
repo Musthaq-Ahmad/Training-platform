@@ -42,15 +42,20 @@ export const mdnWebStorageTopics = {
         text: 'Each origin has its own storage — this is true for both web storage and shared storage. However, access of third-party (i.e., embedded) code to shared storage depends on its browsing context. The context in which a third-party code from another origin runs determines the storage access of the third-party code.',
       },
       {
+        type: 'image',
+        src: '/src/content/assets/js/embedded-content.png',
+        alt: 'A box diagram showing a top-level browsing context called publisher.com, with third-party content embedded in it',
+      },
+      {
         type: 'paragraph',
-        text: 'Third-party code can be added to another site by injecting it with a &lt;script&gt; element or by setting the source of an &lt;iframe&gt; to a site that contains third-party code. The method used for integrating third-party code determines the browsing context of the code.',
+        text: 'Third-party code can be added to another site by injecting it with a <script> element or by setting the source of an <iframe> to a site that contains third-party code. The method used for integrating third-party code determines the browsing context of the code.',
       },
       {
         type: 'list',
         ordered: false,
         items: [
-          "If your third-party code is added to another site with a &lt;script&gt; element, your code will be executed in the browsing context of the embedder. Therefore, when you call Storage.setItem() or SharedStorage.set(), the key/value pair will be written to the embedder's storage. From the browser's perspective, there is no difference between first-party code and third-party code when a &lt;script&gt; tag is used.",
-          "When your third-party code is added to another site within an &lt;iframe&gt;, the code inside the &lt;iframe&gt; will be executed with the origin of the &lt;iframe&gt;'s browsing context. If the code inside the &lt;iframe&gt; calls Storage.setItem(), data will be written into the local or session storage of the &lt;iframe&gt;'s origin. If the &lt;iframe&gt; code calls SharedStorage.set(), the data will be written into the shared storage of the &lt;iframe&gt;'s origin.",
+          "If your third-party code is added to another site with a <script> element, your code will be executed in the browsing context of the embedder. Therefore, when you call Storage.setItem() or SharedStorage.set(), the key/value pair will be written to the embedder's storage. From the browser's perspective, there is no difference between first-party code and third-party code when a <script> tag is used.",
+          "When your third-party code is added to another site within an <iframe>, the code inside the <iframe> will be executed with the origin of the <iframe>'s browsing context. If the code inside the <iframe> calls Storage.setItem(), data will be written into the local or session storage of the <iframe>'s origin. If the <iframe> code calls SharedStorage.set(), the data will be written into the shared storage of the <iframe>'s origin.",
         ],
       },
       {

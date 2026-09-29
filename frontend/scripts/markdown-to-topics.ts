@@ -23,7 +23,15 @@ function camelCase(value: string): string {
 }
 
 function cleanText(value: string): string {
-  const html = marked.parseInline(value) as string;
+  const placeholders: string[] = [];
+
+  const protectedValue = value.replace(/<([a-zA-Z][a-zA-Z0-9_-]*)>/g, (match) => {
+    const token = `__ANGLE_PLACEHOLDER_${placeholders.length}__`;
+    placeholders.push(match);
+    return token;
+  });
+
+  const html = marked.parseInline(protectedValue) as string;
 
   return html
     .replace(/<[^>]+>/g, '')
@@ -31,6 +39,7 @@ function cleanText(value: string): string {
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
+    .replace(/__ANGLE_PLACEHOLDER_(\d+)__/g, (_, index: string) => placeholders[Number(index)])
     .trim();
 }
 
@@ -38,7 +47,44 @@ function tokenToBlocks(tokens: Token[]): ContentBlock[] {
   const blocks: ContentBlock[] = [];
 
   for (const token of tokens) {
+    /*
+     * Paragraphs can contain images.
+     *
+     * Example:
+     * ![Screenshot](https://example.com/image.png)
+     *
+     * Marked can represent this as a paragraph containing
+     * an image token rather than as a top-level image token.
+     */
     if (token.type === 'paragraph') {
+      const imageTokens = token.tokens?.filter((child) => child.type === 'image');
+
+      if (imageTokens && imageTokens.length > 0) {
+        for (const image of imageTokens) {
+          if (image.type === 'image') {
+            blocks.push({
+              type: 'image',
+              src: image.href,
+              alt: image.text,
+            });
+          }
+        }
+
+        /*
+         * Keep any normal text from the paragraph too.
+         */
+        const text = cleanText(token.text);
+
+        if (text) {
+          blocks.push({
+            type: 'paragraph',
+            text,
+          });
+        }
+
+        continue;
+      }
+
       const text = cleanText(token.text);
 
       if (text) {
@@ -65,6 +111,19 @@ function tokenToBlocks(tokens: Token[]): ContentBlock[] {
       continue;
     }
 
+    /*
+     * Handle images that appear as top-level tokens.
+     */
+    if (token.type === 'image') {
+      blocks.push({
+        type: 'image',
+        src: token.href,
+        alt: token.text,
+      });
+
+      continue;
+    }
+
     if (token.type === 'code') {
       blocks.push({
         type: 'code',
@@ -82,6 +141,11 @@ function tokenToBlocks(tokens: Token[]): ContentBlock[] {
       blocks.push({
         type: 'list',
         ordered: token.ordered,
+        ...(token.ordered
+          ? {
+              start: typeof token.start === 'number' ? token.start : Number(token.start) || 1,
+            }
+          : {}),
         items: token.items.map((item: { text: string }) => cleanText(item.text)),
       });
 
@@ -106,6 +170,7 @@ function tokenToBlocks(tokens: Token[]): ContentBlock[] {
 
 async function convertFile(inputPath: string, outputPath: string) {
   const markdown = await readFile(inputPath, 'utf8');
+
   const tokens = marked.lexer(markdown);
 
   const headingIndex = tokens.findIndex((token) => token.type === 'heading');

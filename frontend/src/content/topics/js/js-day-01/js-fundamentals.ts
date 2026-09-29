@@ -228,6 +228,7 @@ export const jsFundamentalsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'The name must contain only letters, digits, or the symbols $ and _.',
           'The first character must not be a digit.',
@@ -669,6 +670,7 @@ export const jsFundamentalsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: ['Double quotes: "Hello".', "Single quotes: 'Hello'.", 'Backticks: `Hello`.'],
       },
       {
@@ -858,6 +860,7 @@ export const jsFundamentalsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Math is a built-in object that provides mathematical operations. We will learn it in the chapter Numbers. Here, it serves just as an example of an object.',
           'The result of typeof null is "object". That’s an officially recognized error in typeof, coming from very early days of JavaScript and kept for compatibility. Definitely, null is not an object. It is a special value with a separate type of its own. The behavior of typeof is wrong here.',
@@ -1240,6 +1243,7 @@ export const jsFundamentalsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Compare the first character of both strings.',
           'If the first character from the first string is greater (or less) than the other string’s, then the first string is greater (or less) than the second. We’re done.',
@@ -1259,6 +1263,7 @@ export const jsFundamentalsTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'G is the same as G.',
           'l is the same as l.',

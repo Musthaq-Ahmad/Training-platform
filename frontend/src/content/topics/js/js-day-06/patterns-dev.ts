@@ -182,6 +182,7 @@ export const patternsDevTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Use AbortSignal with EventTarget so cleanup is a single abort() call.',
           'Return an unsubscribe function from subscribe so callers don’t need to find their handler again.',
@@ -250,6 +251,7 @@ export const patternsDevTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'A module is a file. The file is its own scope.',
           'Anything not exported is private to the file.',
@@ -296,6 +298,7 @@ export const patternsDevTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'The file extension. .mjs is always a module; .cjs is always CommonJS.',
           'The closest package.json. If it has "type": "module", then .js files are modules. If it has "type": "commonjs" (or omits the field), .js files are CommonJS.',
@@ -655,6 +658,7 @@ export const patternsDevTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'It encapsulates setup. The ranks map and the threshold lookup happen exactly once, when the logger is constructed. Every call to log.warn reuses those captured values.',
           'It returns an interface, not a type. Callers depend on the shape { debug, info, warn, error }. Whether that came from a class, an object literal, or a Proxy is invisible to them — and that’s the decoupling Factory was always trying to enable.',

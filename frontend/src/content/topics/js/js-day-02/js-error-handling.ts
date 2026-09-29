@@ -24,6 +24,7 @@ export const jsErrorHandlingTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'First, the code in try {...} is executed.',
           'If there were no errors, then catch (err) is ignored: the execution reaches the end of try and goes on, skipping catch.',
@@ -398,6 +399,7 @@ export const jsErrorHandlingTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Catch gets all errors.',
           'In the catch (err) {...} block we analyze the error object err.',
@@ -504,6 +506,7 @@ export const jsErrorHandlingTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'If you answer “Yes” to “Make an error?”, then try -&gt; catch -&gt; finally.',
           'If you say “No”, then try -&gt; finally.',
@@ -684,6 +687,7 @@ export const jsErrorHandlingTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'We register at the service and get a piece of JS (or a script URL) from them to insert on pages.',
           'That JS script sets a custom window.onerror function.',
@@ -935,6 +939,7 @@ export const jsErrorHandlingTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'We’ll make a new class ReadError to represent a generic “data reading” error.',
           'The function readUser will catch data reading errors that occur inside it, such as ValidationError and SyntaxError, and generate a ReadError instead.',

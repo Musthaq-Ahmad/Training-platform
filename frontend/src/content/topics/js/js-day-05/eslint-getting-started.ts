@@ -253,6 +253,7 @@ export const eslintGettingStartedTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: ['Install the ESLint packages in your project:'],
       },
       {
@@ -310,6 +311,7 @@ export const eslintGettingStartedTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 2,
         items: [
           'Add an eslint.config.js file: # Create JavaScript configuration file touch eslint.config.js',
           'Add configuration to the eslint.config.js file. Refer to the Configure ESLint documentation to learn how to add rules, custom configurations, plugins, and more. import { defineConfig } from "eslint/config"; import js from "@eslint/js"; export default defineConfig([ { files: ["**/*.js"], plugins: { js, }, extends: ["js/recommended"], rules: { "no-unused-vars": "warn", "no-undef": "warn", }, }, ]);',

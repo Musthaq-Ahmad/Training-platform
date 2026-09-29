@@ -16,11 +16,11 @@ If you want to create a site in an existing repository, skip to the [Creating yo
 
 1.  In the upper-right corner of any page, select , then click **New repository**.
 
-    ![Screenshot of a GitHub dropdown menu showing options to create new items. The menu item "New repository" is outlined in dark orange.](https://docs.github.com/assets/cb-29762/images/help/repository/repo-create-global-nav-update.png)
+    ![Screenshot of a GitHub dropdown menu showing options to create new items. The menu item "New repository" is outlined in dark orange.](/src/content/assets/js/repo-create-global-nav-update.png)
 
-2.  Use the **Owner** dropdown menu to select the account you want to own the repository. ![Screenshot of the owner menu for a new GitHub repository. The menu shows two options, octocat and github.](https://docs.github.com/assets/cb-80933/images/help/repository/create-repository-owner.png)
+2.  Use the **Owner** dropdown menu to select the account you want to own the repository. ![Screenshot of the owner menu for a new GitHub repository. The menu shows two options, octocat and github.](/src/content/assets/js/create-repository-owner.png)
 
-3.  Type a name for your repository and an optional description. If you're creating a user or organization site, your repository must be named `<user>.github.io` or `<organization>.github.io`. If your user or organization name contains uppercase letters, you must lowercase the letters. For more information, see [What is GitHub Pages?](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#types-of-github-pages-sites). ![Screenshot of GitHub Pages settings in a repository. The repository name field contains the text "octocat.github.io" and is outlined in dark orange.](https://docs.github.com/assets/cb-48480/images/help/pages/create-repository-name-pages.png)
+3.  Type a name for your repository and an optional description. If you're creating a user or organization site, your repository must be named `<user>.github.io` or `<organization>.github.io`. If your user or organization name contains uppercase letters, you must lowercase the letters. For more information, see [What is GitHub Pages?](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#types-of-github-pages-sites). ![Screenshot of GitHub Pages settings in a repository. The repository name field contains the text "octocat.github.io" and is outlined in dark orange.](/src/content/assets/js/create-repository-name-pages.png)
 
 4.  Choose a repository visibility. For more information, see [About repositories](https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories#about-repository-visibility).
 
@@ -58,7 +58,7 @@ GitHub Pages sites are publicly available on the internet, even if the repositor
 
 1.  Under your repository name, click **Settings**. If you cannot see the "Settings" tab, select the dropdown menu, then click **Settings**.
 
-    ![Screenshot of a repository header showing the tabs. The "Settings" tab is highlighted by a dark orange outline.](https://docs.github.com/assets/cb-28260/images/help/repository/repo-actions-settings.png)
+    ![Screenshot of a repository header showing the tabs. The "Settings" tab is highlighted by a dark orange outline.](/src/content/assets/js/repo-actions-settings.png)
 
 2.  In the "Code, planning, and automation" section of the sidebar, click **Pages**.
 

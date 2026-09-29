@@ -1,141 +1,141 @@
-![Kayce Basques](https://web.dev/images/authors/kaycebasques.jpg)
+![Kayce Basques](/src/content/assets/js/kaycebasques.jpg)
 
-Runtime performance is how your page performs when it is running, as opposed to loading. This tutorial teaches you how to use the Chrome DevTools Performance panel to analyze runtime performance. In terms of the [RAIL](https://web.dev/rail/) model, the skills you learn in this tutorial are useful for analyzing the Response, Animation, and Idle phases of your page.
+रनटाइम परफ़ॉर्मेंस से पता चलता है कि आपका पेज लोड होने के बजाय, चलने के दौरान कैसा परफ़ॉर्म करता है. इस ट्यूटोरियल में, रनटाइम परफ़ॉर्मेंस का विश्लेषण करने के लिए, Chrome DevTools के परफ़ॉर्मेंस पैनल का इस्तेमाल करने का तरीका बताया गया है. [RAIL](https://web.dev/rail/?hl=hi) मॉडल के हिसाब से, इस ट्यूटोरियल में आपको जो स्किल मिलती हैं वे आपके पेज के रिस्पॉन्स, ऐनिमेशन, और आइडल फ़ेज़ का विश्लेषण करने के लिए काम की हैं.
 
-## Get started
+## अपनी प्रोफ़ाइल बनाना शुरू करें
 
-In this tutorial, we will use the **Performance** panel to find a performance bottleneck on a live page. To begin:
+इस ट्यूटोरियल में, हम लाइव पेज पर परफ़ॉर्मेंस में आने वाली रुकावट का पता लगाने के लिए, **परफ़ॉर्मेंस** पैनल का इस्तेमाल करेंगे. शुरू करने के लिए:
 
-1.  Open Google Chrome in [Incognito Mode](https://support.google.com/chrome/answer/95464). Incognito Mode ensures that Chrome runs in a clean state. For example, if you have a lot of extensions installed, those extensions might create noise in your performance measurements.
-2.  Load the following page in your Incognito window. This is the demo that you're going to profile. The page shows a bunch of little blue squares moving up and down.
+1.  Google Chrome को [गुप्त मोड](https://support.google.com/chrome/answer/95464?hl=hi) में खोलें. गुप्त मोड से यह पक्का होता है कि Chrome में कोई डेटा सेव न हो. उदाहरण के लिए, अगर आपने बहुत सारे एक्सटेंशन इंस्टॉल किए हैं, तो हो सकता है कि वे एक्सटेंशन आपकी परफ़ॉर्मेंस के मेज़रमेंट में गड़बड़ी पैदा करें.
+2.  गुप्त विंडो में यह पेज लोड करें. यह वह डेमो है जिसकी प्रोफ़ाइल बनानी है. पेज पर, ऊपर और नीचे की ओर बढ़ते हुए नीले रंग के कई छोटे-छोटे स्क्वेयर दिखते हैं.
 
     `https://googlechrome.github.io/devtools-samples/jank/`
 
-3.  Press Command+Option+I (Mac) or Control+Shift+I (Windows, Linux) to open DevTools.
+3.  DevTools खोलने के लिए, Command+Option+I (Mac) या Control+Shift+I (Windows, Linux) दबाएं.
 
-    ![The demo on the left, and DevTools on the right.](https://developer.chrome.com/static/docs/devtools/performance/image/demo-and-devtools.png)
+    ![बाईं ओर डेमो और दाईं ओर DevTools.](/src/content/assets/js/demo-and-devtools.png)
 
-### Simulate a mobile CPU
+### मोबाइल सीपीयू को सिम्युलेट करना
 
-Mobile devices have much less CPU power than desktops and laptops. Whenever you profile a page, use CPU Throttling to simulate how your page performs on mobile devices.
+मोबाइल डिवाइसों में, डेस्कटॉप और लैपटॉप के मुकाबले सीपीयू की पावर काफ़ी कम होती है. किसी पेज की प्रोफ़ाइल बनाते समय, सीपीयू थ्रॉटलिंग का इस्तेमाल करें. इससे यह पता चलता है कि आपका पेज मोबाइल डिवाइसों पर कैसा परफ़ॉर्म करता है.
 
-1.  In DevTools, click the **Performance** tab.
-2.  Make sure that the **Screenshots** checkbox is enabled.
-3.  Click **Capture Settings** . DevTools reveals settings related to how it captures performance metrics.
-4.  For **CPU**, select **4x slowdown**. DevTools throttles your CPU so that it's 4 times slower than usual.
+1.  DevTools में, **परफ़ॉर्मेंस** टैब पर क्लिक करें.
+2.  पक्का करें कि **स्क्रीनशॉट** चेकबॉक्स चालू हो.
+3.  **कैप्चर सेटिंग** पर क्लिक करें. DevTools में, परफ़ॉर्मेंस मेट्रिक को कैप्चर करने के तरीके से जुड़ी सेटिंग दिखती हैं.
+4.  **सीपीयू** के लिए, **चार गुना धीमा** चुनें. DevTools आपके सीपीयू की परफ़ॉर्मेंस को धीमा कर देता है, ताकि वह सामान्य से चार गुना धीमे काम करे.
 
-    ![CPU throttling set to 4x slowdown.](https://developer.chrome.com/static/docs/devtools/performance/image/cpu-throttling.png)
+    ![सीपीयू थ्रॉटलिंग को चार गुना धीमा करने पर सेट किया गया है.](/src/content/assets/js/cpu-throttling.png)
 
-### Set up the demo
+### डेमो सेट अप करना
 
-It's hard to create a runtime performance demo that works consistently for all readers of this website. This section lets you customize the demo to ensure that your experience is relatively consistent with the screenshots and descriptions you see in this tutorial, regardless of your particular setup.
+रनटाइम परफ़ॉर्मेंस का ऐसा डेमो बनाना मुश्किल है जो इस वेबसाइट के सभी पाठकों के लिए लगातार काम करता रहे. इस सेक्शन की मदद से, डेमो को पसंद के मुताबिक बनाया जा सकता है. इससे यह पक्का किया जा सकता है कि आपका अनुभव, इस ट्यूटोरियल में दिखाए गए स्क्रीनशॉट और जानकारी से मिलता-जुलता हो. भले ही, आपका सेटअप कुछ भी हो.
 
-1.  Keep clicking **Add 10** until the blue squares move noticeably slower than before. On a high-end machine, it may take about 20 clicks.
-2.  Click **Optimize**. The blue squares should move faster and more smoothly.
+1.  **10 जोड़ें** पर तब तक क्लिक करते रहें, जब तक नीले वर्ग पहले की तुलना में ज़्यादा धीरे न चलने लगें. बेहतर मशीन पर, इसमें करीब 20 क्लिक लग सकते हैं.
+2.  **ऑप्टिमाइज़ करें** पर क्लिक करें. नीले रंग के स्क्वेयर तेज़ी से और आसानी से चलने चाहिए.
 
-3.  Click **Un-Optimize**. The blue squares move slower and with more jank again.
+3.  **अन-ऑप्टिमाइज़ करें** पर क्लिक करें. नीले रंग के स्क्वेयर, धीरे-धीरे और ज़्यादा झटके के साथ फिर से आगे बढ़ते हैं.
 
-### Record runtime performance
+### रनटाइम की परफ़ॉर्मेंस रिकॉर्ड करना
 
-When you ran the optimized version of the page, the blue squares move faster. Why is that? Both versions are supposed to move each square the same amount of space in the same amount of time. Take a recording in the **Performance** panel to learn how to detect the performance bottleneck in the un-optimized version.
+पेज के ऑप्टिमाइज़ किए गए वर्शन को चलाने पर, नीले स्क्वेयर तेज़ी से आगे बढ़ते हैं. ऐसा क्यों है? दोनों वर्शन में, हर स्क्वेयर को एक ही समय में एक ही जगह पर ले जाया जाना चाहिए. ऑप्टिमाइज़ नहीं किए गए वर्शन में परफ़ॉर्मेंस की समस्या का पता लगाने का तरीका जानने के लिए, **परफ़ॉर्मेंस** पैनल में रिकॉर्डिंग करें.
 
-1.  In DevTools, click **Record** . DevTools captures performance metrics as the page runs.
+1.  DevTools में, **रिकॉर्ड करें** पर क्लिक करें. पेज के चलने के दौरान, DevTools परफ़ॉर्मेंस मेट्रिक कैप्चर करता है.
 
-    ![Profiling the demo page.](https://developer.chrome.com/static/docs/devtools/performance/image/profiling-page.png)
+    ![डेमो पेज की प्रोफ़ाइल बनाना.](/src/content/assets/js/profiling-page.png)
 
-2.  Wait a few seconds.
+2.  कुछ सेकंड इंतज़ार करें.
 
-3.  Click **Stop**. DevTools stops recording, processes the data, then displays the results in the **Performance** panel.
+3.  **बंद करें** पर क्लिक करें. DevTools, रिकॉर्डिंग बंद कर देता है और डेटा को प्रोसेस करता है. इसके बाद, **परफ़ॉर्मेंस** पैनल में नतीजे दिखाता है.
 
-    ![The profiling report page.](https://developer.chrome.com/static/docs/devtools/performance/image/profiling-results.png)
+    ![प्रोफ़ाइल बनाने से जुड़ी रिपोर्ट का पेज.](/src/content/assets/js/profiling-results.png)
 
-Wow, that's an overwhelming amount of data. Don't worry, it'll make more sense shortly.
+वाह, यह बहुत ज़्यादा डेटा है. चिंता न करें, जल्द ही आपको इसकी जानकारी मिल जाएगी.
 
-## Analyze the results
+## नतीजों का विश्लेषण करना
 
-Once you have a performance recording, you can analyze just how poor the page's performance is, and find the cause(s).
+परफ़ॉर्मेंस रिकॉर्डिंग होने के बाद, यह विश्लेषण किया जा सकता है कि पेज की परफ़ॉर्मेंस कितनी खराब है और इसकी वजह क्या है.
 
-### Analyze frames per second
+### हर सेकंड कितने फ़्रेम रिकॉर्ड किए गए, इसका विश्लेषण करना
 
-The main metric for measuring the performance of any animation is frames per second (FPS). Users are happy when animations run at 60 FPS.
+किसी भी ऐनिमेशन की परफ़ॉर्मेंस को मेज़र करने के लिए, फ़्रेम प्रति सेकंड (एफ़पीएस) मुख्य मेट्रिक होती है. जब ऐनिमेशन 60 FPS पर चलते हैं, तो उपयोगकर्ता खुश होते हैं.
 
-1.  Look at the **FPS** chart. Whenever you see a red bar above **FPS**, it means that the framerate dropped so low that it's probably harming the user experience.
+1.  **फ़्रेम रेट** चार्ट देखें. जब भी आपको **FPS** के ऊपर लाल रंग का बार दिखता है, तो इसका मतलब है कि फ़्रेम रेट इतना कम हो गया है कि शायद इससे उपयोगकर्ता अनुभव पर असर पड़ रहा है.
 
-    ![The FPS chart highlighted.](https://developer.chrome.com/static/docs/devtools/performance/image/the-fps-chart.png)
+    ![एफ़पीएस चार्ट को हाइलाइट किया गया.](/src/content/assets/js/the-fps-chart.png)
 
-2.  Below the **FPS** chart you see the **CPU** chart. The colors in the **CPU** chart correspond to the colors in the **Summary** tab, at the bottom of the **Performance** panel. The fact that the **CPU** chart is full of color means that the CPU was maxed out during the recording. Whenever you see the CPU maxed out for long periods, it's a cue to find ways to do less work.
+2.  **FPS** चार्ट के नीचे, आपको **सीपीयू** चार्ट दिखेगा. **सीपीयू** चार्ट में मौजूद रंग, **परफ़ॉर्मेंस** पैनल में सबसे नीचे मौजूद **खास जानकारी** टैब में मौजूद रंगों से मेल खाते हैं. **सीपीयू** चार्ट का पूरा रंगीन होना, इस बात का संकेत है कि रिकॉर्डिंग के दौरान सीपीयू का इस्तेमाल ज़्यादा हुआ. जब भी आपको लंबे समय तक सीपीयू का इस्तेमाल ज़्यादा दिखे, तो इसका मतलब है कि आपको कम काम करने के तरीके ढूंढने चाहिए.
 
-    ![The CPU chart and Summary tab.](https://developer.chrome.com/static/docs/devtools/performance/image/the-cpu-chart-summary.png)
+    ![सीपीयू चार्ट और खास जानकारी वाला टैब.](/src/content/assets/js/the-cpu-chart-summary.png)
 
-3.  Hover your mouse over the **FPS**, **CPU**, or **NET** charts. DevTools shows a screenshot of the page at that point in time. Move your mouse left and right to replay the recording. This is called scrubbing, and it's useful for manually analyzing the progression of animations.
+3.  **FPS**, **सीपीयू** या **नेट** चार्ट पर कर्सर घुमाएं. DevTools उस समय के पेज का स्क्रीनशॉट दिखाता है. रिकॉर्डिंग को फिर से चलाने के लिए, माउस को बाईं और दाईं ओर ले जाएं. इसे स्क्रबिंग कहा जाता है. यह ऐनिमेशन की प्रोग्रेस का मैन्युअल तौर पर विश्लेषण करने के लिए काम का है.
 
-    ![Viewing a screenshot in a performance recording.](https://developer.chrome.com/static/docs/devtools/performance/image/viewing-screenshot.png)
+    ![परफ़ॉर्मेंस रिकॉर्डिंग में स्क्रीनशॉट देखना.](/src/content/assets/js/viewing-screenshot.png)
 
-4.  In the **Frames** section, hover your mouse over one of the green squares. DevTools shows you the FPS for that particular frame. Each frame is probably well below the target of 60 FPS.
+4.  **फ़्रेम** सेक्शन में, अपने माउस को हरे रंग के किसी एक वर्ग पर घुमाएं. DevTools, उस फ़्रेम के लिए FPS दिखाता है. ऐसा हो सकता है कि हर फ़्रेम, 60 एफ़पीएस के टारगेट से काफ़ी कम हो.
 
-    ![Hovering over a frame.](https://developer.chrome.com/static/docs/devtools/performance/image/hovering-a-frame.png)
+    ![किसी फ़्रेम पर कर्सर घुमाना.](/src/content/assets/js/hovering-a-frame.png)
 
-Of course, with this demo, it's pretty obvious that the page is not performing well. But in real scenarios, it may not be so clear, so having all of these tools to make measurements comes in handy.
+इस डेमो से यह साफ़ तौर पर पता चलता है कि पेज की परफ़ॉर्मेंस अच्छी नहीं है. हालांकि, असल परिस्थितियों में ऐसा शायद न हो. इसलिए, मेज़रमेंट करने के लिए इन सभी टूल का होना ज़रूरी है.
 
-#### Bonus: Open the FPS meter
+#### बोनस: एफ़पीएस मीटर खोलना
 
-Another handy tool is the **FPS meter**, which provides real-time estimates for FPS as the page runs.
+**FPS मीटर** एक और आसान टूल है. यह पेज के चलने के दौरान, FPS के लिए रीयल-टाइम अनुमान देता है.
 
-1.  Press Command+Shift+P (Mac) or Control+Shift+P (Windows, Linux) to open the Command Menu.
-2.  Start typing `Rendering` in the Command Menu and select **Show Rendering**.
-3.  In the **Rendering** panel, enable **Show Rendering stats**. A new overlay appears in the top-right of your viewport.
+1.  कमांड मेन्यू खोलने के लिए, Command+Shift+P (Mac) या Control+Shift+P (Windows, Linux) दबाएं.
+2.  कमांड मेन्यू में `Rendering` टाइप करना शुरू करें और **रेंडरिंग दिखाएं** को चुनें.
+3.  **रेंडरिंग** पैनल में, **रेंडरिंग के आंकड़े दिखाएं** को चालू करें. आपके व्यूपोर्ट के सबसे ऊपर दाईं ओर एक नया ओवरले दिखेगा.
 
-    ![The FPS meter.](https://developer.chrome.com/static/docs/devtools/performance/image/the-fps-meter.png)
+    ![एफ़पीएस मीटर.](/src/content/assets/js/the-fps-meter.png)
 
-4.  Disable the **FPS Meter** and press Escape to close the **Rendering** panel. You won't be using it in this tutorial.
+4.  **एफ़पीएस मीटर** बंद करें और **रेंडरिंग** पैनल को बंद करने के लिए, Escape दबाएं. इस ट्यूटोरियल में इसका इस्तेमाल नहीं किया जाएगा.
 
-### Find the bottleneck
+### समस्या का पता लगाना
 
-Now that you've measured and verified that the animation is not performing well, the next question to answer is: why?
+आपने यह मेज़र कर लिया है और पुष्टि कर ली है कि ऐनिमेशन की परफ़ॉर्मेंस अच्छी नहीं है. अब अगला सवाल यह है कि ऐसा क्यों है?
 
-1.  Note the **Summary** tab. When no events are selected, this tab shows you a breakdown of activity. The page spent most of its time rendering. Since performance is the art of doing less work, your goal is to reduce the amount of time spent doing rendering work.
+1.  **खास जानकारी** टैब पर ध्यान दें. अगर कोई इवेंट नहीं चुना जाता है, तो यह टैब आपको गतिविधि का ब्रेकडाउन दिखाता है. पेज को रेंडर होने में ज़्यादा समय लगा. परफ़ॉर्मेंस का मतलब है कम काम करना. इसलिए, आपका मकसद रेंडरिंग के काम में लगने वाले समय को कम करना होना चाहिए.
 
-    ![The Summary tab, outlined in blue.](https://developer.chrome.com/static/docs/devtools/performance/image/the-summary-tab.png)
+    ![&#39;खास जानकारी&#39; टैब, जिसकी आउटलाइन नीले रंग में है.](/src/content/assets/js/the-summary-tab.png)
 
-2.  Expand the **Main** section. DevTools shows you a flame chart of activity on the main thread, over time. The x-axis represents the recording, over time. Each bar represents an event. A wider bar means that event took longer. The y-axis represents the call stack. When you see events stacked on top of each other, it means the upper events caused the lower events.
+2.  **मुख्य** सेक्शन को बड़ा करें. DevTools, आपको समय के साथ मुख्य थ्रेड पर की गई गतिविधि का फ़्लेम चार्ट दिखाता है. X-ऐक्सिस, समय के साथ रिकॉर्डिंग को दिखाता है. हर बार किसी इवेंट को दिखाता है. ज़्यादा चौड़े बार का मतलब है कि इवेंट को पूरा होने में ज़्यादा समय लगा. Y-ऐक्सिस, कॉल स्टैक को दिखाता है. जब आपको इवेंट एक-दूसरे के ऊपर स्टैक किए गए दिखते हैं, तो इसका मतलब है कि ऊपर के इवेंट की वजह से नीचे के इवेंट हुए.
 
-    ![The Main section.](https://developer.chrome.com/static/docs/devtools/performance/image/the-main-section.png)
+    ![मुख्य सेक्शन.](/src/content/assets/js/the-main-section.png)
 
-3.  There's a lot of data in the recording. Zoom in on a single **Animation Frame Fired** event by clicking, holding, and dragging your mouse over the **Overview**, which is the section that includes the **FPS**, **CPU**, and **NET** charts. The **Main** section and **Summary** tab only display information for the selected portion of the recording.
+3.  रिकॉर्डिंग में बहुत ज़्यादा डेटा है. **ऐनिमेशन फ़्रेम फ़ायर किया गया** इवेंट पर ज़ूम इन करने के लिए, **खास जानकारी** पर क्लिक करके उसे दबाकर रखें और फिर उसे खींचें और छोड़ें. इस सेक्शन में **एफ़पीएस**, **सीपीयू**, और **नेट** चार्ट शामिल होते हैं. **मुख्य** सेक्शन और **खास जानकारी** टैब में, सिर्फ़ रिकॉर्डिंग के चुने गए हिस्से की जानकारी दिखती है.
 
-    ![Zoomed in on a single Animation Frame Fired event.](https://developer.chrome.com/static/docs/devtools/performance/image/zoomed-frame.png)
+    ![ऐनिमेशन फ़्रेम सक्रिय किए गए किसी एक इवेंट पर ज़ूम इन किया गया.](/src/content/assets/js/zoomed-frame.png)
 
-4.  Note the red triangle in the top-right of the **Task** and layout events. Whenever you see a red triangle, it's a warning that there may be an issue related to this event. A red triangle on a **Task** means that it was a [long task](https://web.dev/articles/optimize-long-tasks?utm_source=devtools).
+4.  **टास्क** और लेआउट इवेंट के सबसे ऊपर दाईं ओर मौजूद लाल रंग के ट्राएंगल पर ध्यान दें. जब भी आपको लाल रंग का ट्राएंगल दिखे, तो समझ लें कि इस इवेंट से जुड़ी कोई समस्या हो सकती है. **टास्क** पर लाल रंग का त्रिभुज दिखने का मतलब है कि यह [लंबा टास्क](https://web.dev/articles/optimize-long-tasks?utm_source=devtools&hl=hi) था.
 
-5.  Click the **Animation Frame Fired** event. The **Summary** tab now shows you information about that event. Clicking the link next to **Initiated by** causes DevTools to highlight the event that initiated the **Animation Frame Fired** event. Also note the **app.update @** link. Clicking that jumps you to the relevant line in the source code.
+5.  **ऐनिमेशन फ़्रेम ट्रिगर हुआ** इवेंट पर क्लिक करें. **खास जानकारी** टैब में, अब आपको उस इवेंट के बारे में जानकारी दिखेगी. **इसके ज़रिए शुरू किया गया** के बगल में मौजूद लिंक पर क्लिक करने से, DevTools उस इवेंट को हाइलाइट कर देता है जिसने **ऐनिमेशन फ़्रेम ट्रिगर हुआ** इवेंट को शुरू किया था. **app.update @** लिंक पर भी ध्यान दें. उस पर क्लिक करने से, आपको सोर्स कोड में उस लाइन पर ले जाया जाता है.
 
-    ![More information about the Animation Frame Fired event.](https://developer.chrome.com/static/docs/devtools/performance/image/more-information.png)
+    ![ऐनिमेशन फ़्रेम फ़ायर होने के इवेंट के बारे में ज़्यादा जानकारी.](/src/content/assets/js/more-information.png)
 
-6.  Under the **app.update** event, there's a bunch of purple events. If they were wider, it looks as though each one might have a red triangle on it. Click one of the purple **Layout** events now. DevTools provides more information about the event in the **Summary** tab. Indeed, there's a warning about forced reflows (another word for layout).
+6.  **app.update** इवेंट में, बैंगनी रंग के कई इवेंट हैं. अगर वे चौड़े थे, तो ऐसा लगता है कि हर एक पर लाल रंग का त्रिभुज हो सकता है. अब बैंगनी रंग के किसी **लेआउट** इवेंट पर क्लिक करें. DevTools, **खास जानकारी** टैब में इवेंट के बारे में ज़्यादा जानकारी देता है. हां, ज़बरदस्ती रीफ़्लो (लेआउट का दूसरा नाम) के बारे में चेतावनी दी गई है.
 
-7.  In the **Summary** tab, click the link next to **app.update @** under **Animation Frame Requested**. DevTools takes you to the line of code that forced the layout.
+7.  **खास जानकारी** टैब में, **ऐनिमेशन फ़्रेम का अनुरोध किया गया** में जाकर, **app.update @** के बगल में मौजूद लिंक पर क्लिक करें. DevTools, आपको उस कोड की लाइन पर ले जाता है जिसकी वजह से लेआउट बदला है.
 
-    ![The line of code that caused the forced layout.](https://developer.chrome.com/static/docs/devtools/performance/image/source-code-caused.png)
+    ![कोड की वह लाइन जिसकी वजह से फ़ोर्स किया गया लेआउट दिख रहा है.](/src/content/assets/js/source-code-caused.png)
 
-Phew! That was a lot to take in, but you now have a solid foundation in the basic workflow for analyzing runtime performance. Good job.
+वाह! इसमें बहुत कुछ है, लेकिन अब आपके पास रनटाइम परफ़ॉर्मेंस का विश्लेषण करने के लिए, बुनियादी वर्कफ़्लो की अच्छी जानकारी है. शानदार।
 
-### Bonus: Analyze the optimized version
+### बोनस: ऑप्टिमाइज़ किए गए वर्शन का विश्लेषण करना
 
-Using the workflows and tools that you just learned, click **Optimize** on the demo to enable the optimized code, take another performance recording, and then analyze the results. From the improved framerate to the reduction in events in the **Main** section's flame chart, you can see that the optimized version of the app does much less work, resulting in better performance.
+अभी तक आपको जो वर्कफ़्लो और टूल के बारे में पता चला है उनका इस्तेमाल करके, ऑप्टिमाइज़ किए गए कोड को चालू करने के लिए, डेमो पर **ऑप्टिमाइज़ करें** पर क्लिक करें. इसके बाद, परफ़ॉर्मेंस की एक और रिकॉर्डिंग लें और फिर नतीजों का विश्लेषण करें. बेहतर फ़्रेमरेट से लेकर **मुख्य** सेक्शन के फ़्लेम चार्ट में इवेंट की संख्या में कमी तक, यह देखा जा सकता है कि ऐप्लिकेशन के ऑप्टिमाइज़ किए गए वर्शन में बहुत कम काम होता है. इसकी वजह से, परफ़ॉर्मेंस बेहतर होती है.
 
-## Next steps
+## अगले चरण
 
-The foundation for understanding performance is the RAIL model. This model teaches you the performance metrics that are most important to your users. See [Measure Performance With The RAIL Model](https://web.dev/rail/) to learn more.
+परफ़ॉर्मेंस को समझने के लिए, RAIL मॉडल का इस्तेमाल किया जाता है. यह मॉडल, आपको परफ़ॉर्मेंस की उन मेट्रिक के बारे में बताता है जो आपके उपयोगकर्ताओं के लिए सबसे ज़्यादा अहम हैं. ज़्यादा जानने के लिए, [RAIL मॉडल की मदद से परफ़ॉर्मेंस मेज़र करना](https://web.dev/rail/?hl=hi) लेख पढ़ें.
 
-To get more comfortable with the Performance panel, practice makes perfect. Try profiling your own pages and analyzing the results. If you have any questions about your results, [open a Stack Overflow question tagged with `google-chrome-devtools`](http://stackoverflow.com/questions/ask?tags=google-chrome-devtools). Include screenshots or links to reproducible pages, if possible.
+परफ़ॉर्मेंस पैनल को बेहतर तरीके से इस्तेमाल करने के लिए, बार-बार इसका इस्तेमाल करें. अपने पेजों की प्रोफ़ाइल बनाने और नतीजों का विश्लेषण करने की कोशिश करें. अगर आपको अपने नतीजों के बारे में कोई सवाल पूछना है, तो [`google-chrome-devtools` से टैग किया गया Stack Overflow का कोई सवाल खोलें](http://stackoverflow.com/questions/ask?tags=google-chrome-devtools). अगर हो सके, तो उन पेजों के स्क्रीनशॉट या लिंक शामिल करें जिन पर समस्या का पता चला है.
 
-To become an expert in runtime performance, you've got to learn how the browser translates HTML, CSS, and JS into pixels on a screen. The best place to start is the [Rendering Performance Overview](https://web.dev/rendering-performance/). [The Anatomy Of A Frame](https://aerotwist.com/blog/the-anatomy-of-a-frame/) dives into even more detail.
+रनटाइम परफ़ॉर्मेंस के विशेषज्ञ बनने के लिए, आपको यह जानना होगा कि ब्राउज़र, एचटीएमएल, सीएसएस, और JS को स्क्रीन पर पिक्सल में कैसे बदलता है. सबसे अच्छा तरीका यह है कि [रेंडरिंग की परफ़ॉर्मेंस की खास जानकारी](https://web.dev/rendering-performance/?hl=hi) देखी जाए. [फ़्रेम के बारे में ज़्यादा जानकारी](https://aerotwist.com/blog/the-anatomy-of-a-frame/) में इस बारे में ज़्यादा जानकारी दी गई है.
 
-Last, there are many ways to improve runtime performance. This tutorial focused on one particular animation bottleneck to give you a focused tour through the Performance panel, but it's only one of many bottlenecks you may encounter. The rest of the Rendering Performance series has a lot of good tips for improving various aspects of runtime performance, such as:
+आखिर में, रनटाइम की परफ़ॉर्मेंस को बेहतर बनाने के कई तरीके हैं. इस ट्यूटोरियल में, परफ़ॉर्मेंस पैनल के बारे में जानकारी देने के लिए, ऐनिमेशन की एक खास समस्या पर फ़ोकस किया गया है. हालांकि, आपको कई और समस्याएं भी आ सकती हैं. रेंडरिंग की परफ़ॉर्मेंस से जुड़ी सीरीज़ के बाकी लेखों में, रनटाइम की परफ़ॉर्मेंस के अलग-अलग पहलुओं को बेहतर बनाने के लिए कई अच्छी सलाह दी गई हैं. जैसे:
 
-- [Optimizing JS Execution](https://web.dev/optimize-javascript-execution/)
-- [Reduce The Scope And Complexity Of Style Calculations](https://web.dev/reduce-the-scope-and-complexity-of-style-calculations/)
-- [Avoid Large, Complex Layouts And Layout Thrashing](https://web.dev/avoid-large-complex-layouts-and-layout-thrashing/)
-- [Simplify Paint Complexity And Reduce Paint Areas](https://web.dev/simplify-paint-complexity-and-reduce-paint-areas/)
-- [Stick To Compositor-Only Properties And Manage Layer Count](https://web.dev/stick-to-compositor-only-properties-and-manage-layer-count/)
-- [Debounce Your Input Handlers](https://web.dev/debounce-your-input-handlers/)
+- [JS एक्सीक्यूशन को ऑप्टिमाइज़ करना](https://web.dev/optimize-javascript-execution/?hl=hi)
+- [स्टाइल कैलकुलेशन का दायरा और जटिलता कम करना](https://web.dev/reduce-the-scope-and-complexity-of-style-calculations/?hl=hi)
+- [बड़े और जटिल लेआउट और लेआउट थ्रैशिंग से बचना](https://web.dev/avoid-large-complex-layouts-and-layout-thrashing/?hl=hi)
+- [पेंट की जटिलता को आसान बनाना और पेंट किए जाने वाले हिस्सों को कम करना](https://web.dev/simplify-paint-complexity-and-reduce-paint-areas/?hl=hi)
+- [सिर्फ़ कंपोजिटर प्रॉपर्टी का इस्तेमाल करना और लेयर की संख्या मैनेज करना](https://web.dev/stick-to-compositor-only-properties-and-manage-layer-count/?hl=hi)
+- [अपने इनपुट हैंडलर को डीबाउंस करना](https://web.dev/debounce-your-input-handlers/?hl=hi)

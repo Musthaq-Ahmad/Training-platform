@@ -44,6 +44,7 @@ export const jsClassesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'A new object is created.',
           'The constructor runs with the given argument and assigns it to this.name.',
@@ -96,6 +97,7 @@ export const jsClassesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Creates a function named User, that becomes the result of the class declaration. The function code is taken from the constructor method (assumed empty if we don’t write such method).',
           'Stores class methods, such as sayHi, in User.prototype.',
@@ -144,6 +146,7 @@ export const jsClassesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           "First, a function created by class is labelled by a special internal property [[IsClassConstructor]]: true. So it’s not entirely the same as creating it manually. The language checks for that property in a variety of places. For example, unlike a regular function, it must be called with new: class User { constructor() {} } alert(typeof User); // function User(); // Error: Class constructor User cannot be invoked without 'new' Also, a string representation of a class constructor in most JavaScript engines starts with the “class…” class User { constructor() {} } alert(User); // class User { ... } There are other differences, we’ll see them soon.",
           'Class methods are non-enumerable. A class definition sets enumerable flag to false for all methods in the "prototype". That’s good, because if we for..in over an object, we usually don’t want its class methods.',
@@ -326,6 +329,7 @@ export const jsClassesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Pass a wrapper-function, such as setTimeout(() =&gt; button.click(), 1000).',
           'Bind the method to object, e.g. in the constructor.',
@@ -434,6 +438,7 @@ export const jsClassesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'The rabbit object (has no run).',
           'Its prototype, that is Rabbit.prototype (has hide, but not run).',
@@ -855,6 +860,7 @@ export const jsClassesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Inside longEar.eat(), the line (**) calls rabbit.eat providing it with this=longEar. // inside longEar.eat() we have this = longEar this.__proto__.eat.call(this) // (**) // becomes longEar.__proto__.eat.call(this) // that is rabbit.eat.call(this);',
           'Then in the line (*) of rabbit.eat, we’d like to pass the call even higher in the chain, but this=longEar, so this.__proto__.eat is again rabbit.eat! // inside rabbit.eat() we also have this = longEar this.__proto__.eat.call(this) // (*) // becomes longEar.__proto__.eat.call(this) // or (again) rabbit.eat.call(this);',
@@ -976,6 +982,7 @@ export const jsClassesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'To extend a class: class Child extends Parent: * That means Child.prototype.__proto__ will be Parent.prototype, so methods are inherited.',
           'When overriding a constructor: * We must call parent constructor as super() in Child constructor before using this.',
@@ -1061,6 +1068,7 @@ export const jsClassesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Create by given parameters (title, date etc).',
           'Create an empty article with today’s date.',
@@ -1182,6 +1190,7 @@ export const jsClassesTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Rabbit function prototypally inherits from Animal function.',
           'Rabbit.prototype prototypally inherits from Animal.prototype.',
@@ -1272,8 +1281,18 @@ export const jsClassesTopics = {
         text: 'For instance, a coffee machine. Simple from outside: a button, a display, a few holes…And, surely, the result – great coffee! :)',
       },
       {
+        type: 'image',
+        src: '/src/content/assets/js/coffee.jpg',
+        alt: '',
+      },
+      {
         type: 'paragraph',
         text: 'But inside… (a picture from the repair manual)',
+      },
+      {
+        type: 'image',
+        src: '/src/content/assets/js/coffee-inside.jpg',
+        alt: '',
       },
       {
         type: 'paragraph',

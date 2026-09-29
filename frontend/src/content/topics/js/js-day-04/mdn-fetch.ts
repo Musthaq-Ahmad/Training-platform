@@ -12,6 +12,7 @@ export const mdnFetchTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'a definition of the resource to fetch. This can be any one of: * a string containing the URL * an object, such as an instance of URL, which has a stringifier that produces a string containing the URL * a Request instance',
           'optionally, an object containing options to configure the request.',

@@ -282,6 +282,11 @@ export const eloquentJsCh6Topics = {
         text: 'The following diagram sketches the situation after this code has run. The Rabbit and Object prototypes lie behind killerRabbit as a kind of backdrop, where properties that are not found in the object itself can be looked up.',
       },
       {
+        type: 'image',
+        src: '/src/content/assets/js/rabbits.svg',
+        alt: 'A diagram showing the object structure of rabbits and their prototypes. There is a box for the &#39;killerRabbit&#39; instance (holding instance properties like &#39;type&#39;), with its two prototypes, &#39;Rabbit.prototype&#39; (holding the &#39;speak&#39; method) and &#39;Object.prototype&#39; (holding methods like &#39;toString&#39;) stacked behind it.',
+      },
+      {
         type: 'paragraph',
         text: 'Overriding properties that exist in a prototype can be a useful thing to do. As the rabbit teeth example shows, overriding can be used to express exceptional properties in instances of a more generic class of objects while letting the nonexceptional objects take a standard value from their prototype.',
       },

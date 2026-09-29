@@ -169,6 +169,7 @@ export const jsClosureDeepDiveTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'Environment Record – an object that stores all local variables as its properties (and some other information like the value of this).',
           'A reference to the outer lexical environment, the one associated with the outer code.',
@@ -205,6 +206,7 @@ export const jsClosureDeepDiveTopics = {
       {
         type: 'list',
         ordered: true,
+        start: 1,
         items: [
           'When the script starts, the Lexical Environment is pre-populated with all declared variables. * Initially, they are in the “Uninitialized” state. That’s a special internal state, it means that the engine knows about the variable, but it cannot be referenced until it has been declared with let. It’s almost the same as if the variable didn’t exist.',
           'Then let phrase definition appears. There’s no assignment yet, so its value is undefined. We can use the variable from this point forward.',
