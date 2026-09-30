@@ -3,6 +3,7 @@ import type { DayTask } from '@itp/types';
 import styles from './TaskModal.module.css';
 
 type TaskModalProps = {
+  courseTitle: string;
   isOpen: boolean;
   dayNumber: number;
   tasks: DayTask[];
@@ -11,6 +12,7 @@ type TaskModalProps = {
 };
 
 export default function TaskModal({
+  courseTitle,
   isOpen,
   dayNumber,
   tasks,
@@ -76,7 +78,10 @@ export default function TaskModal({
       >
         <header className={styles.header}>
           <div className={styles.headerContent}>
-            <p className={styles.eyebrow}>CSS · DAY {String(dayNumber).padStart(2, '0')}</p>
+            <p className={styles.eyebrow}>
+              {' '}
+              {courseTitle}-DAY {String(dayNumber).padStart(2, '0')}
+            </p>
 
             <h2 id="task-modal-title" className={styles.title}>
               Day Tasks
