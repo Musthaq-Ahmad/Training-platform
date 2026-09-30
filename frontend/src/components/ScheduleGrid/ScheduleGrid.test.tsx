@@ -10,6 +10,7 @@ const mockDays: DaySummary[] = [
     courseId: 'course-1',
     dayNumber: 1,
     title: 'Introduction to JavaScript',
+    description: 'Learn the basics of JavaScript.',
     status: 'COMPLETED',
   },
   {
@@ -17,6 +18,7 @@ const mockDays: DaySummary[] = [
     courseId: 'course-1',
     dayNumber: 2,
     title: 'JavaScript Variables',
+    description: 'Learn about variables in JavaScript.',
     status: 'UNLOCKED',
   },
   {
@@ -24,6 +26,7 @@ const mockDays: DaySummary[] = [
     courseId: 'course-1',
     dayNumber: 3,
     title: 'JavaScript Functions',
+    description: 'Learn about functions in JavaScript.',
     status: 'LOCKED',
   },
   {
@@ -31,6 +34,7 @@ const mockDays: DaySummary[] = [
     courseId: 'course-1',
     dayNumber: 10,
     title: 'Advanced JavaScript',
+    description: 'Explore advanced JavaScript concepts.',
     status: 'UNLOCKED',
   },
 ];
