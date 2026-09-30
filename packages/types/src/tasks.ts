@@ -28,8 +28,8 @@ export type TaskResponse = {
   runtime: TaskRuntime;
   /** node only: what Run types into the terminal, e.g. "npm test". null for browser and sql. */
   runCommand: string | null;
-  /** node only: true when trainee code needs its own Postgres (DATABASE_URL). Always false for browser. */
-  usesDatabase: boolean;
+  /** sql only: schema and seed data run on a fresh database when the task opens and on Reset. null = start empty. */
+  setupSql: string | null;
 };
 
 /** GET /api/tasks/:taskId/code */

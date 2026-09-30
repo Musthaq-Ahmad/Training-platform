@@ -1,0 +1,90 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background-color: var(--color-bg-pill-inactive);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.pillReady {
+  background-color: var(--color-bg-green-fill);
+  color: var(--color-text-green);
+}
+
+.pillFailed {
+  background-color: var(--color-status-error-tint);
+  color: var(--color-status-error-text);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background-color: currentColor;
+}
+
+.spinner {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent-spinner-track);
+  border-top-color: var(--color-accent-spinner);
+  animation: sql-runtime-spin 700ms linear infinite;
+}
+
+@keyframes sql-runtime-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-status-error-text);
+  text-decoration: underline;
+}
+
+.iconButton {
+  display: flex;
+  padding: 6px;
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+}
+
+.iconButton:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-surface-2);
+}
+
+.iconButton:disabled {
+  color: var(--color-text-dim);
+  cursor: not-allowed;
+}
+
+.footer {
+  color: var(--color-text-secondary);
+}
+
+.systemTag {
+  color: var(--color-accent-label);
+}
