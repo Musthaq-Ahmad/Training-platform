@@ -1,7 +1,7 @@
 import type { DayContent } from '@itp/types';
 
 export const postgresqlDay06: DayContent = {
-  dayId: 'postgresql-day-6',
+  dayId: 'postgresql-day-06',
   courseSlug: 'postgresql',
   courseTitle: 'PostgreSQL',
   dayNumber: 6,

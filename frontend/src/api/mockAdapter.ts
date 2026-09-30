@@ -13,8 +13,14 @@ import type {
 } from '@itp/types';
 import { mockUser } from '../test/fixtures/user';
 
-import { mockTaskStatus, mockTasksByDay } from '../test/fixtures/dayTasks';
-import { catalogTaskCode, catalogTaskResponse, findCatalogTask, scenarios } from './mockTasks';
+import { mockTaskStatus } from '../test/fixtures/dayTasks';
+import {
+  catalogTaskCode,
+  catalogTaskResponse,
+  findCatalogTask,
+  scenarios,
+  catalogDayTasks,
+} from './mockTasks';
 import { mockStatusByDay, mockJournalByDay } from '../test/fixtures/dayStatus';
 import { mockDayContents } from './dayOverview';
 import { buildCourseDays, buildDashboard } from '../test/fixtures/dashboard';
@@ -158,11 +164,22 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
 
   if (method === 'get' && dayTasksMatch) {
     const dayId = dayTasksMatch[1];
-    if (!mockDayContents[dayId]) return errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
-    if (mockStatusByDay[dayId]?.isLocked) {
-      return errorResponse(config, 403, 'DAY_LOCKED', "This day isn't unlocked yet.");
+
+    if (!mockDayContents[dayId]) {
+      return errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
     }
-    return respond(config, 200, mockTasksByDay[dayId] ?? []);
+    if (mockStatusByDay[dayId]?.isLocked) {
+      return errorResponse(
+        config,
+        403,
+        'DAY_LOCKED',
+        'Finish the previous day to unlock this day.'
+      );
+    }
+
+    const status = mockTaskStatus(dayId);
+
+    return respond(config, 200, catalogDayTasks(dayId, status));
   }
 
   if (method === 'get' && dayStatusMatch) {

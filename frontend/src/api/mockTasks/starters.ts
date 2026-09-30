@@ -417,7 +417,7 @@ export function workspaceForDay(dayId: string): DayWorkspace {
       return dayNumber === 4
         ? node('npm test', (task) => typescriptStarter(task, true)) // ts-jest day
         : node('npm run check', (task) => typescriptStarter(task, false));
-    case 'nodejs':
+    case 'node':
       if (dayNumber <= 2) return node('npm test', (task) => nodeStarter(task, 'cli'));
       if (dayNumber === 3) return node('npm test', (task) => nodeStarter(task, 'http'));
       return node('npm test', (task) => nodeStarter(task, 'express'));

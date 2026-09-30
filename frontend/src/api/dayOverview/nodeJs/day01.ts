@@ -1,7 +1,7 @@
 import type { DayContent } from '@itp/types';
 export const nodejsDay01: DayContent = {
-  dayId: 'nodejs-day-01',
-  courseSlug: 'nodejs',
+  dayId: 'node-day-01',
+  courseSlug: 'node',
   courseTitle: 'Node.js',
   dayNumber: 1,
   totalDays: 5,
@@ -11,25 +11,25 @@ export const nodejsDay01: DayContent = {
     'Understand the Node.js runtime and create a repeatable project setup. Build a System Information CLI that displays runtime information using commands for version, operating system, memory, current directory, and environment. Use strict TypeScript, npm scripts, and Jest tests.',
   learningObjectives: [
     {
-      id: 'nodejs-day-01-lo-01',
+      id: 'node-day-01-lo-01',
       code: 'LO1',
       title: 'Understand Node.js',
       description: 'Explain the difference between Node.js and browser JavaScript.',
     },
     {
-      id: 'nodejs-day-01-lo-02',
+      id: 'node-day-01-lo-02',
       code: 'LO2',
       title: 'Configure a Node.js project',
       description: 'Use npm scripts, environment variables, and command-line arguments.',
     },
     {
-      id: 'nodejs-day-01-lo-03',
+      id: 'node-day-01-lo-03',
       code: 'LO3',
       title: 'Use TypeScript in strict mode',
       description: 'Compile and run TypeScript with strict type checking.',
     },
     {
-      id: 'nodejs-day-01-lo-04',
+      id: 'node-day-01-lo-04',
       code: 'LO4',
       title: 'Build a System Information CLI',
       description:
@@ -38,14 +38,14 @@ export const nodejsDay01: DayContent = {
   ],
   selfCheckItems: [
     {
-      id: 'nodejs-day-01-sc-01',
+      id: 'node-day-01-sc-01',
       code: 'SC1',
       label: 'Explain Node.js versus browser JavaScript',
       description: 'I can explain how Node.js differs from JavaScript running in a browser.',
       isRequired: true,
     },
     {
-      id: 'nodejs-day-01-sc-02',
+      id: 'node-day-01-sc-02',
       code: 'SC2',
       label: 'Configure the project',
       description:
@@ -53,7 +53,7 @@ export const nodejsDay01: DayContent = {
       isRequired: true,
     },
     {
-      id: 'nodejs-day-01-sc-03',
+      id: 'node-day-01-sc-03',
       code: 'SC3',
       label: 'Implement and test CLI commands',
       description:
