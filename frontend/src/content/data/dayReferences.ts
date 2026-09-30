@@ -380,4 +380,46 @@ export const dayReferences: DayReferenceConfig[] = [
       { label: 'Node.js Day 4 — API Development', dayId: 'node-day-04' },
     ],
   },
+  {
+    id: 'postgres-day-01',
+    courseId: 'postgres',
+    dayNumber: 1,
+    topicIds: ['pginstall', 'pgcreatedb', 'pgaccessdb'],
+  },
+  {
+    id: 'postgres-day-02',
+    courseId: 'postgres',
+    dayNumber: 2,
+    topicIds: ['pgsqlintro', 'pgcreatetable', 'pgpopulate'],
+  },
+  {
+    id: 'postgres-day-03',
+    courseId: 'postgres',
+    dayNumber: 3,
+    topicIds: ['pgjoin', 'pgaggregate'],
+  },
+  {
+    id: 'postgres-day-04',
+    courseId: 'postgres',
+    dayNumber: 4,
+    topicIds: ['pgtransactions', 'pgindexesintro', 'pgindextypes'],
+  },
+  {
+    id: 'postgres-day-05',
+    courseId: 'postgres',
+    dayNumber: 5,
+    topicIds: [],
+    prerequisiteLinks: [
+      { label: 'PostgreSQL Day 1: Getting Started', dayId: 'postgres-day-01' },
+      { label: 'PostgreSQL Day 2: SQL Basics', dayId: 'postgres-day-02' },
+      { label: 'PostgreSQL Day 3: Joins and Aggregates', dayId: 'postgres-day-03' },
+      { label: 'PostgreSQL Day 4: Transactions and Indexes', dayId: 'postgres-day-04' },
+    ],
+  },
+  {
+    id: 'postgres-day-06',
+    courseId: 'postgres',
+    dayNumber: 6,
+    topicIds: ['nodeenvvariables'],
+  },
 ];

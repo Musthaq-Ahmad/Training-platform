@@ -4,6 +4,11 @@ import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-css';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-sql';
+import 'prismjs/components/prism-bash';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-jsx';
+import 'prismjs/components/prism-tsx';
 
 import { getDayReference } from '../../content/data/getDayReference';
 import type { ContentBlock } from '../../content/types';
