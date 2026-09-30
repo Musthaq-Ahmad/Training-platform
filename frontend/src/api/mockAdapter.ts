@@ -128,6 +128,15 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   if (method === 'post' && activityMatch) {
     return respond(config, 204, undefined);
   }
+  if (method === 'post' && url === '/activity/time') {
+    console.log('[MOCK ACTIVITY POST]', config.data);
+    return respond(config, 204, undefined);
+  }
+
+  if (method === 'get' && url === '/activity/time') {
+    console.log('[MOCK ACTIVITY GET]', config.data);
+    return respond(config, 200, []);
+  }
 
   if (method === 'get' && url === '/auth/me') {
     return respond(config, 200, mockUser);

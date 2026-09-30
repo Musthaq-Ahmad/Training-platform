@@ -12,6 +12,7 @@ import CodeEditor from '../CodeEditor';
 import EditorStatusBar from '../EditorStatusBar';
 import EditorTabs from '../EditorTabs';
 import styles from './EditorPane.module.css';
+import { useMarkWork } from '../../pages/TaskPage/state/WorkActivityContext';
 
 type EditorPaneProps = {
   taskId: string;
@@ -21,6 +22,7 @@ type EditorPaneProps = {
 
 export default function EditorPane({ taskId, onSave, onRun }: EditorPaneProps) {
   const state = useWorkspaceState();
+  const markWork = useMarkWork();
   const dispatch = useWorkspaceDispatch();
 
   // Reset to 1:1 when the active path changes. Adjusting state during render
@@ -75,8 +77,14 @@ export default function EditorPane({ taskId, onSave, onRun }: EditorPaneProps) {
         <CodeEditor
           taskId={taskId}
           path={state.activePath}
-          onChange={(path, content) => dispatch({ type: 'fileEdited', path, content })}
-          onCursorChange={(line, column) => setCursor({ line, column })}
+          onChange={(path, content) => {
+            markWork();
+            dispatch({ type: 'fileEdited', path, content });
+          }}
+          onCursorChange={(line, column) => {
+            markWork();
+            setCursor({ line, column });
+          }}
           onSave={onSave}
           onRun={onRun}
         />

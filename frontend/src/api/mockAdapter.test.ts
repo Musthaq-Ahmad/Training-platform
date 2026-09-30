@@ -124,4 +124,21 @@ describe('mockAdapter', () => {
       expect(res.data).toEqual({ responseText: null });
     });
   });
+
+  describe('activity', () => {
+    it('answers POST /activity/time with 204', async () => {
+      const res = await client.post('/activity/time', {
+        activeSeconds: 60,
+        codingSeconds: 0,
+        readingSeconds: 0,
+      });
+      expect(res.status).toBe(204);
+    });
+
+    it('answers GET /activity/time with an empty list', async () => {
+      const res = await client.get('/activity/time');
+      expect(res.status).toBe(200);
+      expect(res.data).toEqual([]);
+    });
+  });
 });

@@ -15,6 +15,9 @@ import { useAutosave } from '../../pages/TaskPage/hooks/useAutosave';
 import { useRunner } from '../../runtimes/runnerContext';
 import RuntimeHost from '../../runtimes/RuntimeHost';
 import type { PaneId } from '../../types/workspaceTypes';
+import { useReportActivityMode } from '../../context/useActivity';
+import { useTaskActivityMode } from '../../pages/TaskPage/hooks/useTaskActivityMode';
+import { WorkActivityContext } from '../../pages/TaskPage/state/WorkActivityContext';
 import {
   useWorkspaceDispatch,
   useWorkspaceState,
@@ -35,6 +38,10 @@ type TaskWorkspaceProps = {
 
 export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
   const state = useWorkspaceState();
+  const { mode, markWork } = useTaskActivityMode({
+    isInstructionsVisible: state.visiblePanes.sidebar && state.sidebarTab === 'instructions',
+  });
+  useReportActivityMode(mode, task.day.id);
   const dispatch = useWorkspaceDispatch();
   const navigate = useNavigate();
   const runner = useRunner();
@@ -88,8 +95,9 @@ export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
     if (!state.visiblePanes.result) {
       dispatch({ type: 'paneToggled', pane: 'result' });
     }
+    markWork();
     runnerRun();
-  }, [dispatch, runnerRun, state.visiblePanes.result]);
+  }, [dispatch, markWork, runnerRun, state.visiblePanes.result]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -163,85 +171,89 @@ export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
     .join(' ');
 
   return (
-    <div className={styles.workspace}>
-      <TaskToolbar
-        estimatedMinutes={task.estimatedMinutes}
-        visiblePanes={state.visiblePanes}
-        onTogglePane={handleTogglePane}
-        onBack={handleBack}
-        onRun={handleRun}
-        runner={runner}
-        saveIndicator={<SaveIndicator state={autosave.state} onRetry={autosave.retry} />}
-        hasSubmitted={hasSubmitted}
-        submittedAt={submittedAt}
-        submitSlot={
-          <SubmitTaskButton
-            taskTitle={task.title}
-            hasSubmitted={hasSubmitted}
-            saveState={autosave.state}
-            flush={autosave.flush}
-            onSubmit={handleSubmit}
-          />
-        }
-      />
-      <div className={styles.paneRow} style={{ gridTemplateColumns: gridColumns }}>
-        {state.visiblePanes.sidebar && (
-          <div className={styles.pane} data-testid="sidebar-pane">
-            <WorkspaceSidebar
-              activeTab={state.sidebarTab}
-              onTabChange={(tab) => dispatch({ type: 'sidebarTabChanged', tab })}
-              fileCount={selectFileCount(state)}
-              onCollapse={() => dispatch({ type: 'paneToggled', pane: 'sidebar' })}
-              instructions={<InstructionsPanel markdown={task.instructionsMarkdown} />}
-              files={<FilesPanel onRefresh={refreshFiles} />}
+    <WorkActivityContext.Provider value={markWork}>
+      <div className={styles.workspace}>
+        <TaskToolbar
+          estimatedMinutes={task.estimatedMinutes}
+          visiblePanes={state.visiblePanes}
+          onTogglePane={handleTogglePane}
+          onBack={handleBack}
+          onRun={handleRun}
+          runner={runner}
+          saveIndicator={<SaveIndicator state={autosave.state} onRetry={autosave.retry} />}
+          hasSubmitted={hasSubmitted}
+          submittedAt={submittedAt}
+          submitSlot={
+            <SubmitTaskButton
+              taskTitle={task.title}
+              hasSubmitted={hasSubmitted}
+              saveState={autosave.state}
+              flush={autosave.flush}
+              onSubmit={handleSubmit}
             />
-          </div>
-        )}
-        {/* Always mounted, hidden with CSS when toggled off — unmounting Monaco would lose undo history. */}
-        <div
-          className={state.visiblePanes.code ? styles.pane : `${styles.pane} ${styles.paneHidden}`}
-          data-testid="code-pane"
-        >
-          <EditorPane taskId={task.id} onSave={() => void autosave.flush()} onRun={handleRun} />
-        </div>
-
-        {/* Always mounted, hidden with CSS when toggled off — the node runtime's terminal
-            and running server must survive the pane being hidden. */}
-        <div
-          className={
-            state.visiblePanes.result ? styles.pane : `${styles.pane} ${styles.paneHidden}`
           }
-          data-testid="result-pane"
-        >
-          <RuntimeHost task={task} isVisible={state.visiblePanes.result} />
+        />
+        <div className={styles.paneRow} style={{ gridTemplateColumns: gridColumns }}>
+          {state.visiblePanes.sidebar && (
+            <div className={styles.pane} data-testid="sidebar-pane">
+              <WorkspaceSidebar
+                activeTab={state.sidebarTab}
+                onTabChange={(tab) => dispatch({ type: 'sidebarTabChanged', tab })}
+                fileCount={selectFileCount(state)}
+                onCollapse={() => dispatch({ type: 'paneToggled', pane: 'sidebar' })}
+                instructions={<InstructionsPanel markdown={task.instructionsMarkdown} />}
+                files={<FilesPanel onRefresh={refreshFiles} />}
+              />
+            </div>
+          )}
+          {/* Always mounted, hidden with CSS when toggled off — unmounting Monaco would lose undo history. */}
+          <div
+            className={
+              state.visiblePanes.code ? styles.pane : `${styles.pane} ${styles.paneHidden}`
+            }
+            data-testid="code-pane"
+          >
+            <EditorPane taskId={task.id} onSave={() => void autosave.flush()} onRun={handleRun} />
+          </div>
+
+          {/* Always mounted, hidden with CSS when toggled off — the node runtime's terminal
+            and running server must survive the pane being hidden. */}
+          <div
+            className={
+              state.visiblePanes.result ? styles.pane : `${styles.pane} ${styles.paneHidden}`
+            }
+            data-testid="result-pane"
+          >
+            <RuntimeHost task={task} isVisible={state.visiblePanes.result} />
+          </div>
         </div>
+
+        <ConfirmDialog
+          open={isRefreshConfirmOpen}
+          title="Discard unsaved changes and reload files from the server?"
+          confirmLabel="Reload"
+          isConfirming={isRefreshing}
+          error={refreshError}
+          onConfirm={() => void loadServerFiles()}
+          onCancel={() => setIsRefreshConfirmOpen(false)}
+        >
+          Your local changes will be lost.
+        </ConfirmDialog>
+
+        <ConfirmDialog
+          open={isLeaveConfirmOpen}
+          title="Your latest changes aren't saved. Leave anyway?"
+          confirmLabel="Leave"
+          tone="danger"
+          onConfirm={() => {
+            setIsLeaveConfirmOpen(false);
+            void navigate(`/days/${task.day.id}`);
+          }}
+          onCancel={() => setIsLeaveConfirmOpen(false)}
+        >
+          Unsaved changes will be lost.
+        </ConfirmDialog>
       </div>
-
-      <ConfirmDialog
-        open={isRefreshConfirmOpen}
-        title="Discard unsaved changes and reload files from the server?"
-        confirmLabel="Reload"
-        isConfirming={isRefreshing}
-        error={refreshError}
-        onConfirm={() => void loadServerFiles()}
-        onCancel={() => setIsRefreshConfirmOpen(false)}
-      >
-        Your local changes will be lost.
-      </ConfirmDialog>
-
-      <ConfirmDialog
-        open={isLeaveConfirmOpen}
-        title="Your latest changes aren't saved. Leave anyway?"
-        confirmLabel="Leave"
-        tone="danger"
-        onConfirm={() => {
-          setIsLeaveConfirmOpen(false);
-          void navigate(`/days/${task.day.id}`);
-        }}
-        onCancel={() => setIsLeaveConfirmOpen(false)}
-      >
-        Unsaved changes will be lost.
-      </ConfirmDialog>
-    </div>
+    </WorkActivityContext.Provider>
   );
 }

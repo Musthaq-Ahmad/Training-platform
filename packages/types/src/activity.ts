@@ -6,3 +6,22 @@ export type LogFlagEventRequest = {
   durationMs?: number; // how long the trainee was away, if known
   context?: Record<string, string | number | boolean>; // e.g. { source: 'terminal' }
 };
+
+/** POST /api/activity/time — sent about every 60 seconds and when the tab is hidden */
+export type ActivityTimeRequest = {
+  activeSeconds: number;
+  codingSeconds: number;
+  readingSeconds: number;
+  /** The curriculum day the trainee was looking at; omitted on dashboard/profile */
+  dayId?: string;
+};
+
+/** GET /api/activity/time?days=N — one entry per calendar day, newest first */
+export type ActivityTimeDay = {
+  date: string; // 'YYYY-MM-DD' (Asia/Kolkata)
+  activeSeconds: number;
+  codingSeconds: number;
+  readingSeconds: number;
+};
+
+export type ActivityMode = 'coding' | 'reading' | 'none';

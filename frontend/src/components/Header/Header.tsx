@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useAuth } from '../../context/Useauth';
 import styles from './Header.module.css';
+import { useActivity } from '../../context/useActivity';
 
 type HeaderProps = {
   /** Replaces the app name on the left. The task page puts its breadcrumb here. */
@@ -11,6 +12,7 @@ type HeaderProps = {
 };
 
 export default function Header({ leading, status }: HeaderProps) {
+  const activity = useActivity();
   const { user, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -26,6 +28,7 @@ export default function Header({ leading, status }: HeaderProps) {
 
   const handleLogout = async () => {
     // TODO: replace with useAuth().logout() once AuthContext exists
+    await activity?.flushNow();
     setIsLoggingOut(true);
     try {
       await logout();

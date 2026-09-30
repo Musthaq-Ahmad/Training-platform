@@ -13,6 +13,7 @@ import NodePreview from './NodePreview';
 import { useNodeSession, type NodeSessionStatus } from './useNodeSession';
 import { getWebContainer } from './webcontainerService';
 import styles from './NodeRuntime.module.css';
+import { useMarkWork } from '../../pages/TaskPage/state/WorkActivityContext';
 
 type NodeRuntimeProps = { task: TaskResponse; isVisible: boolean };
 
@@ -47,12 +48,18 @@ function runnerFor(
 export default function NodeRuntime({ task, isVisible }: NodeRuntimeProps) {
   const state = useWorkspaceState();
   const dispatch = useWorkspaceDispatch();
+  const markWork = useMarkWork();
 
   // The files at mount are what WebContainer starts from; later edits reach it through the sync.
   const [initialFiles] = useState(() => state.files);
   const [terminal, setTerminal] = useState<Terminal | null>(null);
   const [activeTab, setActiveTab] = useState('terminal');
   const [server, setServer] = useState<{ port: number; url: string } | null>(null);
+  useEffect(() => {
+    if (!terminal) return;
+    const subscription = terminal.onData(() => markWork());
+    return () => subscription.dispose();
+  }, [terminal, markWork]);
 
   const filesRef = useRef(state.files);
   useEffect(() => {
