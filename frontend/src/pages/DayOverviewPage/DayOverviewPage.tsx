@@ -113,7 +113,6 @@ export default function DayOverviewPage() {
       </>
     );
   }
-  console.log('Course title:', day.courseTitle);
   if (error || !status) {
     return (
       <>
@@ -141,7 +140,7 @@ export default function DayOverviewPage() {
       <Header />
 
       <main className={styles.dayOverview}>
-        <DayBreadcrumb courseTitle={day.courseTitle} dayNumber={day.dayNumber} />
+        <DayBreadcrumb dayNumber={day.dayNumber} />
 
         <DaySummary
           courseTitle={day.courseTitle}

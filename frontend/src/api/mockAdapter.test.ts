@@ -6,6 +6,8 @@ import { installMockAdapter } from './mockAdapter';
 import { mockDayContents } from './dayOverview';
 import { mockTasksByDay } from '../test/fixtures/dayTasks';
 import { mockJournalByDay, mockStatusByDay } from '../test/fixtures/dayStatus';
+import type { DashboardResponse, DaySummary } from '@itp/types';
+import { CURRICULUM_COURSES } from '../constants/courses';
 
 function createClient() {
   const client = axios.create();
@@ -122,6 +124,120 @@ describe('mockAdapter', () => {
 
       expect(res.status).toBe(200);
       expect(res.data).toEqual({ responseText: null });
+    });
+  });
+  describe('dashboard', () => {
+    async function getAllCourseDays(): Promise<DaySummary[]> {
+      const responses = await Promise.all(
+        CURRICULUM_COURSES.map((course) => client.get<DaySummary[]>(`/courses/${course.id}/days`))
+      );
+      return responses.flatMap((res) => res.data);
+    }
+
+    it('returns the dashboard for GET /dashboard', async () => {
+      const res = await client.get<DashboardResponse>('/dashboard');
+
+      expect(res.status).toBe(200);
+      expect(res.data.today).toEqual(
+        expect.objectContaining({ activeSeconds: expect.any(Number) as number })
+      );
+      expect(res.data.total.codingSeconds).toBeGreaterThanOrEqual(res.data.today.codingSeconds);
+    });
+
+    it('does not send the list of courses or days in the dashboard', async () => {
+      const res = await client.get<DashboardResponse>('/dashboard');
+
+      expect(res.data).not.toHaveProperty('courses');
+      expect(res.data).not.toHaveProperty('currentDay');
+    });
+
+    it('returns an unlocked next day with the total number of days in its course', async () => {
+      const dashboard = await client.get<DashboardResponse>('/dashboard');
+      const nextDay = dashboard.data.nextDay;
+      if (!nextDay) throw new Error('Expected the fixture to have a next day');
+
+      expect(nextDay.status).toBe('UNLOCKED');
+
+      const courseDays = await client.get<DaySummary[]>(`/courses/${nextDay.courseId}/days`);
+      expect(nextDay.courseTotalDays).toBe(courseDays.data.length);
+      expect(nextDay.description.length).toBeGreaterThan(0);
+    });
+
+    it('lists the next day in its own course with the same status', async () => {
+      const dashboard = await client.get<DashboardResponse>('/dashboard');
+      const nextDay = dashboard.data.nextDay;
+      if (!nextDay) throw new Error('Expected the fixture to have a next day');
+
+      const courseDays = await client.get<DaySummary[]>(`/courses/${nextDay.courseId}/days`);
+      const listed = courseDays.data.find((d) => d.id === nextDay.id);
+
+      expect(listed?.status).toBe(nextDay.status);
+      expect(listed?.title).toBe(nextDay.title);
+    });
+
+    it('counts the total and completed days across every course', async () => {
+      const [dashboard, allDays] = await Promise.all([
+        client.get<DashboardResponse>('/dashboard'),
+        getAllCourseDays(),
+      ]);
+
+      expect(dashboard.data.totalDaysOverall).toBe(allDays.length);
+      expect(dashboard.data.totalDaysCompleteOverall).toBe(
+        allDays.filter((d) => d.status === 'COMPLETED').length
+      );
+    });
+
+    it('has exactly one unlocked day across all courses', async () => {
+      const allDays = await getAllCourseDays();
+
+      expect(allDays.filter((d) => d.status === 'UNLOCKED')).toHaveLength(1);
+    });
+
+    it('returns typing results with a latest attempt and a trend in date order', async () => {
+      const res = await client.get<DashboardResponse>('/dashboard');
+      const { latest, trend } = res.data.typing;
+
+      expect(latest?.wpm).toBeGreaterThan(0);
+      const dates = trend.map((point) => point.date);
+      expect(dates).toEqual([...dates].sort());
+    });
+  });
+
+  describe('course days', () => {
+    it('returns the days of a course for GET /courses/:courseId/days', async () => {
+      const res = await client.get<DaySummary[]>('/courses/css/days');
+
+      expect(res.status).toBe(200);
+      expect(res.data.length).toBeGreaterThan(0);
+      expect(res.data.every((d) => d.courseId === 'css')).toBe(true);
+    });
+
+    it('returns the days in day-number order', async () => {
+      const res = await client.get<DaySummary[]>('/courses/css/days');
+      const numbers = res.data.map((d) => d.dayNumber);
+
+      expect(numbers).toEqual([...numbers].sort((a, b) => a - b));
+    });
+
+    it('never has a completed day after a locked one within a course', async () => {
+      const res = await client.get<DaySummary[]>('/courses/css/days');
+      const firstLocked = res.data.findIndex((d) => d.status === 'LOCKED');
+
+      if (firstLocked !== -1) {
+        expect(res.data.slice(firstLocked).every((d) => d.status === 'LOCKED')).toBe(true);
+      }
+    });
+
+    it('includes a description on every day', async () => {
+      const res = await client.get<DaySummary[]>('/courses/css/days');
+
+      expect(res.data.every((d) => d.description.length > 0)).toBe(true);
+    });
+
+    it('rejects GET /courses/missing/days with 404 NOT_FOUND', async () => {
+      await expect(client.get('/courses/missing/days')).rejects.toMatchObject({
+        response: { status: 404, data: { error: { code: 'NOT_FOUND' } } },
+      });
     });
   });
 });

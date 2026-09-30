@@ -1,13 +1,26 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+import type { DashboardResponse, DaySummary, DayStatus } from '@itp/types';
 
 import DashboardPage from './DashboardPage';
 import { getDashboard } from '../../api/dashboard';
-import type { DashboardResponse } from '@itp/types';
+import { getCourseDays } from '../../api/courses';
+
+const { navigate } = vi.hoisted(() => ({ navigate: vi.fn() }));
+
+vi.mock('react-router', async () => {
+  const actual = await vi.importActual<typeof import('react-router')>('react-router');
+  return { ...actual, useNavigate: () => navigate };
+});
 
 vi.mock('../../api/dashboard', () => ({
   getDashboard: vi.fn(),
+}));
+
+vi.mock('../../api/courses', () => ({
+  getCourseDays: vi.fn(),
 }));
 
 vi.mock('../../components/Header', () => ({
@@ -67,23 +80,23 @@ vi.mock('../../components/TrackTabs', () => ({
   ),
 }));
 
+// The mock cell is never disabled, so clicks on locked days still reach the page's handler
 vi.mock('../../components/ScheduleGrid', () => ({
   default: ({
     title,
     days,
+    onSelectDay,
   }: {
     title: string;
-    days: {
-      id: string;
-      dayNumber: number;
-      title: string;
-    }[];
+    days: { id: string; dayNumber: number; status: string }[];
+    onSelectDay: (dayId: string) => void;
   }) => (
     <div>
       <h2>{title}</h2>
-
       {days.map((day) => (
-        <button key={day.id}>{String(day.dayNumber).padStart(2, '0')}</button>
+        <button key={day.id} onClick={() => onSelectDay(day.id)}>
+          {String(day.dayNumber).padStart(2, '0')}
+        </button>
       ))}
     </div>
   ),
@@ -105,245 +118,95 @@ vi.mock('../../components/StatsRow', () => ({
       <p>Total active: {totalActiveSeconds}</p>
       <p>Total coding: {totalCodingSeconds}</p>
       <p>Latest WPM: {latestWpm ?? '—'}</p>
-
       <button onClick={onTakeTypingTest}>Take a typing test</button>
     </div>
   ),
 }));
 
+/* ---------- Test data ---------- */
+
+// Course ids must match CURRICULUM_COURSES in src/constants/courses.ts
+function day(
+  courseId: string,
+  dayNumber: number,
+  status: DayStatus,
+  extra: Partial<DaySummary> = {}
+): DaySummary {
+  return {
+    id: `${courseId}-day-${String(dayNumber).padStart(2, '0')}`,
+    courseId,
+    dayNumber,
+    title: `${courseId} lesson ${dayNumber}`,
+    description: `Description for ${courseId} lesson ${dayNumber}.`,
+    status,
+    ...extra,
+  };
+}
+
+const JS_NEXT_DAY = day('js', 6, 'UNLOCKED', {
+  title: 'Closures and Higher-Order Functions',
+  description:
+    'Implement memoized function wrappers and partial application utilities with strict scope isolation.',
+});
+
+const jsDays: DaySummary[] = [
+  day('js', 1, 'COMPLETED'),
+  day('js', 2, 'COMPLETED'),
+  day('js', 3, 'COMPLETED'),
+  day('js', 4, 'COMPLETED'),
+  day('js', 5, 'COMPLETED'),
+  JS_NEXT_DAY,
+  day('js', 7, 'LOCKED'),
+];
+
+const nodeDays: DaySummary[] = [day('node', 1, 'LOCKED'), day('node', 2, 'LOCKED')];
+
+const htmlDays: DaySummary[] = [day('html', 1, 'UNLOCKED'), day('html', 2, 'LOCKED')];
+
+const daysByCourse: Record<string, DaySummary[]> = {
+  html: htmlDays,
+  js: jsDays,
+  node: nodeDays,
+};
+
 const mockDashboard: DashboardResponse = {
-  currentDay: {
-    id: 'day-js-06',
-    courseId: 'course-js',
-    dayNumber: 6,
-    title: 'Closures and Higher-Order Functions',
-    description:
-      'Implement memoized function wrappers and partial application utilities with strict scope isolation.',
-    status: 'UNLOCKED',
-  },
-
-  currentCourseId: 'course-js',
-
-  courses: [
-    {
-      id: 'course-html',
-      title: 'HTML',
-      days: [
-        {
-          id: 'course-html-day-1',
-          courseId: 'course-html',
-          dayNumber: 1,
-          title: 'HTML lesson 1',
-          status: 'COMPLETED',
-        },
-        {
-          id: 'course-html-day-2',
-          courseId: 'course-html',
-          dayNumber: 2,
-          title: 'HTML lesson 2',
-          status: 'COMPLETED',
-        },
-      ],
-    },
-
-    {
-      id: 'course-css',
-      title: 'CSS',
-      days: [
-        {
-          id: 'course-css-day-1',
-          courseId: 'course-css',
-          dayNumber: 1,
-          title: 'CSS lesson 1',
-          status: 'COMPLETED',
-        },
-      ],
-    },
-
-    {
-      id: 'course-js',
-      title: 'JavaScript',
-      days: [
-        {
-          id: 'course-js-day-1',
-          courseId: 'course-js',
-          dayNumber: 1,
-          title: 'JS lesson 1',
-          status: 'COMPLETED',
-        },
-        {
-          id: 'course-js-day-2',
-          courseId: 'course-js',
-          dayNumber: 2,
-          title: 'JS lesson 2',
-          status: 'COMPLETED',
-        },
-        {
-          id: 'course-js-day-3',
-          courseId: 'course-js',
-          dayNumber: 3,
-          title: 'JS lesson 3',
-          status: 'COMPLETED',
-        },
-        {
-          id: 'course-js-day-4',
-          courseId: 'course-js',
-          dayNumber: 4,
-          title: 'JS lesson 4',
-          status: 'COMPLETED',
-        },
-        {
-          id: 'course-js-day-5',
-          courseId: 'course-js',
-          dayNumber: 5,
-          title: 'JS lesson 5',
-          status: 'COMPLETED',
-        },
-        {
-          id: 'day-js-06',
-          courseId: 'course-js',
-          dayNumber: 6,
-          title: 'Closures and Higher-Order Functions',
-          description:
-            'Implement memoized function wrappers and partial application utilities with strict scope isolation.',
-          status: 'UNLOCKED',
-        },
-        {
-          id: 'course-js-day-7',
-          courseId: 'course-js',
-          dayNumber: 7,
-          title: 'JS lesson 7',
-          status: 'LOCKED',
-        },
-      ],
-    },
-
-    {
-      id: 'course-ts',
-      title: 'TypeScript',
-      days: [
-        {
-          id: 'course-ts-day-1',
-          courseId: 'course-ts',
-          dayNumber: 1,
-          title: 'TypeScript lesson 1',
-          status: 'LOCKED',
-        },
-      ],
-    },
-
-    {
-      id: 'course-node',
-      title: 'Node.js',
-      days: [
-        {
-          id: 'course-node-day-1',
-          courseId: 'course-node',
-          dayNumber: 1,
-          title: 'Node.js Introduction',
-          status: 'UNLOCKED',
-        },
-        {
-          id: 'course-node-day-2',
-          courseId: 'course-node',
-          dayNumber: 2,
-          title: 'Node.js Modules',
-          status: 'LOCKED',
-        },
-      ],
-    },
-
-    {
-      id: 'course-postgresql',
-      title: 'PostgreSQL',
-      days: [
-        {
-          id: 'course-postgresql-day-1',
-          courseId: 'course-postgresql',
-          dayNumber: 1,
-          title: 'PostgreSQL lesson 1',
-          status: 'LOCKED',
-        },
-      ],
-    },
-
-    {
-      id: 'course-prisma',
-      title: 'Prisma',
-      days: [
-        {
-          id: 'course-prisma-day-1',
-          courseId: 'course-prisma',
-          dayNumber: 1,
-          title: 'Prisma lesson 1',
-          status: 'LOCKED',
-        },
-      ],
-    },
-
-    {
-      id: 'course-react',
-      title: 'React',
-      days: [
-        {
-          id: 'course-react-day-1',
-          courseId: 'course-react',
-          dayNumber: 1,
-          title: 'React lesson 1',
-          status: 'LOCKED',
-        },
-      ],
-    },
-  ],
-
+  nextDay: { ...JS_NEXT_DAY, courseTotalDays: 7 },
   totalDaysCompleteOverall: 17,
   totalDaysOverall: 60,
-
-  today: {
-    activeSeconds: 5400,
-    codingSeconds: 3600,
-    readingSeconds: 1800,
-  },
-
-  total: {
-    activeSeconds: 153000,
-    codingSeconds: 101700,
-    readingSeconds: 51300,
-  },
-
+  today: { activeSeconds: 5400, codingSeconds: 3600, readingSeconds: 1800 },
+  total: { activeSeconds: 153000, codingSeconds: 101700, readingSeconds: 51300 },
   typing: {
-    latest: {
-      wpm: 74,
-      accuracy: 96,
-      takenAt: '2026-09-26T09:00:00Z',
-    },
+    latest: { wpm: 74, accuracy: 96, takenAt: '2026-09-26T09:00:00Z' },
     todayAverageWpm: 71,
     trend: [
-      {
-        date: '2026-09-20',
-        averageWpm: 65,
-      },
-      {
-        date: '2026-09-21',
-        averageWpm: 68,
-      },
-      {
-        date: '2026-09-22',
-        averageWpm: 70,
-      },
+      { date: '2026-09-20', averageWpm: 65 },
+      { date: '2026-09-21', averageWpm: 68 },
+      { date: '2026-09-22', averageWpm: 70 },
     ],
   },
 };
 
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <DashboardPage />
+    </MemoryRouter>
+  );
+}
+
 describe('DashboardPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(getCourseDays).mockImplementation((courseId: string) => {
+      const days = daysByCourse[courseId];
+      return days ? Promise.resolve(days) : Promise.reject(new Error('Course not found.'));
+    });
   });
 
   it('shows the loading state while dashboard data is loading', () => {
     vi.mocked(getDashboard).mockReturnValue(new Promise(() => {}));
 
-    render(<DashboardPage />);
+    renderPage();
 
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
@@ -351,7 +214,7 @@ describe('DashboardPage', () => {
   it('shows the error message when dashboard loading fails', async () => {
     vi.mocked(getDashboard).mockRejectedValue(new Error('Failed to load dashboard'));
 
-    render(<DashboardPage />);
+    renderPage();
 
     expect(await screen.findByText('Failed to load dashboard')).toBeInTheDocument();
   });
@@ -359,83 +222,115 @@ describe('DashboardPage', () => {
   it('renders the header', async () => {
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    render(<DashboardPage />);
+    renderPage();
 
     expect(await screen.findByText('Header')).toBeInTheDocument();
   });
 
-  it('renders the current lesson information', async () => {
+  it('renders the next day on the current lesson card', async () => {
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    render(<DashboardPage />);
+    renderPage();
 
     expect(await screen.findByText('Closures and Higher-Order Functions')).toBeInTheDocument();
-
     expect(
       screen.getByText(
         'Implement memoized function wrappers and partial application utilities with strict scope isolation.'
       )
     ).toBeInTheDocument();
+    expect(screen.getByText('JavaScript', { selector: 'p' })).toBeInTheDocument();
+  });
 
-    expect(screen.getByText('Day 6 of 7')).toBeInTheDocument();
+  it('shows the day number out of the course total sent by the backend', async () => {
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+
+    renderPage();
+
+    expect(await screen.findByText('Day 6 of 7')).toBeInTheDocument();
   });
 
   it('renders the overall progress', async () => {
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    render(<DashboardPage />);
+    renderPage();
 
     expect(await screen.findByText('17 of 60 days complete overall')).toBeInTheDocument();
   });
 
-  it('renders the JavaScript schedule by default', async () => {
+  it("opens the tab of the next day's course and loads only that course's days", async () => {
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    render(<DashboardPage />);
+    renderPage();
 
     expect(await screen.findByText('JavaScript Module — Schedule')).toBeInTheDocument();
-
     expect(screen.getByRole('button', { name: '01' })).toBeInTheDocument();
-
     expect(screen.getByRole('button', { name: '06' })).toBeInTheDocument();
-
     expect(screen.getByRole('button', { name: '07' })).toBeInTheDocument();
+
+    expect(getCourseDays).toHaveBeenCalledTimes(1);
+    expect(getCourseDays).toHaveBeenCalledWith('js');
   });
 
-  it('changes the schedule when another track is selected', async () => {
-    const user = userEvent.setup();
+  it('shows a loading message while the days of the course are loading', async () => {
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+    vi.mocked(getCourseDays).mockReturnValue(new Promise(() => {}));
 
+    renderPage();
+
+    expect(await screen.findByText('Loading days...')).toBeInTheDocument();
+    expect(screen.queryByText('JavaScript Module — Schedule')).not.toBeInTheDocument();
+  });
+
+  it('shows the error message when the days of the course fail to load', async () => {
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+    vi.mocked(getCourseDays).mockRejectedValue(new Error('Failed to load days'));
+
+    renderPage();
+
+    expect(await screen.findByText('Failed to load days')).toBeInTheDocument();
+  });
+
+  it('loads the days of another course when its tab is selected', async () => {
+    const user = userEvent.setup();
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    render(<DashboardPage />);
+    renderPage();
 
-    expect(await screen.findByText('JavaScript Module — Schedule')).toBeInTheDocument();
+    await screen.findByText('JavaScript Module — Schedule');
 
     await user.click(screen.getByRole('tab', { name: 'Node.js' }));
 
-    expect(screen.getByText('Node.js Module — Schedule')).toBeInTheDocument();
-
+    expect(await screen.findByText('Node.js Module — Schedule')).toBeInTheDocument();
+    expect(getCourseDays).toHaveBeenCalledWith('node');
     expect(screen.getByRole('button', { name: '01' })).toBeInTheDocument();
-
     expect(screen.getByRole('button', { name: '02' })).toBeInTheDocument();
+  });
+
+  it('does not fetch a course again when returning to a tab that was already loaded', async () => {
+    const user = userEvent.setup();
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+
+    renderPage();
+
+    await screen.findByText('JavaScript Module — Schedule');
+    await user.click(screen.getByRole('tab', { name: 'Node.js' }));
+    await screen.findByText('Node.js Module — Schedule');
+    await user.click(screen.getByRole('tab', { name: 'JavaScript' }));
+
+    expect(await screen.findByText('JavaScript Module — Schedule')).toBeInTheDocument();
+    expect(getCourseDays).toHaveBeenCalledTimes(2); // js once, node once
   });
 
   it('marks the selected track as active', async () => {
     const user = userEvent.setup();
-
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    render(<DashboardPage />);
+    renderPage();
 
     await screen.findByText('JavaScript Module — Schedule');
 
-    const javascriptTab = screen.getByRole('tab', {
-      name: 'JavaScript',
-    });
-
-    const nodeTab = screen.getByRole('tab', {
-      name: 'Node.js',
-    });
+    const javascriptTab = screen.getByRole('tab', { name: 'JavaScript' });
+    const nodeTab = screen.getByRole('tab', { name: 'Node.js' });
 
     expect(javascriptTab).toHaveAttribute('aria-selected', 'true');
     expect(nodeTab).toHaveAttribute('aria-selected', 'false');
@@ -446,16 +341,16 @@ describe('DashboardPage', () => {
     expect(nodeTab).toHaveAttribute('aria-selected', 'true');
   });
 
-  it('keeps the current lesson based on the actual current day when switching tracks', async () => {
+  it('keeps the current lesson card on the next day when switching tracks', async () => {
     const user = userEvent.setup();
-
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    render(<DashboardPage />);
+    renderPage();
 
     expect(await screen.findByText('Closures and Higher-Order Functions')).toBeInTheDocument();
 
     await user.click(screen.getByRole('tab', { name: 'Node.js' }));
+    await screen.findByText('Node.js Module — Schedule');
 
     expect(screen.getByText('Closures and Higher-Order Functions')).toBeInTheDocument();
   });
@@ -463,66 +358,119 @@ describe('DashboardPage', () => {
   it('renders the statistics data', async () => {
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    render(<DashboardPage />);
+    renderPage();
 
     expect(await screen.findByText('Total active: 153000')).toBeInTheDocument();
-
     expect(screen.getByText('Total coding: 101700')).toBeInTheDocument();
-
     expect(screen.getByText('Latest WPM: 74')).toBeInTheDocument();
   });
 
   it('renders the typing test button', async () => {
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    render(<DashboardPage />);
+    renderPage();
 
-    expect(
-      await screen.findByRole('button', {
-        name: /take a typing test/i,
-      })
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /take a typing test/i })).toBeInTheDocument();
   });
 
   it('calls getDashboard once when the page loads', async () => {
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    render(<DashboardPage />);
+    renderPage();
 
     await screen.findByText('JavaScript Module — Schedule');
 
     expect(getDashboard).toHaveBeenCalledTimes(1);
   });
 
-  it('falls back to HTML Day 1 for a new trainee', async () => {
-    const newTraineeDashboard: DashboardResponse = {
-      ...mockDashboard,
-      currentDay: null,
-    };
+  describe('navigation', () => {
+    it('navigates to the next day when Continue is clicked', async () => {
+      const user = userEvent.setup();
+      vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    vi.mocked(getDashboard).mockResolvedValue(newTraineeDashboard);
+      renderPage();
 
-    render(<DashboardPage />);
+      await user.click(await screen.findByRole('button', { name: 'Continue' }));
 
-    expect(await screen.findByText('HTML lesson 1')).toBeInTheDocument();
+      expect(navigate).toHaveBeenCalledWith('/days/js-day-06');
+    });
 
-    expect(screen.getByText('Day 1 of 2')).toBeInTheDocument();
+    it('navigates when a completed day is clicked in the schedule', async () => {
+      const user = userEvent.setup();
+      vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
 
-    expect(screen.getByText('HTML Module — Schedule')).toBeInTheDocument();
+      renderPage();
+
+      await screen.findByText('JavaScript Module — Schedule');
+      await user.click(screen.getByRole('button', { name: '01' }));
+
+      expect(navigate).toHaveBeenCalledWith('/days/js-day-01');
+    });
+
+    it('does not navigate when a locked day is clicked', async () => {
+      const user = userEvent.setup();
+      vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+
+      renderPage();
+
+      await screen.findByText('JavaScript Module — Schedule');
+      await user.click(screen.getByRole('button', { name: '07' }));
+
+      expect(navigate).not.toHaveBeenCalled();
+    });
   });
 
-  it('starts with HTML track when currentDay is null', async () => {
+  describe('new trainee', () => {
     const newTraineeDashboard: DashboardResponse = {
       ...mockDashboard,
-      currentDay: null,
+      nextDay: { ...day('html', 1, 'UNLOCKED'), courseTotalDays: 2 },
+      totalDaysCompleteOverall: 0,
     };
 
-    vi.mocked(getDashboard).mockResolvedValue(newTraineeDashboard);
+    it('shows HTML Day 1 on the card', async () => {
+      vi.mocked(getDashboard).mockResolvedValue(newTraineeDashboard);
 
-    render(<DashboardPage />);
+      renderPage();
 
-    await screen.findByText('HTML Module — Schedule');
+      expect(await screen.findByText('html lesson 1')).toBeInTheDocument();
+      expect(screen.getByText('Day 1 of 2')).toBeInTheDocument();
+    });
 
-    expect(screen.getByRole('tab', { name: 'HTML' })).toHaveAttribute('aria-selected', 'true');
+    it('starts on the HTML track', async () => {
+      vi.mocked(getDashboard).mockResolvedValue(newTraineeDashboard);
+
+      renderPage();
+
+      expect(await screen.findByText('HTML Module — Schedule')).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'HTML' })).toHaveAttribute('aria-selected', 'true');
+      expect(getCourseDays).toHaveBeenCalledWith('html');
+    });
+  });
+
+  describe('all courses completed', () => {
+    const finishedDashboard: DashboardResponse = {
+      ...mockDashboard,
+      nextDay: null,
+      totalDaysCompleteOverall: 60,
+    };
+
+    it('shows a completion message instead of the lesson card', async () => {
+      vi.mocked(getDashboard).mockResolvedValue(finishedDashboard);
+
+      renderPage();
+
+      expect(
+        await screen.findByText("You've completed every course. Great work!")
+      ).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument();
+    });
+
+    it('falls back to the HTML track', async () => {
+      vi.mocked(getDashboard).mockResolvedValue(finishedDashboard);
+
+      renderPage();
+
+      expect(await screen.findByText('HTML Module — Schedule')).toBeInTheDocument();
+    });
   });
 });
