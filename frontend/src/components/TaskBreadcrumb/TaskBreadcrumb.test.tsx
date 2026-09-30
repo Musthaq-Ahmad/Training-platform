@@ -12,23 +12,29 @@ function renderBreadcrumb() {
 }
 
 describe('TaskBreadcrumb', () => {
-  it('links Dashboard to the dashboard route', () => {
+  it('links the course title and padded day label to its day page', () => {
     renderBreadcrumb();
-    expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/');
+
+    expect(screen.getByRole('link', { name: 'CSSDay 01' })).toHaveAttribute('href', '/days/d1');
   });
 
-  it('links the padded day label to its day page', () => {
+  it('shows the course title as part of the day link', () => {
     renderBreadcrumb();
-    expect(screen.getByRole('link', { name: 'Day 01' })).toHaveAttribute('href', '/days/d1');
-  });
 
-  it('shows the course title as plain text', () => {
-    renderBreadcrumb();
-    expect(screen.getByText('CSS').closest('a')).toBeNull();
+    const courseLink = screen.getByRole('link', { name: 'CSSDay 01' });
+
+    expect(courseLink).toHaveTextContent('CSS');
   });
 
   it('marks the task as the current page', () => {
     renderBreadcrumb();
+
     expect(screen.getByText('Task 7')).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('renders a navigation landmark named Breadcrumb', () => {
+    renderBreadcrumb();
+
+    expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toBeInTheDocument();
   });
 });
