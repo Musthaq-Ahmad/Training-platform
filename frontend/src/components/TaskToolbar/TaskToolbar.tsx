@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ArrowLeft, Timer, Play } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Timer, Play } from 'lucide-react';
 import type { PaneId } from '../../types/workspaceTypes';
 import type { Runner } from '../../runtimes/runnerContext';
 import ViewToggleGroup from '../ViewToggleGroup';
@@ -15,7 +15,16 @@ export type TaskToolbarProps = {
   runner: Runner;
   saveIndicator: ReactNode;
   submitSlot: ReactNode;
+  /** Submitted at least once (this visit, or the task was already completed) */
+  hasSubmitted?: boolean;
+  /** When it was submitted in this visit; null when only the task's status says so */
+  submittedAt?: Date | null;
 };
+
+/** 14:32 */
+function formatClock(date: Date): string {
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
 
 export default function TaskToolbar({
   estimatedMinutes,
@@ -26,6 +35,8 @@ export default function TaskToolbar({
   runner,
   saveIndicator,
   submitSlot,
+  hasSubmitted = false,
+  submittedAt = null,
 }: TaskToolbarProps) {
   return (
     <div className={styles.toolbar}>
@@ -38,6 +49,13 @@ export default function TaskToolbar({
         <span className={styles.estimatePill}>
           <Timer size={14} aria-hidden="true" />
           Est: {formatMinutes(estimatedMinutes)}
+        </span>
+      )}
+
+      {hasSubmitted && (
+        <span className={styles.estimatePill}>
+          <CheckCircle2 size={14} aria-hidden="true" className={styles.submittedIcon} />
+          {submittedAt ? `Submitted ${formatClock(submittedAt)}` : 'Submitted'}
         </span>
       )}
 

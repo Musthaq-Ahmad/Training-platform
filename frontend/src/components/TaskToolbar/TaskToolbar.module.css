@@ -32,6 +32,10 @@
   font-size: 12px;
 }
 
+.submittedIcon {
+  color: var(--color-status-success);
+}
+
 .spacer {
   flex: 1;
 }
