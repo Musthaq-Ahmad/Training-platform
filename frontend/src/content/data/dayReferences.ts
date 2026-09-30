@@ -311,4 +311,34 @@ export const dayReferences: DayReferenceConfig[] = [
     dayNumber: 10,
     topicIds: ['github-pages', 'mdn-history-api'],
   },
+  {
+    id: 'ts-day-01',
+    courseId: 'ts',
+    dayNumber: 1,
+    topicIds: ['tsbasics', 'tseverydaytypes', 'tsnarrowing'],
+  },
+  {
+    id: 'ts-day-02',
+    courseId: 'ts',
+    dayNumber: 2,
+    topicIds: ['tsgenerics', 'tsmappedtypes', 'tsutilitytypes'],
+  },
+  {
+    id: 'ts-day-03',
+    courseId: 'ts',
+    dayNumber: 3,
+    topicIds: ['tsclasses', 'tsobjecttypes'],
+  },
+  {
+    id: 'ts-day-04',
+    courseId: 'ts',
+    dayNumber: 4,
+    topicIds: ['tsdefinitelytyped', 'tsjestinstall', 'tsmigrating'],
+  },
+  {
+    id: 'ts-day-05',
+    courseId: 'ts',
+    dayNumber: 5,
+    topicIds: ['tsdosanddonts'],
+  },
 ];

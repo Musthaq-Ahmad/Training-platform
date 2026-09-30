@@ -1,0 +1,189 @@
+{
+  "courseId": "ts",
+  "note": "Week 5 of the Phase 1 guide (Mon-Fri) = ts-day-01 .. ts-day-05. Entries with source 'skip' or 'manual' are not imported.",
+  "sources": {
+    "ts-handbook": {
+      "repo": "microsoft/TypeScript-Website",
+      "ref": "v2",
+      "basePath": "packages/documentation/copy/en",
+      "license": "CC BY 4.0 (attribution required, keep the source line visible)"
+    },
+    "docusaurus": {
+      "repo": "kulshekhar/ts-jest",
+      "ref": "main",
+      "basePath": "website/docs",
+      "license": "check repo LICENSE before publishing"
+    },
+    "github-readme": {
+      "repo": "DefinitelyTyped/DefinitelyTyped",
+      "ref": "master",
+      "basePath": "",
+      "license": "MIT"
+    }
+  },
+  "days": [
+    {
+      "id": "ts-day-01",
+      "dayNumber": 1,
+      "title": "TypeScript Setup, Basic Types & Type Inference",
+      "references": [
+        {
+          "name": "tsBasics",
+          "title": "TypeScript Handbook: The Basics",
+          "source": "ts-handbook",
+          "path": "handbook-v2/Basics.md",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/basic-types.html"
+        },
+        {
+          "name": "tsEverydayTypes",
+          "title": "TypeScript Handbook: Everyday Types",
+          "source": "ts-handbook",
+          "path": "handbook-v2/Everyday Types.md",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html",
+          "note": "Not a separate link in the guide, but the guide says to focus on Everyday Types. Remove if you want to match the guide exactly."
+        },
+        {
+          "name": "tsNarrowing",
+          "title": "TypeScript Handbook: Narrowing",
+          "source": "ts-handbook",
+          "path": "handbook-v2/Narrowing.md",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html"
+        },
+        {
+          "title": "TypeScript tsconfig reference",
+          "source": "manual",
+          "url": "https://www.typescriptlang.org/tsconfig",
+          "reason": "Generated from many small files, not one Markdown page. Write a short summary of strict, noImplicitAny, strictNullChecks, target, module, outDir, rootDir by hand."
+        },
+        {
+          "title": "TypeScript Playground",
+          "source": "skip",
+          "url": "https://www.typescriptlang.org/play",
+          "reason": "Interactive tool. Cannot be copied, and it is an outbound site (FR-8)."
+        },
+        {
+          "title": "Total TypeScript: Beginner's Workshop",
+          "source": "skip",
+          "url": "https://www.totaltypescript.com/workshops/typescript-beginners-workshop",
+          "reason": "Course with exercises. Cannot be copied."
+        }
+      ]
+    },
+    {
+      "id": "ts-day-02",
+      "dayNumber": 2,
+      "title": "Generics, Utility Types & Advanced Type Patterns",
+      "references": [
+        {
+          "name": "tsGenerics",
+          "title": "TypeScript Handbook: Generics",
+          "source": "ts-handbook",
+          "path": "handbook-v2/Type Manipulation/Generics.md",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html"
+        },
+        {
+          "name": "tsUtilityTypes",
+          "title": "TypeScript Handbook: Utility Types",
+          "source": "ts-handbook",
+          "path": "reference/Utility Types.md",
+          "url": "https://www.typescriptlang.org/docs/handbook/utility-types.html"
+        },
+        {
+          "name": "tsMappedTypes",
+          "title": "TypeScript Handbook: Mapped Types",
+          "source": "ts-handbook",
+          "path": "handbook-v2/Type Manipulation/Mapped Types.md",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/mapped-types.html"
+        },
+        {
+          "title": "Total TypeScript: Generics Workshop",
+          "source": "skip",
+          "url": "https://www.totaltypescript.com/workshops/typescript-generics",
+          "reason": "Course with exercises. Cannot be copied."
+        }
+      ]
+    },
+    {
+      "id": "ts-day-03",
+      "dayNumber": 3,
+      "title": "TypeScript Classes, Interfaces & Access Modifiers",
+      "references": [
+        {
+          "name": "tsClasses",
+          "title": "TypeScript Handbook: Classes",
+          "source": "ts-handbook",
+          "path": "handbook-v2/Classes.md",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/classes.html"
+        },
+        {
+          "name": "tsObjectTypes",
+          "title": "TypeScript Handbook: Object Types",
+          "source": "ts-handbook",
+          "path": "handbook-v2/Object Types.md",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html"
+        },
+        {
+          "title": "Total TypeScript: Classes exercises",
+          "source": "skip",
+          "url": "https://www.totaltypescript.com/workshops/typescript-pro-essentials",
+          "reason": "Course with exercises. Cannot be copied."
+        }
+      ]
+    },
+    {
+      "id": "ts-day-04",
+      "dayNumber": 4,
+      "title": "Migrating JS to TypeScript & ts-jest",
+      "references": [
+        {
+          "name": "tsMigrating",
+          "title": "TypeScript: Migrating from JavaScript",
+          "source": "ts-handbook",
+          "path": "tutorials/Migrating from JavaScript.md",
+          "url": "https://www.typescriptlang.org/docs/handbook/migrating-from-javascript.html"
+        },
+        {
+          "name": "tsJestInstall",
+          "title": "ts-jest: Installation",
+          "source": "docusaurus",
+          "path": "getting-started/installation.md",
+          "url": "https://kulshekhar.github.io/ts-jest/docs/getting-started/installation"
+        },
+        {
+          "name": "tsDefinitelyTyped",
+          "title": "DefinitelyTyped: README (@types packages)",
+          "source": "github-readme",
+          "path": "README.md",
+          "url": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+          "note": "Long README with contributor instructions. Consider keeping only the intro sections when pruning topicIds."
+        },
+        {
+          "title": "TypeScript Error Translator",
+          "source": "skip",
+          "url": "https://ts-error-translator.vercel.app/",
+          "reason": "Interactive tool. Cannot be copied, and it is an outbound site (FR-8)."
+        }
+      ]
+    },
+    {
+      "id": "ts-day-05",
+      "dayNumber": 5,
+      "title": "Phase 1 Capstone: Checkpoint 1 Submission",
+      "references": [
+        {
+          "name": "tsDosAndDonts",
+          "title": "TypeScript: Do's and Don'ts",
+          "source": "ts-handbook",
+          "path": "declaration-files/Do's and Don'ts.md",
+          "url": "https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html"
+        },
+        {
+          "title": "GitHub Docs: Creating a pull request",
+          "source": "manual",
+          "url": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request",
+          "reason": "GitHub Docs source uses Liquid templating. Write a short summary by hand."
+        }
+      ]
+    }
+  ]
+}
