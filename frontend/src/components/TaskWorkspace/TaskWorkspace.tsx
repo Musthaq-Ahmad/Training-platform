@@ -26,7 +26,6 @@ import InstructionsPanel from '../InstructionsPanel';
 import SaveIndicator from '../SaveIndicator';
 import SubmitTaskButton from '../SubmitTaskButton';
 import TaskToolbar from '../TaskToolbar';
-import { useToast } from '../Toast';
 import WorkspaceSidebar from '../WorkspaceSidebar';
 import styles from './TaskWorkspace.module.css';
 
