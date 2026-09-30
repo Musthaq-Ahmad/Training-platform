@@ -410,10 +410,10 @@ export const dayReferences: DayReferenceConfig[] = [
     dayNumber: 5,
     topicIds: [],
     prerequisiteLinks: [
-      { label: 'PostgreSQL Day 1: Getting Started', dayId: 'postgres-day-01' },
-      { label: 'PostgreSQL Day 2: SQL Basics', dayId: 'postgres-day-02' },
-      { label: 'PostgreSQL Day 3: Joins and Aggregates', dayId: 'postgres-day-03' },
-      { label: 'PostgreSQL Day 4: Transactions and Indexes', dayId: 'postgres-day-04' },
+      { label: 'PostgreSQL Day 1: Getting Started', dayId: 'postgresql-day-01' },
+      { label: 'PostgreSQL Day 2: SQL Basics', dayId: 'postgresql-day-02' },
+      { label: 'PostgreSQL Day 3: Joins and Aggregates', dayId: 'postgresql-day-03' },
+      { label: 'PostgreSQL Day 4: Transactions and Indexes', dayId: 'postgresql-day-04' },
     ],
   },
   {
