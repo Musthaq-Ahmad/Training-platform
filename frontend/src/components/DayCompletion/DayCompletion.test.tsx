@@ -1,388 +1,93 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router';
-import type { DayContent, DayTask, DayCurrentStatus, DayJournal } from '@itp/types';
-import type { ApiError } from '../../api/errors';
-import DayOverviewPage from '../../pages/DayOverviewPage';
-import { getDayTasks, getDayStatus, getDayJournal } from '../../api/days';
-import { mockDayContents } from '../../api/dayOverview';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import DayCompletion from './DayCompletion';
 
-vi.mock('../../components/Header', () => ({
-  default: () => <header>Header</header>,
-}));
+describe('DayCompletion', () => {
+  const defaultProps = {
+    completedTasks: 2,
+    totalTasks: 2,
+    isCompleted: false,
+    onComplete: vi.fn(),
+  };
 
-vi.mock('../../api/days', () => ({
-  getDayTasks: vi.fn(),
-  getDayStatus: vi.fn(),
-  getDayJournal: vi.fn(),
-}));
-
-// Day content is static in the page, so each test fills this object.
-vi.mock('../../api/dayOverview', () => ({
-  mockDayContents: {} as Record<string, DayContent>,
-}));
-
-const mockGetDayTasks = vi.mocked(getDayTasks);
-const mockGetDayStatus = vi.mocked(getDayStatus);
-const mockGetDayJournal = vi.mocked(getDayJournal);
-const days = mockDayContents;
-
-function makeApiError(code: string, message = code): ApiError {
-  return Object.assign(new Error(message), { code }) as unknown as ApiError;
-}
-
-function ReferencesRouteProbe() {
-  return <p>References page</p>;
-}
-
-// Real MemoryRouter so <Link>, useNavigate, and useParams work without mocking react-router.
-function renderWithDayId(dayId: string) {
-  return render(
-    <MemoryRouter initialEntries={[`/days/${dayId}`]}>
-      <Routes>
-        <Route path="/days/:dayId" element={<DayOverviewPage />} />
-        <Route path="/days/:dayId/references" element={<ReferencesRouteProbe />} />
-      </Routes>
-    </MemoryRouter>
-  );
-}
-
-const baseDay: DayContent = {
-  dayId: 'day-01',
-  courseSlug: 'css',
-  courseTitle: 'CSS Fundamentals',
-  dayNumber: 1,
-  totalDays: 10,
-  title: 'Intro to CSS',
-  subtitle: 'Learn the basics of styling',
-  lessonSummary: "Today you'll learn selectors and the box model.",
-  learningObjectives: [
-    {
-      id: 'lo-1',
-      code: 'LO-1',
-      title: 'Understand selectors',
-      description: 'Know how to target elements with class, id, and element selectors.',
-    },
-    {
-      id: 'lo-2',
-      code: 'LO-2',
-      title: 'Understand the box model',
-      description: 'Know how margin, border, padding, and content combine to size an element.',
-    },
-  ],
-  selfCheckItems: [
-    {
-      id: 'sc-1',
-      code: 'SC-1',
-      label: 'I can style a div',
-      description: 'Can apply background, sizing, and spacing to a div.',
-      isRequired: true,
-    },
-  ],
-  journalPrompt: 'What was the hardest part today?',
-};
-
-const baseTasks: DayTask[] = [
-  {
-    id: 'task-1',
-    sequenceOrder: 1,
-    title: 'Style a button',
-    status: 'completed',
-    isStretchGoal: false,
-  },
-  {
-    id: 'task-2',
-    sequenceOrder: 2,
-    title: 'Style a nav bar',
-    status: 'not_started',
-    isStretchGoal: false,
-  },
-  {
-    id: 'task-3',
-    sequenceOrder: 3,
-    title: 'Bonus animation',
-    status: 'not_started',
-    isStretchGoal: true,
-  },
-];
-
-const baseStatus: DayCurrentStatus = {
-  isLocked: false,
-  isCompleted: false,
-};
-
-const emptyJournal: DayJournal = {
-  responseText: null,
-};
-
-function setDay(day: DayContent = baseDay) {
-  days[day.dayId] = day;
-}
-
-function mockLoad(
-  tasks: DayTask[] = baseTasks,
-  status: DayCurrentStatus = baseStatus,
-  journal: DayJournal = emptyJournal
-) {
-  mockGetDayTasks.mockResolvedValue(tasks);
-  mockGetDayStatus.mockResolvedValue(status);
-  mockGetDayJournal.mockResolvedValue(journal);
-}
-
-describe('DayOverviewPage', () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-
-    for (const key of Object.keys(days)) {
-      delete days[key];
-    }
-
-    // The page calls .catch() on the journal promise, so it must always return one.
-    mockGetDayJournal.mockResolvedValue(emptyJournal);
-  });
-
-  afterEach(() => {
-    cleanup();
-    vi.restoreAllMocks();
-  });
-
-  it('shows a loading state while the requests are pending', () => {
-    setDay();
-
-    mockGetDayTasks.mockReturnValue(new Promise(() => {}));
-    mockGetDayStatus.mockReturnValue(new Promise(() => {}));
-    mockGetDayJournal.mockReturnValue(new Promise(() => {}));
-
-    renderWithDayId('day-01');
-
-    expect(screen.getByRole('status')).toBeInTheDocument();
-  });
-
-  it('fetches tasks, status and journal with the dayId from the URL, unchanged', async () => {
-    setDay();
-    mockLoad();
-
-    renderWithDayId('day-01');
-
-    await screen.findByText(baseDay.title);
-
-    expect(mockGetDayTasks).toHaveBeenCalledWith('day-01');
-    expect(mockGetDayStatus).toHaveBeenCalledWith('day-01');
-    expect(mockGetDayJournal).toHaveBeenCalledWith('day-01');
-  });
-
-  it('shows a not-found message when the dayId has no day content, without calling the API', () => {
-    renderWithDayId('day-99');
-
-    expect(screen.getByRole('heading', { name: 'Day not found' })).toBeInTheDocument();
-
-    expect(screen.getByRole('link', { name: 'Back to Dashboard' })).toBeInTheDocument();
-
-    expect(mockGetDayTasks).not.toHaveBeenCalled();
-    expect(mockGetDayStatus).not.toHaveBeenCalled();
-    expect(mockGetDayJournal).not.toHaveBeenCalled();
-  });
-
-  it('shows a not-found message when the API returns NOT_FOUND', async () => {
-    setDay();
-
-    mockGetDayTasks.mockRejectedValue(makeApiError('NOT_FOUND'));
-    mockGetDayStatus.mockRejectedValue(makeApiError('NOT_FOUND'));
-
-    renderWithDayId('day-01');
-
-    expect(await screen.findByRole('heading', { name: 'Day not found' })).toBeInTheDocument();
-  });
-
-  it('shows a locked message when the status says the day is locked', async () => {
-    setDay();
-    mockLoad(baseTasks, { ...baseStatus, isLocked: true });
-
-    renderWithDayId('day-01');
-
-    expect(await screen.findByRole('heading', { name: 'This day is locked' })).toBeInTheDocument();
-
-    expect(screen.getByRole('link', { name: 'Back to Dashboard' })).toBeInTheDocument();
-
-    expect(screen.queryByText(baseDay.title)).not.toBeInTheDocument();
-  });
-
-  it('shows a locked message when the API returns DAY_LOCKED', async () => {
-    setDay();
-
-    mockGetDayTasks.mockRejectedValue(makeApiError('DAY_LOCKED'));
-    mockGetDayStatus.mockResolvedValue(baseStatus);
-
-    renderWithDayId('day-01');
-
-    expect(await screen.findByRole('heading', { name: 'This day is locked' })).toBeInTheDocument();
-
-    expect(screen.queryByText(baseDay.title)).not.toBeInTheDocument();
-  });
-
-  it('shows an error message for an unexpected API error', async () => {
-    setDay();
-
-    mockGetDayTasks.mockRejectedValue(makeApiError('SERVER_ERROR'));
-    mockGetDayStatus.mockRejectedValue(makeApiError('SERVER_ERROR'));
-
-    renderWithDayId('day-01');
+  it('renders the heading and description', () => {
+    render(<DayCompletion {...defaultProps} />);
 
     expect(
-      await screen.findByRole('heading', {
-        name: "Couldn't load this day",
-      })
+      screen.getByRole('heading', { name: /day completion verification/i })
     ).toBeInTheDocument();
 
-    expect(screen.queryByText(baseDay.title)).not.toBeInTheDocument();
-
-    expect(screen.queryByRole('heading', { name: 'Day not found' })).not.toBeInTheDocument();
-
-    expect(screen.queryByRole('heading', { name: 'This day is locked' })).not.toBeInTheDocument();
+    expect(screen.getByText(/clicking "submit day" verifies checklist items/i)).toBeInTheDocument();
   });
 
-  it('renders day content and counts only completed, non-stretch tasks', async () => {
-    setDay();
-    mockLoad();
+  it('shows the Submit Day button when the day is not completed', () => {
+    render(<DayCompletion {...defaultProps} />);
 
-    renderWithDayId('day-01');
-
-    expect(await screen.findByText(baseDay.title)).toBeInTheDocument();
-    expect(screen.getByText(baseDay.subtitle)).toBeInTheDocument();
-
-    // 1 of 2 required tasks completed; the stretch goal is excluded from both numbers.
-    expect(screen.getByRole('button', { name: /tasks \(1\/2\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /submit day/i })).toBeInTheDocument();
   });
 
-  it('pre-fills the journal with the saved response', async () => {
-    setDay();
+  it('enables the button when all tasks are completed and the day is not completed', () => {
+    render(<DayCompletion {...defaultProps} />);
 
-    mockLoad(baseTasks, baseStatus, {
-      responseText: 'Saved earlier',
-    });
-
-    renderWithDayId('day-01');
-
-    expect(await screen.findByRole('textbox')).toHaveValue('Saved earlier');
+    expect(screen.getByRole('button', { name: /submit day/i })).toBeEnabled();
   });
 
-  it('still renders the day when the journal request fails', async () => {
-    setDay();
-    mockLoad();
+  it('disables the button when the checklist is incomplete', () => {
+    render(<DayCompletion {...defaultProps} completedTasks={1} totalTasks={2} />);
 
-    mockGetDayJournal.mockRejectedValue(makeApiError('SERVER_ERROR'));
-
-    renderWithDayId('day-01');
-
-    expect(await screen.findByText(baseDay.title)).toBeInTheDocument();
-    expect(screen.getByRole('textbox')).toHaveValue('');
+    expect(screen.getByRole('button', { name: /submit day/i })).toBeDisabled();
   });
 
-  it('navigates to the references page when References is clicked', async () => {
-    setDay();
-    mockLoad();
+  it('shows the Checklist Incomplete badge when tasks are incomplete', () => {
+    render(<DayCompletion {...defaultProps} completedTasks={1} totalTasks={2} />);
 
-    renderWithDayId('day-01');
-
-    await screen.findByText(baseDay.title);
-
-    fireEvent.click(screen.getByRole('button', { name: /references/i }));
-
-    expect(await screen.findByText('References page')).toBeInTheDocument();
+    expect(screen.getByText('Checklist Incomplete')).toBeInTheDocument();
   });
 
-  it('closes the task modal and logs the task id when a task is selected', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+  it('does not show the Checklist Incomplete badge when all tasks are completed', () => {
+    render(<DayCompletion {...defaultProps} />);
 
-    setDay();
-    mockLoad();
-
-    renderWithDayId('day-01');
-
-    await screen.findByText(baseDay.title);
-
-    fireEvent.click(screen.getByRole('button', { name: /tasks \(/i }));
-
-    expect(screen.getByText('Style a button')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('Style a button'));
-
-    expect(logSpy).toHaveBeenCalledWith('Selected task:', 'task-1');
-    expect(screen.queryByText('Style a button')).not.toBeInTheDocument();
+    expect(screen.queryByText('Checklist Incomplete')).not.toBeInTheDocument();
   });
 
-  it('marks the journal as saved after the save handler is called', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+  it('shows Day completed and disables the button when the day is already completed', () => {
+    render(<DayCompletion {...defaultProps} isCompleted={true} />);
 
-    setDay();
-    mockLoad();
-
-    renderWithDayId('day-01');
-
-    await screen.findByText(baseDay.title);
-
-    fireEvent.change(screen.getByRole('textbox'), {
-      target: { value: 'It was tricky to center things.' },
-    });
-
-    fireEvent.click(screen.getByRole('button', { name: /save/i }));
-
-    expect(logSpy).toHaveBeenCalledWith('Journal response:', 'It was tricky to center things.');
-
-    expect(screen.getByText(/saved/i)).toBeInTheDocument();
-  });
-
-  it('enables Submit Day when all required tasks are completed and handles the click', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
-    setDay();
-
-    mockLoad(
-      baseTasks.map((task): DayTask => ({
-        ...task,
-        status: 'completed',
-      }))
-    );
-
-    renderWithDayId('day-01');
-
-    const submitButton = await screen.findByRole('button', {
-      name: /submit day/i,
-    });
-
-    expect(submitButton).not.toBeDisabled();
-
-    fireEvent.click(submitButton);
-
-    expect(logSpy).toHaveBeenCalledWith('Submit Day clicked');
-  });
-
-  it('disables Submit Day while required tasks are incomplete', async () => {
-    setDay();
-    mockLoad();
-
-    renderWithDayId('day-01');
-
-    expect(await screen.findByRole('button', { name: /submit day/i })).toBeDisabled();
-  });
-
-  it('disables Submit Day when the day is already completed', async () => {
-    setDay();
-
-    mockLoad(
-      baseTasks.map((task): DayTask => ({
-        ...task,
-        status: 'completed',
-      })),
-      { ...baseStatus, isCompleted: true }
-    );
-
-    renderWithDayId('day-01');
-
-    const button = await screen.findByRole('button', {
+    const button = screen.getByRole('button', {
       name: /day completed/i,
     });
 
+    expect(button).toBeInTheDocument();
     expect(button).toBeDisabled();
+  });
+
+  it('does not show the Checklist Incomplete badge when the day is already completed', () => {
+    render(
+      <DayCompletion {...defaultProps} completedTasks={1} totalTasks={2} isCompleted={true} />
+    );
+
+    expect(screen.queryByText('Checklist Incomplete')).not.toBeInTheDocument();
+  });
+
+  it('calls onComplete when the Submit Day button is clicked', () => {
+    const onComplete = vi.fn();
+
+    render(<DayCompletion {...defaultProps} onComplete={onComplete} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /submit day/i }));
+
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not call onComplete when the button is disabled', () => {
+    const onComplete = vi.fn();
+
+    render(
+      <DayCompletion {...defaultProps} completedTasks={1} totalTasks={2} onComplete={onComplete} />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /submit day/i }));
+
+    expect(onComplete).not.toHaveBeenCalled();
   });
 });

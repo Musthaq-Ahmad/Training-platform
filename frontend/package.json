@@ -12,6 +12,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@itp/types": "^1.0.0",
     "@monaco-editor/react": "^4.7.0",
     "@webcontainer/api": "^1.6.4",

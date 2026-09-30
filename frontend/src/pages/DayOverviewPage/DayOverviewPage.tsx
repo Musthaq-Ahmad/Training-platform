@@ -113,7 +113,7 @@ export default function DayOverviewPage() {
       </>
     );
   }
-
+  console.log('Course title:', day.courseTitle);
   if (error || !status) {
     return (
       <>
@@ -188,13 +188,14 @@ export default function DayOverviewPage() {
       </main>
 
       <TaskModal
+        courseTitle={day.courseTitle}
         isOpen={isTaskModalOpen}
         dayNumber={day.dayNumber}
         tasks={tasks}
         onClose={() => setIsTaskModalOpen(false)}
         onSelectTask={(task) => {
           setIsTaskModalOpen(false);
-          console.log('Selected task:', task.id);
+          void navigate(`/tasks/${task.id}`);
         }}
       />
     </>

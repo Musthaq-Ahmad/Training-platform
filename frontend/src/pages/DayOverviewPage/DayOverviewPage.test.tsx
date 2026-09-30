@@ -7,6 +7,18 @@ import DayOverviewPage from './DayOverviewPage';
 import { getDayTasks, getDayStatus, getDayJournal } from '../../api/days';
 import { mockDayContents } from '../../api/dayOverview';
 
+const mockNavigate = vi.fn();
+let useMockNavigate = false;
+
+vi.mock('react-router', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router')>();
+
+  return {
+    ...actual,
+    useNavigate: () => (useMockNavigate ? mockNavigate : actual.useNavigate()),
+  };
+});
+
 vi.mock('../../components/Header', () => ({
   default: () => <header>Header</header>,
 }));
@@ -262,21 +274,24 @@ describe('DayOverviewPage', () => {
     expect(await screen.findByText('References page')).toBeInTheDocument();
   });
 
-  it('closes the task modal and logs the task id when a task is selected', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+  it('closes the task modal and navigates to the selected task', async () => {
+    useMockNavigate = true;
     setDay();
     mockLoad();
 
     renderWithDayId('day-01');
 
     await screen.findByText(baseDay.title);
-    fireEvent.click(screen.getByRole('button', { name: /tasks \(/i }));
+
+    fireEvent.click(screen.getByRole('button', { name: /tasks/i }));
+
     expect(screen.getByText('Style a button')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('Style a button'));
+    fireEvent.click(screen.getByRole('button', { name: /style a button/i }));
 
-    expect(logSpy).toHaveBeenCalledWith('Selected task:', 'task-1');
     expect(screen.queryByText('Style a button')).not.toBeInTheDocument();
+
+    expect(mockNavigate).toHaveBeenCalledWith('/tasks/task-1');
   });
 
   it('marks the journal as saved after the save handler is called', async () => {

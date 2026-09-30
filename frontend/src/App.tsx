@@ -8,6 +8,7 @@ import ProfilePage from './pages/ProfilePage';
 import DashboardPage from './pages/DashboardPage';
 import DayOverviewPage from './pages/DayOverviewPage';
 import TaskPageSkeleton from './components/TaskPageSkeleton';
+import NotFoundPage from './pages/NotFoundPage';
 
 const TaskPage = lazy(() => import('./pages/TaskPage'));
 import ReferencePage from './pages/ReferencePage';
@@ -43,6 +44,7 @@ export default function App() {
         <Route element={<PublicOnlyRoute />}>
           <Route path="/login" element={<LoginPage />} />
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AuthProvider>
   );

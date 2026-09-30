@@ -6,14 +6,10 @@ import {
 } from 'axios';
 import type {
   ApiErrorResponse,
-  SqlExecuteRequest,
-  SqlExecuteResponse,
-  SqlStatementResult,
   SubmitTaskResponse,
   TaskCodeResponse,
   TaskFile,
   TaskResponse,
-  TraineeDatabaseResponse,
 } from '@itp/types';
 import {
   nodeTaskCodeFixture,
@@ -32,7 +28,6 @@ import { mockDayContents } from './dayOverview';
 const MOCK_DELAY_MS = 300;
 
 const savedFiles = new Map<string, TaskFile[]>();
-let databaseCallCount = 0;
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -73,55 +68,6 @@ function taskFixtureFor(taskId: string): TaskResponse {
   if (taskId === 't-node') return nodeTaskFixture;
   if (taskId === 't-sql') return sqlTaskFixture;
   return { ...taskFixture, id: taskId };
-}
-
-function statementResult(statement: string): SqlStatementResult {
-  const command = (statement.trim().split(/\s+/)[0] ?? '').toUpperCase();
-
-  if (command === 'SELECT') {
-    return {
-      command,
-      rowCount: 2,
-      columns: ['id', 'title'],
-      rows: [
-        ['1', 'Row 1'],
-        ['2', 'Row 2'],
-      ],
-      truncated: false,
-    };
-  }
-
-  return { command, rowCount: 1, columns: [], rows: [], truncated: false };
-}
-
-function executeSqlMock(body: SqlExecuteRequest): SqlExecuteResponse {
-  const errorIndex = body.query.indexOf('error');
-
-  if (errorIndex !== -1) {
-    return {
-      ok: false,
-      error: {
-        message: 'syntax error at or near "error"',
-        sqlState: '42601',
-        position: errorIndex + 1,
-      },
-      results: [],
-      durationMs: 5,
-    };
-  }
-
-  const statements = body.query
-    .split(';')
-    .map((statement) => statement.trim())
-    .filter((statement) => statement.length > 0);
-
-  return { ok: true, results: statements.map(statementResult), durationMs: 12 };
-}
-
-function databaseResponse(): TraineeDatabaseResponse {
-  return databaseCallCount <= 2
-    ? { status: 'provisioning' }
-    : { status: 'ready', connectionString: 'postgresql://mock:mock@localhost/mock' };
 }
 
 async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse> {
@@ -181,22 +127,6 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
 
   if (method === 'post' && activityMatch) {
     return respond(config, 204, undefined);
-  }
-
-  if (method === 'get' && url === '/sql/database') {
-    databaseCallCount += 1;
-    return respond(config, 200, databaseResponse());
-  }
-
-  if (method === 'post' && url === '/sql/database/reset') {
-    databaseCallCount = 0;
-    const data: TraineeDatabaseResponse = { status: 'provisioning' };
-    return respond(config, 200, data);
-  }
-
-  if (method === 'post' && url === '/sql/execute') {
-    const body = JSON.parse(config.data as string) as SqlExecuteRequest;
-    return respond(config, 200, executeSqlMock(body));
   }
 
   if (method === 'get' && url === '/auth/me') {

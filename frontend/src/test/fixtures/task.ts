@@ -14,7 +14,7 @@ export const taskFixture: TaskResponse = {
   },
   runtime: 'browser',
   runCommand: null,
-  usesDatabase: false,
+  setupSql: null,
   instructionsMarkdown: `## Hands-on Objective
 Implement production-grade responsive layout components for the client portal
 services view inside \`services.html\` adhering to semantic structuring and
@@ -155,7 +155,7 @@ export const nodeTaskFixture: TaskResponse = {
   },
   runtime: 'node',
   runCommand: 'npm test',
-  usesDatabase: false,
+  setupSql: null,
   instructionsMarkdown: `## Hands-on Objective
 Write a small Node.js module that reports basic information about the
 current system, and make the provided test pass.
@@ -222,7 +222,7 @@ export const sqlTaskFixture: TaskResponse = {
   },
   runtime: 'sql',
   runCommand: null,
-  usesDatabase: false,
+  setupSql: null,
   instructionsMarkdown: `## Hands-on Objective
 Design a simple ticket-tracking schema in \`schema.sql\`, seed it with a
 few rows in \`seed.sql\`, and write two read queries in \`queries.sql\`.
@@ -263,4 +263,12 @@ select status, count(*) from tickets group by status;
 `,
     },
   ],
+};
+
+/** Not wired to a URL: a SQL task whose database starts with a table and two rows. */
+export const sqlTaskWithSetupFixture: TaskResponse = {
+  ...sqlTaskFixture,
+  id: 't-sql-setup',
+  setupSql:
+    "create table rooms (id serial primary key, name text not null); insert into rooms (name) values ('A'), ('B');",
 };
