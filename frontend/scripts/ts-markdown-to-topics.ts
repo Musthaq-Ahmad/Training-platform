@@ -59,6 +59,9 @@ const LANGUAGE_ALIASES: Record<string, string> = {
   psql: 'sql',
   shell: 'bash',
   console: 'bash',
+  npm: 'bash',
+  zsh: 'bash',
+  prisma: 'graphql',
 };
 
 function slugify(value: string): string {

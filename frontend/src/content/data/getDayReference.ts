@@ -30,6 +30,7 @@ import * as tsTopics from '../topics/ts';
 import * as nodeTopics from '../topics/node';
 import { dayReferences } from './dayReferences';
 import * as postgresTopics from '../topics/postgres';
+import * as prismaTopics from '../topics/prisma';
 
 const courseTopics: Record<string, ContentTopic[]> = {
   html: [
@@ -69,6 +70,9 @@ const courseTopics: Record<string, ContentTopic[]> = {
   postgres: Object.values(postgresTopics).flatMap(
     (topicCollection) => Object.values(topicCollection) as ContentTopic[]
   ),
+  prisma: Object.values(prismaTopics).flatMap(
+    (topicCollection) => Object.values(topicCollection) as ContentTopic[]
+  ),
 };
 
 export function getDayReference(dayId: string): DayReferenceContent | null {
@@ -92,6 +96,7 @@ export function getDayReference(dayId: string): DayReferenceContent | null {
   return {
     courseId: config.courseId,
     dayNumber: config.dayNumber,
+    instruction: config.instruction,
     videos: config.videos,
     videoAtStart: config.videoAtStart,
     videoAfterTopicId: config.videoAfterTopicId,

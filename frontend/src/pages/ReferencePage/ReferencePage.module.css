@@ -1,11 +1,14 @@
 .page {
   min-height: 100vh;
-  width: min(100% - 48px, 1160px);
-  margin: 0 auto;
-  padding: 24px 0 64px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   color: var(--color-text-primary);
 }
-
+.contentWrapper {
+  width: min(100% - 48px, 1160px);
+  margin: 0 auto;
+}
 /* =========================
    Back Navigation
    ========================= */
@@ -712,4 +715,14 @@
   margin-top: 0;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border-card);
+}
+.instructionBox {
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-size: 15px;
+  line-height: 1.6;
 }

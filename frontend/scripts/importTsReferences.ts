@@ -56,6 +56,7 @@ function normalizeCodeBlocks(document: Document) {
   document.querySelectorAll('pre.playground-link').forEach((el) => el.remove());
 
   document.querySelectorAll('pre').forEach((pre) => {
+    pre.querySelectorAll('br').forEach((br) => br.replaceWith('\n'));
     // Node docs put an ESM and a CommonJS <code> in one <pre>: keep only ESM
     const flavors = pre.querySelectorAll('code.language-mjs, code.language-cjs');
     if (flavors.length > 0) {
@@ -134,6 +135,9 @@ function removePermalinks(root: ParentNode) {
   root.querySelectorAll('a[href^="#"]').forEach((a) => {
     if (a.textContent?.trim() === '#') a.remove();
   });
+
+  // MkDocs permalinks
+  root.querySelectorAll('a.headerlink').forEach((a) => a.remove());
 
   // Version info: "Added in", "Deprecated since", and the History table
   root.querySelectorAll('.api_metadata').forEach((el) => el.remove());
@@ -215,7 +219,11 @@ async function main() {
         );
         // Always start with the title from the sources file, because the converter
         // uses the first heading as the topic title.
-        const finalMarkdown = `# ${reference.title}\n\n${markdown}`;
+        // Anchored references start with their own heading, which would duplicate our title
+        const isSection = new URL(reference.url).hash !== '';
+        const body = isSection ? markdown.replace(/^\s*#{1,6}[^\n]*\n+/, '') : markdown;
+
+        const finalMarkdown = `# ${reference.title}\n\n${body}`;
 
         await writeFile(outputPath, finalMarkdown, 'utf8');
 
