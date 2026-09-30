@@ -29,6 +29,7 @@ import * as jsTopics from '../topics/js';
 import * as tsTopics from '../topics/ts';
 import * as nodeTopics from '../topics/node';
 import { dayReferences } from './dayReferences';
+import * as postgresTopics from '../topics/postgres';
 
 const courseTopics: Record<string, ContentTopic[]> = {
   html: [
@@ -63,6 +64,9 @@ const courseTopics: Record<string, ContentTopic[]> = {
     (topicCollection) => Object.values(topicCollection) as ContentTopic[]
   ),
   node: Object.values(nodeTopics).flatMap(
+    (topicCollection) => Object.values(topicCollection) as ContentTopic[]
+  ),
+  postgres: Object.values(postgresTopics).flatMap(
     (topicCollection) => Object.values(topicCollection) as ContentTopic[]
   ),
 };

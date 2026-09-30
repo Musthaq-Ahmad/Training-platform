@@ -20,6 +20,7 @@
   line-height: 1;
   text-decoration: none;
   transition: color 0.2s ease;
+  gap: 6px;
 }
 
 .backLink:hover {
@@ -363,6 +364,7 @@
   gap: 8px;
   margin-top: 32px;
   padding: 12px 20px;
+  line-height: 1;
 
   background: var(--color-bg-base);
   color: var(--color-text-primary);

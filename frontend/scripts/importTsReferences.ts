@@ -35,7 +35,12 @@ type SourcesFile = {
   days: Day[];
 };
 
-const INPUT_FILE = 'scripts/node-sources.json';
+const INPUT_FILE = process.argv[2];
+
+if (!INPUT_FILE) {
+  console.error('Usage: npx tsx scripts/importTsReferences.ts <sources-file.json>');
+  process.exit(1);
+}
 const OUT_DIR = 'src/content/references';
 
 const turndown = new TurndownService({
@@ -73,11 +78,12 @@ function normalizeCodeBlocks(document: Document) {
 
     // Join per-line divs with real newlines; fall back to textContent
     const lines = pre.querySelectorAll('.line');
+    // after: use the whole <pre> text unless it is a real multi-<code> or per-line block
     const raw = lines.length
       ? Array.from(lines)
           .map((l) => l.textContent ?? '')
           .join('\n')
-      : (pre.querySelector('code')?.textContent ?? pre.textContent ?? '');
+      : (pre.textContent ?? '');
 
     const cleanPre = document.createElement('pre');
     const code = document.createElement('code');
@@ -207,8 +213,11 @@ async function main() {
               .replace(/^-+|-+$/g, '')
           }.md`
         );
+        // Always start with the title from the sources file, because the converter
+        // uses the first heading as the topic title.
+        const finalMarkdown = `# ${reference.title}\n\n${markdown}`;
 
-        await writeFile(outputPath, markdown, 'utf8');
+        await writeFile(outputPath, finalMarkdown, 'utf8');
 
         imported++;
 
