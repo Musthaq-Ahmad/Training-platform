@@ -1,6 +1,7 @@
 process.env.NODE_ENV = 'test';
 process.env.PORT = '5000';
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test_db'; // never connected: repository is mocked
+process.env.SESSION_SECRET = 'test-session-secret-at-least-32-characters-long';
 process.env.GOOGLE_CLIENT_ID = 'test-client-id';
 process.env.GOOGLE_CLIENT_SECRET = 'test-client-secret';
 process.env.GOOGLE_CALLBACK_URL = 'http://localhost:5000/api/auth/google/callback';

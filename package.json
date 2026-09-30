@@ -16,7 +16,7 @@
     "format": "prettier --write .",
     "dev:frontend": "npm run dev -w frontend",
     "dev:backend": "npm run dev -w backend",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "test": "npm run test --workspaces --if-present -- --passWithNoTests"
   },
   "lint-staged": {
