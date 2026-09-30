@@ -26,6 +26,7 @@ import {
   stylelintGettingStartedTopics,
 } from '../topics/css';
 import * as jsTopics from '../topics/js';
+import * as tsTopics from '../topics/ts';
 import { dayReferences } from './dayReferences';
 
 const courseTopics: Record<string, ContentTopic[]> = {
@@ -55,6 +56,9 @@ const courseTopics: Record<string, ContentTopic[]> = {
     ...Object.values(stylelintGettingStartedTopics),
   ],
   js: Object.values(jsTopics).flatMap(
+    (topicCollection) => Object.values(topicCollection) as ContentTopic[]
+  ),
+  ts: Object.values(tsTopics).flatMap(
     (topicCollection) => Object.values(topicCollection) as ContentTopic[]
   ),
 };
