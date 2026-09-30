@@ -193,8 +193,9 @@ export default function DayOverviewPage() {
         dayNumber={day.dayNumber}
         tasks={tasks}
         onClose={() => setIsTaskModalOpen(false)}
-        onSelectTask={() => {
+        onSelectTask={(task) => {
           setIsTaskModalOpen(false);
+          void navigate(`/tasks/${task.id}`);
         }}
       />
     </>

@@ -8,7 +8,7 @@ import { getDayTasks, getDayStatus, getDayJournal } from '../../api/days';
 import { mockDayContents } from '../../api/dayOverview';
 
 const mockNavigate = vi.fn();
-const useMockNavigate = false;
+let useMockNavigate = false;
 
 vi.mock('react-router', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router')>();
@@ -274,29 +274,25 @@ describe('DayOverviewPage', () => {
     expect(await screen.findByText('References page')).toBeInTheDocument();
   });
 
-  // it('closes the task modal and navigates to the selected task', async () => {
-  //   useMockNavigate = true;
-  //   setDay();
-  //   mockLoad();
+  it('closes the task modal and navigates to the selected task', async () => {
+    useMockNavigate = true;
+    setDay();
+    mockLoad();
 
-  //   renderWithDayId('day-01');
+    renderWithDayId('day-01');
 
-  //   await screen.findByText(baseDay.title);
+    await screen.findByText(baseDay.title);
 
-  //   fireEvent.click(
-  //     screen.getByRole('button', { name: /tasks/i })
-  //   );
+    fireEvent.click(screen.getByRole('button', { name: /tasks/i }));
 
-  //   expect(screen.getByText('Style a button')).toBeInTheDocument();
+    expect(screen.getByText('Style a button')).toBeInTheDocument();
 
-  //   fireEvent.click(
-  //     screen.getByRole('button', { name: /style a button/i })
-  //   );
+    fireEvent.click(screen.getByRole('button', { name: /style a button/i }));
 
-  //   expect(screen.queryByText('Style a button')).not.toBeInTheDocument();
+    expect(screen.queryByText('Style a button')).not.toBeInTheDocument();
 
-  //   expect(mockNavigate).toHaveBeenCalledWith('/tasks/task-1');
-  // });
+    expect(mockNavigate).toHaveBeenCalledWith('/tasks/task-1');
+  });
 
   it('marks the journal as saved after the save handler is called', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
