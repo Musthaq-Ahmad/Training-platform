@@ -9,8 +9,18 @@ import SqlRuntime from './SqlRuntime';
 
 // --- mocks -------------------------------------------------------------------------------------
 
+vi.mock('../../context/Useauth', () => ({
+  useAuth: () => ({
+    user: { id: 'u1', email: 'trainee@example.com', name: 'Test Trainee' },
+    isLoading: false,
+  }),
+}));
+
 const database = {
-  state: { status: 'ready', db: { run: vi.fn(), close: vi.fn() } } as SqlDatabaseState,
+  state: {
+    status: 'ready',
+    db: { run: vi.fn(), close: vi.fn(), isPersistent: false },
+  } as SqlDatabaseState,
   reset: vi.fn(() => Promise.resolve()),
   retry: vi.fn(),
 };
@@ -116,7 +126,7 @@ function makeRun(overrides: Partial<SqlRun>): SqlRun {
 }
 
 beforeEach(() => {
-  database.state = { status: 'ready', db: { run: vi.fn(), close: vi.fn() } };
+  database.state = { status: 'ready', db: { run: vi.fn(), close: vi.fn(), isPersistent: false } };
   database.reset.mockClear();
   runner.lastRun = null;
   runner.history = [];

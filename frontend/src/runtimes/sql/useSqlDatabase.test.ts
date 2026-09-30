@@ -7,7 +7,11 @@ vi.mock('./pgliteService', () => ({ createSqlDatabase: vi.fn() }));
 
 /** Typed by inference (not as SqlDatabase), so `db.close` is a plain vi.fn the test can check. */
 function fakeDb() {
-  return { run: vi.fn(), close: vi.fn(() => Promise.resolve()) } satisfies SqlDatabase;
+  return {
+    run: vi.fn(),
+    close: vi.fn(() => Promise.resolve()),
+    isPersistent: false,
+  } satisfies SqlDatabase;
 }
 
 beforeEach(() => {
@@ -24,7 +28,10 @@ describe('useSqlDatabase', () => {
 
     await waitFor(() => expect(result.current.status).toBe('ready'));
     expect(result.current.status === 'ready' && result.current.db).toBe(db);
-    expect(createSqlDatabase).toHaveBeenCalledWith('create table t (id int);');
+    expect(createSqlDatabase).toHaveBeenCalledWith('create table t (id int);', {
+      storageName: null,
+      fresh: false,
+    });
   });
 
   it('reports failed with the message when starting rejects', async () => {
@@ -98,5 +105,39 @@ describe('useSqlDatabase', () => {
       await Promise.resolve();
     });
     expect(db.close).toHaveBeenCalledTimes(1);
+  });
+
+  it('passes the storage name to the service', async () => {
+    vi.mocked(createSqlDatabase).mockResolvedValue(fakeDb());
+    renderHook(() => useSqlDatabase(null, 'itp-sql-u1-t1'));
+    await waitFor(() =>
+      expect(createSqlDatabase).toHaveBeenCalledWith(null, {
+        storageName: 'itp-sql-u1-t1',
+        fresh: false,
+      })
+    );
+  });
+
+  it('reset asks the service to delete the saved database, and retry does not', async () => {
+    vi.mocked(createSqlDatabase).mockResolvedValue(fakeDb());
+    const { result } = renderHook(() => useSqlDatabase(null, 'itp-sql-u1-t1'));
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+
+    act(() => void result.current.reset());
+    await waitFor(() =>
+      expect(createSqlDatabase).toHaveBeenLastCalledWith(null, {
+        storageName: 'itp-sql-u1-t1',
+        fresh: true,
+      })
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    act(() => result.current.retry());
+    await waitFor(() =>
+      expect(createSqlDatabase).toHaveBeenLastCalledWith(null, {
+        storageName: 'itp-sql-u1-t1',
+        fresh: false,
+      })
+    );
   });
 });
