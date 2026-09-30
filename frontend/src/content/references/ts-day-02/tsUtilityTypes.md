@@ -1,0 +1,443 @@
+TypeScript provides several utility types to facilitate common type transformations. These utilities are available globally.
+
+## [](#awaitedtype)`Awaited<Type>`
+
+> Released: [4.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-5.html#the-awaited-type-and-promise-improvements)
+
+This type is meant to model operations like `await` in `async` functions, or the `.then()` method on `Promise`s - specifically, the way that they recursively unwrap `Promise`s.
+
+##### [](#example)Example
+
+```
+type A = Awaited<Promise<string>>;
+ 
+type B = Awaited<Promise<Promise<number>>>;
+ 
+type C = Awaited<boolean | Promise<number>>;
+```
+
+## [](#partialtype)`Partial<Type>`
+
+> Released:  
+> [2.1](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html#partial-readonly-record-and-pick)
+
+Constructs a type with all properties of `Type` set to optional. This utility will return a type that represents all subsets of a given type.
+
+##### [](#example-1)Example
+
+```
+interface Todo {
+  title: string;
+  description: string;
+}
+ 
+function updateTodo(todo: Todo, fieldsToUpdate: Partial<Todo>) {
+  return { ...todo, ...fieldsToUpdate };
+}
+ 
+const todo1 = {
+  title: "organize desk",
+  description: "clear clutter",
+};
+ 
+const todo2 = updateTodo(todo1, {
+  description: "throw out trash",
+});
+```
+
+## [](#requiredtype)`Required<Type>`
+
+> Released:  
+> [2.8](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers)
+
+Constructs a type consisting of all properties of `Type` set to required. The opposite of [`Partial`](#partialtype).
+
+##### [](#example-2)Example
+
+```
+interface Props {
+  a?: number;
+  b?: string;
+}
+ 
+const obj: Props = { a: 5 };
+ 
+const obj2: Required<Props> = { a: 5 };
+```
+
+## [](#readonlytype)`Readonly<Type>`
+
+> Released:  
+> [2.1](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html#partial-readonly-record-and-pick)
+
+Constructs a type with all properties of `Type` set to `readonly`, meaning the properties of the constructed type cannot be reassigned.
+
+##### [](#example-3)Example
+
+```
+interface Todo {
+  title: string;
+}
+ 
+const todo: Readonly<Todo> = {
+  title: "Delete inactive users",
+};
+ 
+todo.title = "Hello";
+```
+
+This utility is useful for representing assignment expressions that will fail at runtime (i.e. when attempting to reassign properties of a [frozen object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze)).
+
+##### [](#objectfreeze)`Object.freeze`
+
+```
+function freeze<Type>(obj: Type): Readonly<Type>;
+```
+
+## [](#recordkeys-type)`Record<Keys, Type>`
+
+> Released:  
+> [2.1](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html#partial-readonly-record-and-pick)
+
+Constructs an object type whose property keys are `Keys` and whose property values are `Type`. This utility can be used to map the properties of a type to another type.
+
+##### [](#example-4)Example
+
+```
+type CatName = "miffy" | "boris" | "mordred";
+ 
+interface CatInfo {
+  age: number;
+  breed: string;
+}
+ 
+const cats: Record<CatName, CatInfo> = {
+  miffy: { age: 10, breed: "Persian" },
+  boris: { age: 5, breed: "Maine Coon" },
+  mordred: { age: 16, breed: "British Shorthair" },
+};
+ 
+cats.boris;
+```
+
+## [](#picktype-keys)`Pick<Type, Keys>`
+
+> Released:  
+> [2.1](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html#partial-readonly-record-and-pick)
+
+Constructs a type by picking the set of properties `Keys` (string literal or union of string literals) from `Type`.
+
+##### [](#example-5)Example
+
+```
+interface Todo {
+  title: string;
+  description: string;
+  completed: boolean;
+}
+ 
+type TodoPreview = Pick<Todo, "title" | "completed">;
+ 
+const todo: TodoPreview = {
+  title: "Clean room",
+  completed: false,
+};
+ 
+todo;
+```
+
+## [](#omittype-keys)`Omit<Type, Keys>`
+
+> Released:  
+> [3.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-5.html#the-omit-helper-type)
+
+Constructs a type by picking all properties from `Type` and then removing `Keys` (string literal or union of string literals). The opposite of [`Pick`](#picktype-keys).
+
+##### [](#example-6)Example
+
+```
+interface Todo {
+  title: string;
+  description: string;
+  completed: boolean;
+  createdAt: number;
+}
+ 
+type TodoPreview = Omit<Todo, "description">;
+ 
+const todo: TodoPreview = {
+  title: "Clean room",
+  completed: false,
+  createdAt: 1615544252770,
+};
+ 
+todo;
+ 
+type TodoInfo = Omit<Todo, "completed" | "createdAt">;
+ 
+const todoInfo: TodoInfo = {
+  title: "Pick up kids",
+  description: "Kindergarten closes at 5pm",
+};
+ 
+todoInfo;
+```
+
+## [](#excludeuniontype-excludedmembers)`Exclude<UnionType, ExcludedMembers>`
+
+> Released:  
+> [2.8](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#predefined-conditional-types)
+
+Constructs a type by excluding from `UnionType` all union members that are assignable to `ExcludedMembers`.
+
+##### [](#example-7)Example
+
+```
+type T0 = Exclude<"a" | "b" | "c", "a">;
+type T1 = Exclude<"a" | "b" | "c", "a" | "b">;
+type T2 = Exclude<string | number | (() => void), Function>;
+ 
+type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; x: number }
+  | { kind: "triangle"; x: number; y: number };
+ 
+type T3 = Exclude<Shape, { kind: "circle" }>
+```
+
+> Released:  
+> [2.8](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#predefined-conditional-types)
+
+Constructs a type by extracting from `Type` all union members that are assignable to `Union`.
+
+##### [](#example-8)Example
+
+```
+type T0 = Extract<"a" | "b" | "c", "a" | "f">;
+type T1 = Extract<string | number | (() => void), Function>;
+ 
+type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; x: number }
+  | { kind: "triangle"; x: number; y: number };
+ 
+type T2 = Extract<Shape, { kind: "circle" }>
+```
+
+## [](#nonnullabletype)`NonNullable<Type>`
+
+> Released:  
+> [2.8](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#predefined-conditional-types)
+
+Constructs a type by excluding `null` and `undefined` from `Type`.
+
+##### [](#example-9)Example
+
+```
+type T0 = NonNullable<string | number | undefined>;
+type T1 = NonNullable<string[] | null | undefined>;
+```
+
+## [](#parameterstype)`Parameters<Type>`
+
+> Released:  
+> [3.1](https://github.com/microsoft/TypeScript/pull/26243)
+
+Constructs a tuple type from the types used in the parameters of a function type `Type`.
+
+For overloaded functions, this will be the parameters of the _last_ signature; see [Inferring Within Conditional Types](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#inferring-within-conditional-types).
+
+##### [](#example-10)Example
+
+```
+declare function f1(arg: { a: number; b: string }): void;
+ 
+type T0 = Parameters<() => string>;
+type T1 = Parameters<(s: string) => void>;
+type T2 = Parameters<<T>(arg: T) => T>;
+type T3 = Parameters<typeof f1>;
+type T4 = Parameters<any>;
+type T5 = Parameters<never>;
+type T6 = Parameters<string>;
+type T7 = Parameters<Function>;
+```
+
+## [](#constructorparameterstype)`ConstructorParameters<Type>`
+
+> Released:  
+> [3.1](https://github.com/microsoft/TypeScript/pull/26243)
+
+Constructs a tuple or array type from the types of a constructor function type. It produces a tuple type with all the parameter types (or the type `never` if `Type` is not a function).
+
+##### [](#example-11)Example
+
+```
+type T0 = ConstructorParameters<ErrorConstructor>;
+type T1 = ConstructorParameters<FunctionConstructor>;
+type T2 = ConstructorParameters<RegExpConstructor>;
+class C {
+  constructor(a: number, b: string) {}
+}
+type T3 = ConstructorParameters<typeof C>;
+type T4 = ConstructorParameters<any>;
+ 
+type T5 = ConstructorParameters<Function>;
+```
+
+## [](#returntypetype)`ReturnType<Type>`
+
+> Released:  
+> [2.8](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#predefined-conditional-types)
+
+Constructs a type consisting of the return type of function `Type`.
+
+For overloaded functions, this will be the return type of the _last_ signature; see [Inferring Within Conditional Types](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#inferring-within-conditional-types).
+
+##### [](#example-12)Example
+
+```
+declare function f1(): { a: number; b: string };
+ 
+type T0 = ReturnType<() => string>;
+type T1 = ReturnType<(s: string) => void>;
+type T2 = ReturnType<<T>() => T>;
+type T3 = ReturnType<<T extends U, U extends number[]>() => T>;
+type T4 = ReturnType<typeof f1>;
+type T5 = ReturnType<any>;
+type T6 = ReturnType<never>;
+type T7 = ReturnType<string>;
+type T8 = ReturnType<Function>;
+```
+
+## [](#instancetypetype)`InstanceType<Type>`
+
+> Released:  
+> [2.8](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#predefined-conditional-types)
+
+Constructs a type consisting of the instance type of a constructor function in `Type`.
+
+##### [](#example-13)Example
+
+```
+class C {
+  x = 0;
+  y = 0;
+}
+ 
+type T0 = InstanceType<typeof C>;
+type T1 = InstanceType<any>;
+type T2 = InstanceType<never>;
+type T3 = InstanceType<string>;
+type T4 = InstanceType<Function>;
+```
+
+## [](#noinfertype)`NoInfer<Type>`
+
+> Released:  
+> [5.4](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-4.html#the-noinfer-utility-type)
+
+Blocks inferences to the contained type. Other than blocking inferences, `NoInfer<Type>` is identical to `Type`.
+
+##### [](#example-14)Example
+
+```
+function createStreetLight<C extends string>(
+  colors: C[],
+  defaultColor?: NoInfer<C>,
+) {
+  // ...
+}
+
+createStreetLight(["red", "yellow", "green"], "red");  // OK
+createStreetLight(["red", "yellow", "green"], "blue");  // Error
+```
+
+## [](#thisparametertypetype)`ThisParameterType<Type>`
+
+> Released:  
+> [3.3](https://github.com/microsoft/TypeScript/pull/28920)
+
+Extracts the type of the [this](https://www.typescriptlang.org/docs/handbook/functions.html#this-parameters) parameter for a function type, or [unknown](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-0.html#new-unknown-top-type) if the function type has no `this` parameter.
+
+##### [](#example-15)Example
+
+```
+function toHex(this: Number) {
+  return this.toString(16);
+}
+ 
+function numberToString(n: ThisParameterType<typeof toHex>) {
+  return toHex.apply(n);
+}
+```
+
+## [](#omitthisparametertype)`OmitThisParameter<Type>`
+
+> Released:  
+> [3.3](https://github.com/microsoft/TypeScript/pull/28920)
+
+Removes the [`this`](https://www.typescriptlang.org/docs/handbook/functions.html#this-parameters) parameter from `Type`. If `Type` has no explicitly declared `this` parameter, the result is simply `Type`. Otherwise, a new function type with no `this` parameter is created from `Type`. Generics are erased and only the last overload signature is propagated into the new function type.
+
+##### [](#example-16)Example
+
+```
+function toHex(this: Number) {
+  return this.toString(16);
+}
+ 
+const fiveToHex: OmitThisParameter<typeof toHex> = toHex.bind(5);
+ 
+console.log(fiveToHex());
+```
+
+## [](#thistypetype)`ThisType<Type>`
+
+> Released:  
+> [2.3](https://github.com/microsoft/TypeScript/pull/14141)
+
+This utility does not return a transformed type. Instead, it serves as a marker for a contextual [`this`](https://www.typescriptlang.org/docs/handbook/functions.html#this) type. Note that the [`noImplicitThis`](https://www.typescriptlang.org/tsconfig#noImplicitThis) flag must be enabled to use this utility.
+
+##### [](#example-17)Example
+
+```
+type ObjectDescriptor<D, M> = {
+  data?: D;
+  methods?: M & ThisType<D & M>; // Type of 'this' in methods is D & M
+};
+ 
+function makeObject<D, M>(desc: ObjectDescriptor<D, M>): D & M {
+  let data: object = desc.data || {};
+  let methods: object = desc.methods || {};
+  return { ...data, ...methods } as D & M;
+}
+ 
+let obj = makeObject({
+  data: { x: 0, y: 0 },
+  methods: {
+    moveBy(dx: number, dy: number) {
+      this.x += dx; // Strongly typed this
+      this.y += dy; // Strongly typed this
+    },
+  },
+});
+ 
+obj.x = 10;
+obj.y = 20;
+obj.moveBy(5, 5);
+```
+
+In the example above, the `methods` object in the argument to `makeObject` has a contextual type that includes `ThisType<D & M>` and therefore the type of [this](https://www.typescriptlang.org/docs/handbook/functions.html#this) in methods within the `methods` object is `{ x: number, y: number } & { moveBy(dx: number, dy: number): void }`. Notice how the type of the `methods` property simultaneously is an inference target and a source for the `this` type in methods.
+
+The `ThisType<T>` marker interface is simply an empty interface declared in `lib.d.ts`. Beyond being recognized in the contextual type of an object literal, the interface acts like any empty interface.
+
+## [](#intrinsic-string-manipulation-types)Intrinsic String Manipulation Types
+
+### [](#uppercasestringtype)`Uppercase<StringType>`
+
+### [](#lowercasestringtype)`Lowercase<StringType>`
+
+### [](#capitalizestringtype)`Capitalize<StringType>`
+
+### [](#uncapitalizestringtype)`Uncapitalize<StringType>`
+
+To help with string manipulation around template string literals, TypeScript includes a set of types which can be used in string manipulation within the type system. You can find those in the [Template Literal Types](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#uppercasestringtype) documentation.

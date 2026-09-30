@@ -12,6 +12,13 @@ import { ToastProvider } from '../components/Toast';
 import { RunnerProvider } from './runnerContext';
 import RuntimeHost from './RuntimeHost';
 
+vi.mock('../context/Useauth', () => ({
+  useAuth: () => ({
+    user: { id: 'u1', email: 'trainee@example.com', name: 'Test Trainee' },
+    isLoading: false,
+  }),
+}));
+
 // The SQL runtime starts a real PGlite on mount; these tests only check which tabs show.
 vi.mock('./sql/pgliteService', () => ({ createSqlDatabase: () => new Promise(() => {}) }));
 

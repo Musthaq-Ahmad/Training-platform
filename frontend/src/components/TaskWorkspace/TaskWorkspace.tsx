@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { useToast } from '../Toast';
 import { useFlagTracking } from '../../hooks/Useflagtracking';
 import type { TaskResponse } from '@itp/types';
-import { getTaskCode, saveTaskCode } from '../../api/tasks';
+import { getTaskCode, saveTaskCode, submitTask } from '../../api/tasks';
 import { applyRuntimeSettings } from '../../lib/monacoSetup';
 import {
   selectFileCount,
@@ -24,7 +24,9 @@ import EditorPane from '../EditorPane';
 import FilesPanel from '../FilesPanel';
 import InstructionsPanel from '../InstructionsPanel';
 import SaveIndicator from '../SaveIndicator';
+import SubmitTaskButton from '../SubmitTaskButton';
 import TaskToolbar from '../TaskToolbar';
+import { useToast } from '../Toast';
 import WorkspaceSidebar from '../WorkspaceSidebar';
 import styles from './TaskWorkspace.module.css';
 
@@ -37,6 +39,7 @@ export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
   const dispatch = useWorkspaceDispatch();
   const navigate = useNavigate();
   const runner = useRunner();
+  const toast = useToast();
 
   const { show } = useToast();
   const showLeaveWarning = useCallback(
@@ -50,6 +53,9 @@ export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const [isLeaveConfirmOpen, setIsLeaveConfirmOpen] = useState(false);
+  // Submitting can be repeated and doesn't lock editing; this only drives the pill and the label.
+  const [submittedAt, setSubmittedAt] = useState<Date | null>(null);
+  const hasSubmitted = submittedAt !== null || task.status === 'completed';
 
   useEffect(() => {
     applyRuntimeSettings(task.runtime);
@@ -137,6 +143,12 @@ export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
     })();
   }, [autosave, navigate, task.day.id]);
 
+  const handleSubmit = useCallback(async () => {
+    const result = await submitTask(task.id);
+    setSubmittedAt(new Date(result.submittedAt));
+    toast.show({ message: 'Task submitted', variant: 'success' });
+  }, [task.id, toast]);
+
   const handleTogglePane = useCallback(
     (pane: PaneId) => dispatch({ type: 'paneToggled', pane }),
     [dispatch]
@@ -161,7 +173,17 @@ export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
         onRun={handleRun}
         runner={runner}
         saveIndicator={<SaveIndicator state={autosave.state} onRetry={autosave.retry} />}
-        submitSlot={null}
+        hasSubmitted={hasSubmitted}
+        submittedAt={submittedAt}
+        submitSlot={
+          <SubmitTaskButton
+            taskTitle={task.title}
+            hasSubmitted={hasSubmitted}
+            saveState={autosave.state}
+            flush={autosave.flush}
+            onSubmit={handleSubmit}
+          />
+        }
       />
       <div className={styles.paneRow} style={{ gridTemplateColumns: gridColumns }}>
         {state.visiblePanes.sidebar && (

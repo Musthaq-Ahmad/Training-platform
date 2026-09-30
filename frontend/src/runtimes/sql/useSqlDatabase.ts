@@ -8,8 +8,15 @@ export type SqlDatabaseState =
 
 type Settled = Exclude<SqlDatabaseState, { status: 'starting' }>;
 
-/** One in-memory Postgres per task visit. `reset` and `retry` throw it away and start again. */
-export function useSqlDatabase(setupSql: string | null): SqlDatabaseState & {
+/**
+ * One Postgres per task. With a `storageName` its tables are saved in this browser, so they are
+ * still there after a refresh or a later visit. Without one it is in memory, per visit.
+ * `reset` deletes the saved copy and starts again from the setup SQL. `retry` starts again as is.
+ */
+export function useSqlDatabase(
+  setupSql: string | null,
+  storageName: string | null = null
+): SqlDatabaseState & {
   reset: () => Promise<void>;
   retry: () => void;
 } {
@@ -19,6 +26,8 @@ export function useSqlDatabase(setupSql: string | null): SqlDatabaseState & {
   const [generation, setGeneration] = useState(0);
   const [settled, setSettled] = useState<{ generation: number; state: Settled } | null>(null);
   const waitingForStartRef = useRef<Array<() => void>>([]);
+  // Set by reset(), read once by the next start, so only a reset deletes the saved tables.
+  const isFreshStartRef = useRef(false);
 
   useEffect(() => {
     let isCancelled = false;
@@ -29,7 +38,10 @@ export function useSqlDatabase(setupSql: string | null): SqlDatabaseState & {
       for (const resolve of waitingForStartRef.current.splice(0)) resolve();
     };
 
-    createSqlDatabase(setupSql)
+    const fresh = isFreshStartRef.current;
+    isFreshStartRef.current = false;
+
+    createSqlDatabase(setupSql, { storageName, fresh })
       .then((db) => {
         if (isCancelled) {
           void db.close(); // unmounted or reset while starting
@@ -48,7 +60,7 @@ export function useSqlDatabase(setupSql: string | null): SqlDatabaseState & {
       isCancelled = true;
       if (started) void started.close();
     };
-  }, [setupSql, generation]);
+  }, [setupSql, storageName, generation]);
 
   const restart = useCallback(() => setGeneration((current) => current + 1), []);
 
@@ -56,6 +68,7 @@ export function useSqlDatabase(setupSql: string | null): SqlDatabaseState & {
     () =>
       new Promise<void>((resolve) => {
         waitingForStartRef.current.push(resolve);
+        isFreshStartRef.current = true;
         restart(); // the effect's cleanup closes the old database, then a new one starts
       }),
     [restart]
