@@ -4,8 +4,34 @@ import { marked, type Token } from 'marked';
 
 import type { ContentTopic, ContentBlock } from '../src/content/types.ts';
 
+const COURSE = process.argv[2];
+
+if (!COURSE) {
+  console.error('Usage: npx tsx scripts/ts-markdown-to-topics.ts <course>  (e.g. node, ts)');
+  process.exit(1);
+}
+
 const INPUT_DIR = 'src/content/references';
-const OUTPUT_DIR = 'src/content/topics/ts';
+const OUTPUT_DIR = `src/content/topics/${COURSE}`;
+
+const DEFAULT_LANGUAGE = COURSE === 'ts' ? 'typescript' : 'javascript';
+function detectLanguage(lang: string | undefined, code: string): string {
+  const label = (lang ?? '').trim().toLowerCase();
+
+  if (label) return LANGUAGE_ALIASES[label] ?? label;
+
+  // Unlabeled block: shell commands vs. code
+  if (/^\s*(\$ |npm |npx |node |yarn |pnpm |cd |mkdir |curl )/.test(code)) return 'bash';
+
+  return DEFAULT_LANGUAGE;
+}
+const LANGUAGE_ALIASES: Record<string, string> = {
+  ts: 'typescript',
+  js: 'javascript',
+  mjs: 'javascript',
+  cjs: 'javascript',
+  sh: 'bash',
+};
 
 function slugify(value: string): string {
   return value
@@ -37,6 +63,8 @@ function cleanText(value: string): string {
     .replace(/<[^>]+>/g, '')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
     .replace(/__ANGLE_PLACEHOLDER_(\d+)__/g, (_, index: string) => placeholders[Number(index)])
@@ -114,7 +142,7 @@ function tokenToBlocks(tokens: Token[]): ContentBlock[] {
         type: 'code',
         code: {
           filename: 'example',
-          language: token.lang === 'ts' ? 'typescript' : token.lang || 'typescript',
+          language: detectLanguage(token.lang, token.text),
           code: token.text,
         },
       });
@@ -205,7 +233,7 @@ async function main() {
   });
 
   for (const dayDir of dayDirs) {
-    if (!dayDir.isDirectory() || !dayDir.name.startsWith('ts-day-')) {
+    if (!dayDir.isDirectory() || !dayDir.name.startsWith(`${COURSE}-day-`)) {
       continue;
     }
 

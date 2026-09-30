@@ -27,6 +27,7 @@ import {
 } from '../topics/css';
 import * as jsTopics from '../topics/js';
 import * as tsTopics from '../topics/ts';
+import * as nodeTopics from '../topics/node';
 import { dayReferences } from './dayReferences';
 
 const courseTopics: Record<string, ContentTopic[]> = {
@@ -61,6 +62,9 @@ const courseTopics: Record<string, ContentTopic[]> = {
   ts: Object.values(tsTopics).flatMap(
     (topicCollection) => Object.values(topicCollection) as ContentTopic[]
   ),
+  node: Object.values(nodeTopics).flatMap(
+    (topicCollection) => Object.values(topicCollection) as ContentTopic[]
+  ),
 };
 
 export function getDayReference(dayId: string): DayReferenceContent | null {
@@ -70,10 +74,11 @@ export function getDayReference(dayId: string): DayReferenceContent | null {
     return null;
   }
 
-  const topics = courseTopics[config.courseId] ?? [];
+  // Prefer the day's own course, but allow reusing topics from any course
+  const allTopics: ContentTopic[] = Object.values(courseTopics).flat();
 
   const sections = config.topicIds
-    .map((topicId) => topics.find((topic) => topic.id === topicId))
+    .map((topicId) => allTopics.find((topic) => topic.id === topicId))
     .filter((topic): topic is ContentTopic => Boolean(topic))
     .map((topic, index) => ({
       ...topic,
@@ -86,6 +91,7 @@ export function getDayReference(dayId: string): DayReferenceContent | null {
     videos: config.videos,
     videoAtStart: config.videoAtStart,
     videoAfterTopicId: config.videoAfterTopicId,
+    prerequisiteLinks: config.prerequisiteLinks,
     sections,
   };
 }

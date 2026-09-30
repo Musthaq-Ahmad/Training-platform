@@ -1,0 +1,112 @@
+{
+  "courseId": "node",
+  "sources": {},
+  "days": [
+    {
+      "id": "node-day-01",
+      "dayNumber": 1,
+      "title": "Node.js Fundamentals",
+      "references": [
+        {
+          "name": "nodeIntroduction",
+          "title": "Introduction to Node.js",
+          "source": "web",
+          "url": "https://nodejs.org/learn/getting-started/introduction-to-nodejs"
+        },
+        {
+          "name": "nodeRunScripts",
+          "title": "Run Node.js scripts from the command line",
+          "source": "web",
+          "url": "https://nodejs.org/learn/command-line/run-nodejs-scripts-from-the-command-line"
+        },
+        {
+          "name": "nodeTsModules",
+          "title": "TypeScript Modules",
+          "source": "web",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/modules.html"
+        },
+        {
+          "name": "nodeTsconfig",
+          "title": "What is a tsconfig.json",
+          "source": "web",
+          "url": "https://www.typescriptlang.org/docs/handbook/tsconfig-json.html"
+        }
+      ]
+    },
+    {
+      "id": "node-day-02",
+      "dayNumber": 2,
+      "title": "File System and Testing",
+      "references": [
+        {
+          "name": "nodeFsPromises",
+          "title": "fs Promises API",
+          "source": "web",
+          "url": "https://nodejs.org/api/fs.html#promises-api"
+        },
+        {
+          "name": "nodeJestGettingStarted",
+          "title": "Jest: Getting Started",
+          "source": "skip",
+          "note": "Already imported as jest-getting-started (js-day-08). Reuse that topic id."
+        }
+      ]
+    },
+    {
+      "id": "node-day-03",
+      "dayNumber": 3,
+      "title": "HTTP",
+      "references": [
+        {
+          "name": "nodeHttpClientRequest",
+          "title": "http.ClientRequest",
+          "source": "web",
+          "url": "https://nodejs.org/api/http.html#class-httpclientrequest"
+        },
+        {
+          "name": "nodeHttpServer",
+          "title": "http.Server",
+          "source": "web",
+          "url": "https://nodejs.org/api/http.html#class-httpserver"
+        },
+        {
+          "name": "nodeHttpServerResponse",
+          "title": "http.ServerResponse",
+          "source": "web",
+          "url": "https://nodejs.org/api/http.html#class-httpserverresponse"
+        },
+        {
+          "name": "nodeHttpOverview",
+          "title": "An overview of HTTP",
+          "source": "web",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview"
+        }
+      ]
+    },
+    {
+      "id": "node-day-04",
+      "dayNumber": 4,
+      "title": "Express",
+      "references": [
+        {
+          "name": "nodeExpressRouting",
+          "title": "Express routing",
+          "source": "web",
+          "url": "https://expressjs.com/en/guide/routing/"
+        },
+        {
+          "name": "nodeExpressMiddleware",
+          "title": "Using Express middleware",
+          "source": "web",
+          "url": "https://expressjs.com/en/guide/using-middleware/"
+        }
+      ]
+    },
+    {
+      "id": "node-day-05",
+      "dayNumber": 5,
+      "title": "Prerequisite references",
+      "references": []
+    }
+  ]
+}

@@ -341,4 +341,43 @@ export const dayReferences: DayReferenceConfig[] = [
     dayNumber: 5,
     topicIds: ['tsdosanddonts'],
   },
+  {
+    id: 'node-day-01',
+    courseId: 'node',
+    dayNumber: 1,
+    topicIds: ['nodeintroduction', 'noderunscripts', 'nodetsmodules', 'nodetsconfig'],
+  },
+  {
+    id: 'node-day-02',
+    courseId: 'node',
+    dayNumber: 2,
+    topicIds: ['nodefspromises', 'jest-getting-started'],
+  },
+  {
+    id: 'node-day-03',
+    courseId: 'node',
+    dayNumber: 3,
+    topicIds: [
+      'nodehttpclientrequest',
+      'nodehttpserver',
+      'nodehttpserverresponse',
+      'nodehttpoverview',
+    ],
+  },
+  {
+    id: 'node-day-04',
+    courseId: 'node',
+    dayNumber: 4,
+    topicIds: ['nodeexpressrouting', 'nodeexpressmiddleware'],
+  },
+  {
+    id: 'node-day-05',
+    courseId: 'node',
+    dayNumber: 5,
+    topicIds: [],
+    prerequisiteLinks: [
+      { label: 'Node.js Day 1 — Fundamentals', dayId: 'node-day-01' },
+      { label: 'Node.js Day 4 — API Development', dayId: 'node-day-04' },
+    ],
+  },
 ];
