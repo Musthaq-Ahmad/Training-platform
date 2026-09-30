@@ -91,6 +91,11 @@
   --color-accent-glow-950: #3b076499;
   --color-accent-glow-deep: #ead5ff40;
 
+  /* Primary button (Submit Task) */
+  --color-button-primary-bg: #7c41e4;
+  --color-button-primary-bg-hover: #6b32d1;
+  --color-button-primary-text: #ffffff;
+
   /* =========================================================
      Status
      ========================================================= */
@@ -229,6 +234,11 @@
     --color-accent-glow-800: #6b21a866;
     --color-accent-glow-950: #3b076499;
     --color-accent-glow-deep: #3b0764b2;
+
+    /* Primary button (Submit Task) */
+    --color-button-primary-bg: #d0bcff;
+    --color-button-primary-bg-hover: #e0d2ff;
+    --color-button-primary-text: #3c0091;
 
     /* -------------------------------------------------------
        Status

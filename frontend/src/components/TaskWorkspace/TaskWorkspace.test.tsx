@@ -8,7 +8,7 @@ import { EditorProvider } from '../../pages/TaskPage/state/EditorContext';
 import { RunnerProvider } from '../../runtimes/runnerContext';
 import { ToastProvider } from '../../components/Toast';
 import { taskFixture, taskCodeFixture } from '../../test/fixtures/task';
-import { saveTaskCode } from '../../api/tasks';
+import { saveTaskCode, submitTask } from '../../api/tasks';
 import { ApiError } from '../../api/errors';
 import { buildPreviewDocument } from '../../runtimes/browser/buildPreviewDocument';
 
@@ -27,14 +27,14 @@ vi.mock('react-router', async () => {
   return { ...actual, useNavigate: () => navigateMock };
 });
 
-function renderWorkspace() {
+function renderWorkspace(task = taskFixture) {
   return render(
     <MemoryRouter>
       <ToastProvider>
         <WorkspaceProvider code={taskCodeFixture}>
           <EditorProvider>
             <RunnerProvider>
-              <TaskWorkspace task={taskFixture} />
+              <TaskWorkspace task={task} />
             </RunnerProvider>
           </EditorProvider>
         </WorkspaceProvider>
@@ -139,5 +139,29 @@ describe('TaskWorkspace', () => {
 
     expect(await screen.findByText('Saved')).toBeInTheDocument();
     expect(saveTaskCode).toHaveBeenCalled();
+  });
+
+  it('submits: shows the toast and the Submitted pill, and the button reads Resubmit', async () => {
+    const user = userEvent.setup();
+    vi.mocked(submitTask).mockResolvedValue({
+      status: 'completed',
+      submittedAt: new Date(2026, 8, 28, 14, 32).toISOString(),
+    });
+    renderWorkspace();
+
+    await user.click(screen.getByRole('button', { name: /submit task/i }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+    expect(submitTask).toHaveBeenCalledWith(taskFixture.id);
+    expect(await screen.findByText('Task submitted')).toBeInTheDocument();
+    expect(screen.getByText('Submitted 14:32')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /resubmit/i })).toBeEnabled();
+  });
+
+  it('shows Submitted and Resubmit from the start for a completed task', () => {
+    renderWorkspace({ ...taskFixture, status: 'completed' });
+
+    expect(screen.getByText('Submitted')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /resubmit/i })).toBeInTheDocument();
   });
 });

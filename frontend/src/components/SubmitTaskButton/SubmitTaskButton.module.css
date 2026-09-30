@@ -1,0 +1,43 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 10px;
+  background-color: var(--color-button-primary-bg);
+  color: var(--color-button-primary-text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.button:hover:not(:disabled) {
+  background-color: var(--color-button-primary-bg-hover);
+  box-shadow: 0 0 16px var(--color-accent-icon-shadow);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent-spinner-track);
+  border-top-color: var(--color-button-primary-text);
+  animation: submit-task-spin 700ms linear infinite;
+}
+
+@keyframes submit-task-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
