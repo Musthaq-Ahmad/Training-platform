@@ -34,21 +34,15 @@
   font-size: 1rem;
 }
 
-.pageLabel {
-  color: var(--color-text-primary);
-  font-weight: 600;
-  cursor: pointer;
-}
-
 .divider {
   color: var(--color-text-tertiary);
 }
 
-.userName {
+.link {
   color: var(--color-text-secondary);
 }
 
-.userName:hover {
+.link:hover {
   color: var(--color-text-primary);
 }
 
@@ -58,4 +52,10 @@
 
 .logoutButton:hover {
   color: var(--color-text-primary);
+}
+
+.active {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  cursor: pointer;
 }

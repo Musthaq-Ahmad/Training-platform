@@ -1,5 +1,6 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router';
 import type { ProfileData } from '@itp/types';
 
 import ProfilePage from './ProfilePage';
@@ -16,6 +17,7 @@ vi.mock('../../context/Useauth', () => ({
     logout: vi.fn(),
   }),
 }));
+
 vi.mock('../../api/profile', () => ({
   getProfile: vi.fn(),
 }));
@@ -24,6 +26,14 @@ afterEach(() => {
   cleanup();
   vi.clearAllMocks();
 });
+
+function renderProfilePage() {
+  return render(
+    <MemoryRouter>
+      <ProfilePage />
+    </MemoryRouter>
+  );
+}
 
 describe('ProfilePage', () => {
   const profile: ProfileData = {
@@ -34,17 +44,14 @@ describe('ProfilePage', () => {
       currentDay: 6,
       totalDays: 12,
     },
-
     total: {
       activeSeconds: 153000,
       readingSeconds: 51300,
     },
-
     typing: {
       latestWpm: 74,
       latestAccuracy: 98.4,
     },
-
     dailyActivity: [
       {
         date: 'Oct 14',
@@ -64,7 +71,7 @@ describe('ProfilePage', () => {
   it('renders the loading state while the profile is loading', () => {
     vi.mocked(getProfile).mockImplementation(() => new Promise<ProfileData>(() => {}));
 
-    render(<ProfilePage />);
+    renderProfilePage();
 
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
@@ -72,21 +79,20 @@ describe('ProfilePage', () => {
   it('renders the profile after loading successfully', async () => {
     vi.mocked(getProfile).mockResolvedValue(profile);
 
-    render(<ProfilePage />);
+    renderProfilePage();
 
     expect(await screen.findByText('rahul.sharma@vonnue.com')).toBeInTheDocument();
 
     const main = screen.getByRole('main');
 
     expect(within(main).getByText('Rahul Sharma')).toBeInTheDocument();
-
     expect(within(main).getByText('JavaScript, Day 6 of 12')).toBeInTheDocument();
   });
 
   it('renders the stats from the profile data', async () => {
     vi.mocked(getProfile).mockResolvedValue(profile);
 
-    render(<ProfilePage />);
+    renderProfilePage();
 
     const stats = await screen.findByRole('region', {
       name: 'Training statistics',
@@ -101,12 +107,10 @@ describe('ProfilePage', () => {
   it('renders the daily activity from the profile data', async () => {
     vi.mocked(getProfile).mockResolvedValue(profile);
 
-    render(<ProfilePage />);
+    renderProfilePage();
 
     expect(await screen.findByText('Oct 14 (Today)')).toBeInTheDocument();
-
     expect(screen.getByText('Oct 13')).toBeInTheDocument();
-
     expect(screen.getByText('4h 10m')).toBeInTheDocument();
     expect(screen.getByText('3h 45m')).toBeInTheDocument();
 
@@ -117,7 +121,7 @@ describe('ProfilePage', () => {
   it('renders an error/empty state when loading the profile fails', async () => {
     vi.mocked(getProfile).mockRejectedValue(new Error('Failed to load profile'));
 
-    render(<ProfilePage />);
+    renderProfilePage();
 
     expect(await screen.findByRole('alert')).toBeInTheDocument();
   });
@@ -125,7 +129,7 @@ describe('ProfilePage', () => {
   it('calls getProfile once when the page loads', async () => {
     vi.mocked(getProfile).mockResolvedValue(profile);
 
-    render(<ProfilePage />);
+    renderProfilePage();
 
     await waitFor(() => {
       expect(getProfile).toHaveBeenCalledTimes(1);
