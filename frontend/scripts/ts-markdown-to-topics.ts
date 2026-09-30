@@ -14,14 +14,39 @@ if (!COURSE) {
 const INPUT_DIR = 'src/content/references';
 const OUTPUT_DIR = `src/content/topics/${COURSE}`;
 
-const DEFAULT_LANGUAGE = COURSE === 'ts' ? 'typescript' : 'javascript';
+const DEFAULT_LANGUAGES: Record<string, string> = {
+  ts: 'typescript',
+  postgres: 'sql',
+  prisma: 'typescript',
+  react: 'jsx',
+};
+
+const DEFAULT_LANGUAGE = DEFAULT_LANGUAGES[COURSE] ?? 'javascript';
 function detectLanguage(lang: string | undefined, code: string): string {
   const label = (lang ?? '').trim().toLowerCase();
 
   if (label) return LANGUAGE_ALIASES[label] ?? label;
 
-  // Unlabeled block: shell commands vs. code
-  if (/^\s*(\$ |npm |npx |node |yarn |pnpm |cd |mkdir |curl )/.test(code)) return 'bash';
+  // Shell commands
+  if (
+    /^\s*\$ /.test(code) ||
+    /^\s*(createdb|dropdb|psql|pg_\w+|initdb|postgres|npm|npx|node|yarn|pnpm|cd|mkdir|curl|sudo|brew|apt|git)\b/.test(
+      code
+    ) ||
+    /^\s*export [A-Z_]+=/.test(code)
+  ) {
+    return 'bash';
+  }
+
+  // JavaScript inside SQL courses (e.g. the env variables page)
+  if (
+    DEFAULT_LANGUAGE === 'sql' &&
+    /^\s*(const |let |var |import |require\(|process\.|console\.|function |export (const|default|function))/m.test(
+      code
+    )
+  ) {
+    return 'javascript';
+  }
 
   return DEFAULT_LANGUAGE;
 }
@@ -31,6 +56,9 @@ const LANGUAGE_ALIASES: Record<string, string> = {
   mjs: 'javascript',
   cjs: 'javascript',
   sh: 'bash',
+  psql: 'sql',
+  shell: 'bash',
+  console: 'bash',
 };
 
 function slugify(value: string): string {
