@@ -1,0 +1,119 @@
+{
+  "courseId": "postgres",
+  "sources": {},
+  "days": [
+    {
+      "id": "postgres-day-01",
+      "dayNumber": 1,
+      "title": "Getting Started",
+      "references": [
+        {
+          "name": "pgInstall",
+          "title": "Installation",
+          "source": "web",
+          "url": "https://www.postgresql.org/docs/current/tutorial-install.html"
+        },
+        {
+          "name": "pgCreateDb",
+          "title": "Creating a Database",
+          "source": "web",
+          "url": "https://www.postgresql.org/docs/current/tutorial-createdb.html"
+        },
+        {
+          "name": "pgAccessDb",
+          "title": "Accessing a Database",
+          "source": "web",
+          "url": "https://www.postgresql.org/docs/current/tutorial-accessdb.html"
+        }
+      ]
+    },
+    {
+      "id": "postgres-day-02",
+      "dayNumber": 2,
+      "title": "SQL Basics",
+      "references": [
+        {
+          "name": "pgSqlIntro",
+          "title": "Introduction to SQL",
+          "source": "web",
+          "url": "https://www.postgresql.org/docs/current/tutorial-sql-intro.html"
+        },
+        {
+          "name": "pgCreateTable",
+          "title": "Creating a New Table",
+          "source": "web",
+          "url": "https://www.postgresql.org/docs/current/tutorial-table.html"
+        },
+        {
+          "name": "pgPopulate",
+          "title": "Populating a Table With Rows",
+          "source": "web",
+          "url": "https://www.postgresql.org/docs/current/tutorial-populate.html"
+        }
+      ]
+    },
+    {
+      "id": "postgres-day-03",
+      "dayNumber": 3,
+      "title": "Joins and Aggregates",
+      "references": [
+        {
+          "name": "pgJoin",
+          "title": "Joins Between Tables",
+          "source": "web",
+          "url": "https://www.postgresql.org/docs/current/tutorial-join.html"
+        },
+        {
+          "name": "pgAggregate",
+          "title": "Aggregate Functions",
+          "source": "web",
+          "url": "https://www.postgresql.org/docs/current/tutorial-agg.html"
+        }
+      ]
+    },
+    {
+      "id": "postgres-day-04",
+      "dayNumber": 4,
+      "title": "Transactions and Indexes",
+      "references": [
+        {
+          "name": "pgTransactions",
+          "title": "Transactions",
+          "source": "web",
+          "url": "https://www.postgresql.org/docs/current/tutorial-transactions.html"
+        },
+        {
+          "name": "pgIndexesIntro",
+          "title": "Indexes: Introduction",
+          "source": "web",
+          "url": "https://www.postgresql.org/docs/current/indexes-intro.html"
+        },
+        {
+          "name": "pgIndexTypes",
+          "title": "Index Types",
+          "source": "web",
+          "url": "https://www.postgresql.org/docs/current/indexes-types.html"
+        }
+      ]
+    },
+    {
+      "id": "postgres-day-05",
+      "dayNumber": 5,
+      "title": "Prerequisite references",
+      "references": []
+    },
+    {
+      "id": "postgres-day-06",
+      "dayNumber": 6,
+      "title": "Environment Variables",
+      "references": [
+        {
+          "name": "nodeEnvVariables",
+          "title": "How to read environment variables from Node.js",
+          "source": "web",
+          "url": "https://nodejs.org/learn/command-line/how-to-read-environment-variables-from-nodejs"
+        }
+      ]
+    }
+  ]
+}

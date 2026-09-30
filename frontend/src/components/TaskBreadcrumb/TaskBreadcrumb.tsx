@@ -20,18 +20,13 @@ export default function TaskBreadcrumb({
     <nav aria-label="Breadcrumb">
       <ol className={styles.list}>
         <li>
-          <Link to="/" className={styles.link}>
-            Dashboard
-          </Link>
-        </li>
-        <li>{courseTitle}</li>
-        <li>
           <Link to={`/days/${dayId}`} className={styles.link}>
+            <span>{`${courseTitle}`}</span>
             {dayLabel}
           </Link>
         </li>
         <li>
-          <span className={styles.current} aria-current="page">
+          <span aria-current="page" className={styles.current}>
             {`Task ${taskNumber}`}
           </span>
         </li>

@@ -49,6 +49,7 @@ export type DayReferenceConfig = {
   videoAtStart?: boolean;
   resources?: DayReferenceResource[];
   topicIds: string[];
+  prerequisiteLinks?: PrerequisiteLink[];
 };
 
 export type ResolvedSection = ContentTopic & {
@@ -62,4 +63,9 @@ export type DayReferenceContent = {
   videoAfterTopicId?: string;
   sections: ResolvedSection[];
   videoAtStart?: boolean;
+  prerequisiteLinks?: PrerequisiteLink[];
+};
+export type PrerequisiteLink = {
+  label: string;
+  dayId: string;
 };

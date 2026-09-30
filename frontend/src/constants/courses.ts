@@ -7,12 +7,12 @@ export type CurriculumCourse = {
 };
 
 export const CURRICULUM_COURSES: CurriculumCourse[] = [
-  { id: 'course-html', label: 'HTML' },
-  { id: 'course-css', label: 'CSS' },
-  { id: 'course-js', label: 'JavaScript' },
-  { id: 'course-ts', label: 'TypeScript' },
-  { id: 'course-node', label: 'Node.js' },
-  { id: 'course-postgresql', label: 'PostgreSQL' },
-  { id: 'course-prisma', label: 'Prisma' },
-  { id: 'course-react', label: 'React' },
+  { id: 'html', label: 'HTML' },
+  { id: 'css', label: 'CSS' },
+  { id: 'js', label: 'JavaScript' },
+  { id: 'ts', label: 'TypeScript' },
+  { id: 'node', label: 'Node.js' },
+  { id: 'postgresql', label: 'PostgreSQL' },
+  { id: 'prisma', label: 'Prisma' },
+  { id: 'react', label: 'React' },
 ];

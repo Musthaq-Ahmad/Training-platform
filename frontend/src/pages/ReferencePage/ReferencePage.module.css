@@ -20,6 +20,7 @@
   line-height: 1;
   text-decoration: none;
   transition: color 0.2s ease;
+  gap: 6px;
 }
 
 .backLink:hover {
@@ -363,6 +364,7 @@
   gap: 8px;
   margin-top: 32px;
   padding: 12px 20px;
+  line-height: 1;
 
   background: var(--color-bg-base);
   color: var(--color-text-primary);
@@ -629,4 +631,85 @@
 .codeBlock :global(.token.important),
 .codeBlock :global(.token.bold) {
   font-weight: 600;
+}
+/* =========================
+   Accordions
+   ========================= */
+
+.accordion {
+  margin: 10px 0;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: 8px;
+}
+
+.accordionSummary {
+  padding: 14px 16px;
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.accordionSummary::-webkit-details-marker {
+  display: none;
+}
+
+.accordionSummary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 10px;
+  color: var(--color-accent-purple);
+  transition: transform 0.15s ease;
+}
+
+.accordion[open] > .accordionSummary::before {
+  transform: rotate(90deg);
+}
+
+.accordion[open] > .accordionSummary {
+  border-bottom: 1px solid var(--color-border-card);
+}
+
+.accordionBody {
+  padding: 16px;
+}
+
+/* =========================
+   Prerequisite links
+   ========================= */
+
+.prerequisites {
+  margin-bottom: 8px;
+}
+
+.prerequisiteList {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.prerequisiteItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border-card);
+  border-radius: 8px;
+}
+
+.prerequisiteLabel {
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.prerequisiteButton {
+  margin-top: 0;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
 }
