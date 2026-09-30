@@ -11,17 +11,10 @@ import type {
   TaskFile,
   TaskResponse,
 } from '@itp/types';
-import {
-  nodeTaskCodeFixture,
-  nodeTaskFixture,
-  sqlTaskCodeFixture,
-  sqlTaskFixture,
-  taskCodeFixture,
-  taskFixture,
-} from '../test/fixtures/task';
 import { mockUser } from '../test/fixtures/user';
 
-import { mockTasksByDay } from '../test/fixtures/dayTasks';
+import { mockTaskStatus, mockTasksByDay } from '../test/fixtures/dayTasks';
+import { catalogTaskCode, catalogTaskResponse, findCatalogTask, scenarios } from './mockTasks';
 import { mockStatusByDay, mockJournalByDay } from '../test/fixtures/dayStatus';
 import { mockDayContents } from './dayOverview';
 
@@ -54,20 +47,37 @@ function errorResponse(
   return Promise.reject(new AxiosError(message, undefined, config, undefined, response));
 }
 
-function codeFixtureFor(taskId: string): TaskCodeResponse {
+// Tasks: test scenarios first (/tasks/t-browser, t-node, t-sql, … see mockTasks/scenarios.ts),
+// then the real curriculum tasks from the trainee guides (/tasks/html-day-01-t-2, …).
+
+function codeFixtureFor(taskId: string): TaskCodeResponse | null {
   if (savedFiles.has(taskId)) {
     return { files: savedFiles.get(taskId) as TaskFile[], updatedAt: new Date().toISOString() };
   }
-
-  if (taskId === 't-node') return nodeTaskCodeFixture;
-  if (taskId === 't-sql') return sqlTaskCodeFixture;
-  return taskCodeFixture;
+  return scenarios[taskId]?.code ?? catalogTaskCode(taskId);
 }
 
-function taskFixtureFor(taskId: string): TaskResponse {
-  if (taskId === 't-node') return nodeTaskFixture;
-  if (taskId === 't-sql') return sqlTaskFixture;
-  return { ...taskFixture, id: taskId };
+function taskFixtureFor(taskId: string): TaskResponse | null {
+  const scenario = scenarios[taskId];
+  if (scenario) return scenario.task;
+  const found = findCatalogTask(taskId);
+  return found ? catalogTaskResponse(taskId, mockTaskStatus(found.day.dayId)) : null;
+}
+
+/** A curriculum task whose day is locked answers 403, like the real API (FR-1). */
+function isLockedTask(taskId: string): boolean {
+  if (taskId === 'locked') return true;
+  const found = findCatalogTask(taskId);
+  return found ? mockStatusByDay[found.day.dayId]?.isLocked === true : false;
+}
+
+function scenarioFailure(
+  config: InternalAxiosRequestConfig,
+  taskId: string,
+  step: 'getTask' | 'getCode' | 'saveCode' | 'submit'
+): Promise<AxiosResponse<never>> | null {
+  const failure = scenarios[taskId]?.fail?.[step];
+  return failure ? errorResponse(config, failure.status, failure.code, failure.message) : null;
 }
 
 async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse> {
@@ -86,7 +96,7 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
 
   if (method === 'get' && codeMatch) {
     const taskId = codeMatch[1];
-    if (taskId === 'locked') {
+    if (isLockedTask(taskId)) {
       return errorResponse(
         config,
         403,
@@ -94,24 +104,33 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
         'Finish the previous day to unlock this task.'
       );
     }
-    return respond(config, 200, codeFixtureFor(taskId));
+    const failure = scenarioFailure(config, taskId, 'getCode');
+    if (failure) return failure;
+    const code = codeFixtureFor(taskId);
+    return code
+      ? respond(config, 200, code)
+      : errorResponse(config, 404, 'NOT_FOUND', 'Task not found.');
   }
 
   if (method === 'put' && codeMatch) {
     const taskId = codeMatch[1];
+    const failure = scenarioFailure(config, taskId, 'saveCode');
+    if (failure) return failure;
     const body = JSON.parse(config.data as string) as { files: TaskFile[] };
     savedFiles.set(taskId, body.files);
     return respond(config, 204, undefined);
   }
 
   if (method === 'post' && submitMatch) {
+    const failure = scenarioFailure(config, submitMatch[1], 'submit');
+    if (failure) return failure;
     const data: SubmitTaskResponse = { status: 'completed', submittedAt: new Date().toISOString() };
     return respond(config, 200, data);
   }
 
   if (method === 'get' && taskMatch) {
     const taskId = taskMatch[1];
-    if (taskId === 'locked') {
+    if (isLockedTask(taskId)) {
       return errorResponse(
         config,
         403,
@@ -119,10 +138,12 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
         'Finish the previous day to unlock this task.'
       );
     }
-    if (taskId === 'missing') {
-      return errorResponse(config, 404, 'NOT_FOUND', 'Task not found.');
-    }
-    return respond(config, 200, taskFixtureFor(taskId));
+    const failure = scenarioFailure(config, taskId, 'getTask');
+    if (failure) return failure;
+    const task = taskFixtureFor(taskId);
+    return task
+      ? respond(config, 200, task)
+      : errorResponse(config, 404, 'NOT_FOUND', 'Task not found.');
   }
 
   if (method === 'post' && activityMatch) {
