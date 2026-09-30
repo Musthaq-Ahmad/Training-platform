@@ -1,2 +1,3 @@
-export { ToastProvider, useToast } from './Toast';
-export type { ToastVariant, ShowToastOptions } from './Toast';
+export { ToastProvider } from './Toast';
+export { useToast } from './useToast';
+export type { ShowToastOptions, ToastContextValue, ToastVariant } from './ToastContext';
