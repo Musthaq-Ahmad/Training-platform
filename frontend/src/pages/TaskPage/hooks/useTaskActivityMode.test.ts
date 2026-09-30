@@ -12,47 +12,71 @@ describe('useTaskActivityMode', () => {
     vi.useRealTimers();
   });
 
-  const setup = (isInstructionsVisible: boolean) =>
-    renderHook(
-      (props: { visible: boolean }) =>
-        useTaskActivityMode({ isInstructionsVisible: props.visible }),
-      {
-        initialProps: { visible: isInstructionsVisible },
-      }
-    );
+  const setup = () => renderHook(() => useTaskActivityMode());
 
-  it('reads while the instructions are on screen and nothing was typed', () => {
-    const { result } = setup(true);
-    expect(result.current.mode).toBe('reading');
-  });
+  it('starts with none when no work has been marked', () => {
+    const { result } = setup();
 
-  it('switches to coding when work is marked', () => {
-    const { result } = setup(true);
-    act(() => result.current.markWork());
-    expect(result.current.mode).toBe('coding');
-  });
-
-  it('returns to reading once the trainee has not worked for over a minute', () => {
-    const { result } = setup(true);
-    act(() => result.current.markWork());
-
-    // The check runs every 5 s, so allow a little over the 60 s window
-    act(() => {
-      vi.advanceTimersByTime(66_000);
-    });
-    expect(result.current.mode).toBe('reading');
-  });
-
-  it('reports none when the instructions are hidden and there is no recent work', () => {
-    const { result, rerender } = setup(true);
-    rerender({ visible: false });
     expect(result.current.mode).toBe('none');
   });
 
-  it('keeps reporting coding with the instructions hidden while working', () => {
-    const { result, rerender } = setup(false);
-    act(() => result.current.markWork());
-    rerender({ visible: false });
+  it('switches to coding when work is marked', () => {
+    const { result } = setup();
+
+    act(() => {
+      result.current.markWork();
+    });
+
+    expect(result.current.mode).toBe('coding');
+  });
+
+  it('remains coding while within the work window', () => {
+    const { result } = setup();
+
+    act(() => {
+      result.current.markWork();
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(59_000);
+    });
+
+    expect(result.current.mode).toBe('coding');
+  });
+
+  it('returns to none after the trainee has not worked for over a minute', () => {
+    const { result } = setup();
+
+    act(() => {
+      result.current.markWork();
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(66_000);
+    });
+
+    expect(result.current.mode).toBe('none');
+  });
+
+  it('resets the work window when work is marked again', () => {
+    const { result } = setup();
+
+    act(() => {
+      result.current.markWork();
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(50_000);
+    });
+
+    act(() => {
+      result.current.markWork();
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(50_000);
+    });
+
     expect(result.current.mode).toBe('coding');
   });
 });

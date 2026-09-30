@@ -38,9 +38,7 @@ type TaskWorkspaceProps = {
 
 export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
   const state = useWorkspaceState();
-  const { mode, markWork } = useTaskActivityMode({
-    isInstructionsVisible: state.visiblePanes.sidebar && state.sidebarTab === 'instructions',
-  });
+  const { mode, markWork } = useTaskActivityMode();
   useReportActivityMode(mode, task.day.id);
   const dispatch = useWorkspaceDispatch();
   const navigate = useNavigate();

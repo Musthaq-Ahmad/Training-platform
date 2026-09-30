@@ -11,7 +11,6 @@ export type LogFlagEventRequest = {
 export type ActivityTimeRequest = {
   activeSeconds: number;
   codingSeconds: number;
-  readingSeconds: number;
   /** The curriculum day the trainee was looking at; omitted on dashboard/profile */
   dayId?: string;
 };
@@ -21,7 +20,6 @@ export type ActivityTimeDay = {
   date: string; // 'YYYY-MM-DD' (Asia/Kolkata)
   activeSeconds: number;
   codingSeconds: number;
-  readingSeconds: number;
 };
 
-export type ActivityMode = 'coding' | 'reading' | 'none';
+export type ActivityMode = 'coding' | 'none';

@@ -82,7 +82,6 @@ export default function EditorPane({ taskId, onSave, onRun }: EditorPaneProps) {
             dispatch({ type: 'fileEdited', path, content });
           }}
           onCursorChange={(line, column) => {
-            markWork();
             setCursor({ line, column });
           }}
           onSave={onSave}

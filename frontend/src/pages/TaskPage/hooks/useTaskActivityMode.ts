@@ -5,11 +5,7 @@ export const WORK_WINDOW_MS = 60_000;
 const CHECK_EVERY_MS = 5000;
 
 /** coding while the trainee works (edits, cursor, Run, terminal); reading when the instructions are shown. */
-export function useTaskActivityMode({
-  isInstructionsVisible,
-}: {
-  isInstructionsVisible: boolean;
-}): {
+export function useTaskActivityMode(): {
   mode: ActivityMode;
   markWork: () => void;
 } {
@@ -17,6 +13,7 @@ export function useTaskActivityMode({
   const [hasRecentWork, setHasRecentWork] = useState(false);
 
   const markWork = useCallback(() => {
+    console.trace('[ACTIVITY] markWork called');
     lastWorkAtRef.current = Date.now();
     setHasRecentWork(true); // no re-render when it's already true
   }, []);
@@ -29,6 +26,6 @@ export function useTaskActivityMode({
     return () => window.clearInterval(id);
   }, [hasRecentWork]);
 
-  const mode: ActivityMode = hasRecentWork ? 'coding' : isInstructionsVisible ? 'reading' : 'none';
+  const mode: ActivityMode = hasRecentWork ? 'coding' : 'none';
   return { mode, markWork };
 }
