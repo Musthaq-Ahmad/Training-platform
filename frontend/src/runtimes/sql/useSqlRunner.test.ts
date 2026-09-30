@@ -15,6 +15,7 @@ function fakeDb(result: SqlRunResult = okResult) {
   return {
     run: vi.fn(() => Promise.resolve(result)),
     close: vi.fn(() => Promise.resolve()),
+    isPersistent: false,
   } satisfies SqlDatabase;
 }
 
