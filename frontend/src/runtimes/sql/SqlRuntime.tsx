@@ -13,6 +13,8 @@ import SqlResults from './SqlResults';
 import { useSqlDatabase } from './useSqlDatabase';
 import { useSqlRunner, type SqlRun } from './useSqlRunner';
 import styles from './SqlRuntime.module.css';
+import { useAuth } from '../../context/Useauth';
+import { sqlStorageName } from './sqlStorageName';
 
 // isVisible is accepted and not used: nothing here needs to measure itself.
 type SqlRuntimeProps = { task: TaskResponse; isVisible: boolean };
@@ -38,7 +40,9 @@ function footerText(run: SqlRun | null): string {
 }
 
 export default function SqlRuntime({ task }: SqlRuntimeProps) {
-  const database = useSqlDatabase(task.setupSql);
+  const { user } = useAuth();
+  const storageName = user ? sqlStorageName(user.id, task.id) : null;
+  const database = useSqlDatabase(task.setupSql, storageName);
   const runner = useSqlRunner(database.status === 'ready' ? database.db : null);
   const editorRef = useEditorRef();
   const monaco = useMonaco();
@@ -186,6 +190,14 @@ export default function SqlRuntime({ task }: SqlRuntimeProps) {
           Database ready
         </span>
       )}
+      {database.status === 'ready' && storageName && !database.db.isPersistent && (
+        <span
+          className={styles.pill}
+          title="Your tables are kept only until you leave this page: the database is open in another tab, or the browser blocked storage."
+        >
+          Not saved
+        </span>
+      )}
       {database.status === 'failed' && (
         <span className={`${styles.pill} ${styles.pillFailed}`} title={database.message}>
           Database failed
@@ -245,8 +257,8 @@ export default function SqlRuntime({ task }: SqlRuntimeProps) {
         onConfirm={() => void confirmReset()}
         onCancel={() => setIsResetOpen(false)}
       >
-        This deletes every table and row in this task&apos;s database and starts again from the
-        task&apos;s setup. Your .sql files are not affected.
+        This deletes every table and row in this task&apos;s database, including the copy saved in
+        this browser, and starts again from the task&apos;s setup. Your .sql files are not affected.
       </ConfirmDialog>
     </>
   );
