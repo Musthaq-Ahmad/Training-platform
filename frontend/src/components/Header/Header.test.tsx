@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import Header from './Header';
+import { MemoryRouter } from 'react-router';
 
 const mockLogout = vi.fn();
 
@@ -22,28 +23,45 @@ afterEach(() => {
 
 describe('Header', () => {
   it('renders the app name, dashboard link, and user name', () => {
-    render(<Header />);
+    render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>
+    );
     expect(screen.getByText('Vink')).toHaveTextContent('VinkUp');
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Rahul Sharma')).toBeInTheDocument();
   });
 
-  it('renders Dashboard, user name, and logout as clickable buttons', () => {
-    render(<Header />);
-    expect(screen.getByText('Dashboard').tagName).toBe('BUTTON');
-    expect(screen.getByText('Rahul Sharma').tagName).toBe('BUTTON');
-    expect(screen.getByText('Log out').tagName).toBe('BUTTON');
+  it('renders Dashboard and user name as navigation links and logout as a button', () => {
+    render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Rahul Sharma' })).toHaveAttribute('href', '/profile');
+    expect(screen.getByRole('button', { name: 'Log out' })).toBeInTheDocument();
   });
 
   it('shows leading content instead of the app name when given', () => {
-    render(<Header leading={<span>Custom crumb</span>} />);
+    render(
+      <MemoryRouter>
+        <Header leading={<span>Custom crumb</span>} />
+      </MemoryRouter>
+    );
 
     expect(screen.getByText('Custom crumb')).toBeInTheDocument();
     expect(screen.queryByText('Vink')).not.toBeInTheDocument();
   });
 
   it('renders the status slot before the nav', () => {
-    render(<Header status={<span>ACTIVE SESSION</span>} />);
+    render(
+      <MemoryRouter>
+        <Header status={<span>ACTIVE SESSION</span>} />
+      </MemoryRouter>
+    );
 
     expect(screen.getByText('ACTIVE SESSION')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /log out/i })).toBeInTheDocument();

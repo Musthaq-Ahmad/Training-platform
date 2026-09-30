@@ -22,11 +22,14 @@
 }
 
 .link {
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
   text-decoration: none;
+  display: flex;
+  gap: 3px;
 }
 
 .link:hover {
+  color: var(--color-text-primary);
   text-decoration: underline;
 }
 

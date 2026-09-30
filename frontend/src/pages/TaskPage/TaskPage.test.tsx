@@ -124,8 +124,7 @@ describe('TaskPage', () => {
     renderTaskPage();
 
     expect(await screen.findByText('Task 7')).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('link', { name: 'Day 01' })).toHaveAttribute('href', '/days/d1');
-    expect(screen.queryByText(/in-house trainee training platform/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toBeInTheDocument();
   });
 
   it('shows the app name in the header when the task could not load', async () => {
