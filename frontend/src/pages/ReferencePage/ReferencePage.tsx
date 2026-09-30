@@ -1,5 +1,6 @@
 import Prism from 'prismjs';
 import React from 'react';
+import { Link } from 'react-router';
 import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-css';
 import 'prismjs/components/prism-javascript';
@@ -14,6 +15,7 @@ import { getDayReference } from '../../content/data/getDayReference';
 import type { ContentBlock } from '../../content/types';
 import styles from './ReferencePage.module.css';
 import Header from '../../components/Header';
+import ArrowIcon from './assets/ArrowIcon';
 
 type ReferencePageProps = {
   dayId: string;
@@ -287,9 +289,10 @@ const ReferencePage = ({ dayId }: ReferencePageProps) => {
   return (
     <main className={styles.page}>
       <Header />
-      <a href={`/days/${dayId}`} className={styles.backLink}>
-        ← Back to day overview
-      </a>
+      <Link to={`/days/${dayId}`} className={styles.backLink}>
+        <ArrowIcon direction="left" />
+        <span>Back to day overview</span>
+      </Link>
 
       {/* Outer Reference Container */}
       <div className={styles.referenceContainer}>
@@ -308,12 +311,13 @@ const ReferencePage = ({ dayId }: ReferencePageProps) => {
                 <li key={link.dayId} className={styles.prerequisiteItem}>
                   <span className={styles.prerequisiteLabel}>{link.label}</span>
 
-                  <a
-                    href={`/days/${link.dayId}/references`}
+                  <Link
+                    to={`/days/${link.dayId}/references`}
                     className={`${styles.returnButton} ${styles.prerequisiteButton}`}
                   >
-                    View References →
-                  </a>
+                    <span>View References</span>
+                    <ArrowIcon direction="right" />
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -361,9 +365,10 @@ const ReferencePage = ({ dayId }: ReferencePageProps) => {
         })}
 
         {/* Return to Day */}
-        <a href={`/days/${dayId}`} className={styles.returnButton}>
-          ← Return to Day {content.dayNumber}
-        </a>
+        <Link to={`/days/${dayId}`} className={styles.returnButton}>
+          <ArrowIcon direction="left" />
+          <span>Return to Day {content.dayNumber}</span>
+        </Link>
       </div>
     </main>
   );
