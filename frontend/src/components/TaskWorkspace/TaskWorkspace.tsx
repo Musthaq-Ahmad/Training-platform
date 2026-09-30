@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useToast } from '../Toast';
+import { useFlagTracking } from '../../hooks/Useflagtracking';
 import type { TaskResponse } from '@itp/types';
 import { getTaskCode, saveTaskCode, submitTask } from '../../api/tasks';
 import { applyRuntimeSettings } from '../../lib/monacoSetup';
@@ -24,7 +26,6 @@ import InstructionsPanel from '../InstructionsPanel';
 import SaveIndicator from '../SaveIndicator';
 import SubmitTaskButton from '../SubmitTaskButton';
 import TaskToolbar from '../TaskToolbar';
-import { useToast } from '../Toast';
 import WorkspaceSidebar from '../WorkspaceSidebar';
 import styles from './TaskWorkspace.module.css';
 
@@ -38,6 +39,14 @@ export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
   const navigate = useNavigate();
   const runner = useRunner();
   const toast = useToast();
+
+  const { show } = useToast();
+  const showLeaveWarning = useCallback(
+    (message: string) => show({ message, variant: 'warning', durationMs: 5000 }),
+    [show]
+  );
+  // Logs TAB_SWITCH / FULLSCREEN_EXIT and shows the toast. This is the only place exits are logged.
+  useFlagTracking({ taskId: task.id, onWarning: showLeaveWarning });
 
   const [isRefreshConfirmOpen, setIsRefreshConfirmOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);

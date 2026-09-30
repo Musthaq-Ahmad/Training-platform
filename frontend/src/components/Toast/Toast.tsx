@@ -1,14 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { X } from 'lucide-react';
+import {
+  ToastContext,
+  type ShowToastOptions,
+  type ToastContextValue,
+  type ToastVariant,
+} from './ToastContext';
 import styles from './Toast.module.css';
-
-export type ToastVariant = 'info' | 'success' | 'warning' | 'error';
-
-export type ShowToastOptions = {
-  message: string;
-  variant?: ToastVariant;
-  durationMs?: number;
-};
 
 type ToastItem = {
   id: string;
@@ -17,24 +15,24 @@ type ToastItem = {
   durationMs: number;
 };
 
-type ToastContextValue = {
-  show: (options: ShowToastOptions) => void;
-};
-
 const MAX_VISIBLE_TOASTS = 3;
 const DEFAULT_DURATION_MS = 4000;
-
-const ToastContext = createContext<ToastContextValue | null>(null);
 
 function createToastId(): string {
   return `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 function ToastItemView({ toast, onDismiss }: { toast: ToastItem; onDismiss: () => void }) {
+  // Keep the latest callback in a ref so a new toast arriving doesn't restart this timer
+  const onDismissRef = useRef(onDismiss);
   useEffect(() => {
-    const timer = setTimeout(onDismiss, toast.durationMs);
+    onDismissRef.current = onDismiss;
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(() => onDismissRef.current(), toast.durationMs);
     return () => clearTimeout(timer);
-  }, [toast.durationMs, onDismiss]);
+  }, [toast.durationMs]);
 
   return (
     <div className={`${styles.toast} ${styles[toast.variant]}`}>
@@ -66,8 +64,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  // Stable value: components that only call show() don't re-render when toasts change
+  const value = useMemo<ToastContextValue>(() => ({ show }), [show]);
+
   return (
-    <ToastContext.Provider value={{ show }}>
+    <ToastContext.Provider value={value}>
       {children}
       <div className={styles.container} role="status" aria-live="polite">
         {toasts.map((toast) => (
@@ -76,10 +77,4 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       </div>
     </ToastContext.Provider>
   );
-}
-
-export function useToast(): ToastContextValue {
-  const context = useContext(ToastContext);
-  if (!context) throw new Error('useToast must be used within a ToastProvider');
-  return context;
 }
