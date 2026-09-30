@@ -24,6 +24,7 @@ import { mockUser } from '../test/fixtures/user';
 import { mockTasksByDay } from '../test/fixtures/dayTasks';
 import { mockStatusByDay, mockJournalByDay } from '../test/fixtures/dayStatus';
 import { mockDayContents } from './dayOverview';
+import { buildCourseDays, buildDashboard } from '../test/fixtures/dashboard';
 
 const MOCK_DELAY_MS = 300;
 
@@ -83,6 +84,7 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   const dayTasksMatch = /^\/days\/([^/]+)\/tasks$/.exec(url);
   const dayStatusMatch = /^\/days\/([^/]+)\/status$/.exec(url);
   const dayJournalMatch = /^\/days\/([^/]+)\/journal$/.exec(url);
+  const courseDaysMatch = /^\/courses\/([^/]+)\/days$/.exec(url);
 
   if (method === 'get' && codeMatch) {
     const taskId = codeMatch[1];
@@ -155,6 +157,15 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
     // No journal row yet is normal for a new trainee: return an empty response, not a 404.
     const journal = mockJournalByDay[dayJournalMatch[1]] ?? { responseText: null };
     return respond(config, 200, journal);
+  }
+  if (method === 'get' && url === '/dashboard') {
+    return respond(config, 200, buildDashboard());
+  }
+
+  if (method === 'get' && courseDaysMatch) {
+    const days = buildCourseDays(courseDaysMatch[1]);
+    if (!days) return errorResponse(config, 404, 'NOT_FOUND', 'Course not found.');
+    return respond(config, 200, days);
   }
 
   return errorResponse(config, 404, 'NOT_FOUND', 'Not found.');
