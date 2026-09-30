@@ -140,4 +140,27 @@ describe('TaskToolbar', () => {
       screen.getByRole('button', { name: /run/i }).querySelector('svg')
     ).not.toBeInTheDocument();
   });
+
+  it('shows the submitted pill only when hasSubmitted, with the time when given', () => {
+    const props = {
+      estimatedMinutes: 50,
+      visiblePanes,
+      onTogglePane: vi.fn(),
+      onBack: vi.fn(),
+      onRun: vi.fn(),
+      runner: makeRunner(),
+      saveIndicator: null,
+      submitSlot: null,
+    };
+    const { rerender } = render(<TaskToolbar {...props} />);
+    expect(screen.queryByText(/^Submitted/)).not.toBeInTheDocument();
+
+    rerender(<TaskToolbar {...props} hasSubmitted />);
+    expect(screen.getByText('Submitted')).toBeInTheDocument();
+
+    rerender(
+      <TaskToolbar {...props} hasSubmitted submittedAt={new Date(2026, 8, 28, 14, 32, 5)} />
+    );
+    expect(screen.getByText('Submitted 14:32')).toBeInTheDocument();
+  });
 });
