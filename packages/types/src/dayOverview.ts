@@ -49,3 +49,7 @@ export interface DayCurrentStatus {
 export interface DayJournal {
   responseText: string | null;
 }
+
+export type SaveJournalRequest = {
+  responseText: string;
+};

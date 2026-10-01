@@ -1,19 +1,25 @@
 import styles from './DayCompletion.module.css';
 
-interface DayCompletionProps {
+type DayCompletionProps = {
   completedTasks: number;
   totalTasks: number;
   isCompleted: boolean;
-  onComplete: () => void;
-}
+  isSubmitting: boolean;
+  onComplete: () => void | Promise<void>;
+};
 
 export default function DayCompletion({
   completedTasks,
   totalTasks,
   isCompleted,
+  isSubmitting,
   onComplete,
 }: DayCompletionProps) {
-  const isChecklistIncomplete = completedTasks < totalTasks;
+  const hasIncompleteTasks = completedTasks < totalTasks;
+
+  let buttonLabel = 'SUBMIT DAY';
+  if (isCompleted) buttonLabel = 'Day completed';
+  else if (isSubmitting) buttonLabel = 'Submitting...';
 
   return (
     <section className={styles.dayCompletion}>
@@ -21,8 +27,10 @@ export default function DayCompletion({
         <div className={styles.dayCompletionHeader}>
           <h2 className={styles.dayCompletionTitle}>Day Completion Verification</h2>
 
-          {!isCompleted && isChecklistIncomplete && (
-            <span className={styles.statusBadge}>Checklist Incomplete</span>
+          {!isCompleted && hasIncompleteTasks && (
+            <span className={styles.statusBadge}>
+              Tasks incomplete ({completedTasks}/{totalTasks})
+            </span>
           )}
         </div>
 
@@ -35,8 +43,9 @@ export default function DayCompletion({
       <button
         type="button"
         className={styles.dayCompletionButton}
-        onClick={onComplete}
-        disabled={isCompleted || isChecklistIncomplete}
+        onClick={() => void onComplete()}
+        disabled={isCompleted || hasIncompleteTasks || isSubmitting}
+        aria-busy={isSubmitting}
       >
         <svg
           className={styles.buttonIcon}
@@ -48,10 +57,11 @@ export default function DayCompletion({
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-hidden="true"
         >
           <polyline points="20 6 9 17 4 12" />
         </svg>
-        <span>{isCompleted ? 'Day completed' : 'SUBMIT DAY'}</span>
+        <span>{buttonLabel}</span>
       </button>
     </section>
   );

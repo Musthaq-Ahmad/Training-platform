@@ -9,7 +9,7 @@ afterEach(() => {
 
 describe('DailyJournal', () => {
   const defaultProps = {
-    prompt: 'What did you learn today?',
+    prompts: ['What did you learn today?'],
     initialResponse: 'I learned about React hooks.',
     isSaving: false,
     isSaved: false,
@@ -39,7 +39,7 @@ describe('DailyJournal', () => {
 
     expect(
       screen.getByRole('textbox', {
-        name: '',
+        name: 'Daily journal response',
       })
     ).toHaveValue('I learned about React hooks.');
   });
@@ -47,7 +47,11 @@ describe('DailyJournal', () => {
   it('renders an empty textarea when initialResponse is null', () => {
     render(<DailyJournal {...defaultProps} initialResponse={null} />);
 
-    expect(screen.getByRole('textbox')).toHaveValue('');
+    expect(
+      screen.getByRole('textbox', {
+        name: 'Daily journal response',
+      })
+    ).toHaveValue('');
   });
 
   it('renders the textarea placeholder', () => {
@@ -63,7 +67,9 @@ describe('DailyJournal', () => {
   it('updates the response when the user types', () => {
     render(<DailyJournal {...defaultProps} />);
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('textbox', {
+      name: 'Daily journal response',
+    });
 
     fireEvent.change(textarea, {
       target: { value: 'Today I learned TypeScript.' },
@@ -95,9 +101,14 @@ describe('DailyJournal', () => {
 
     render(<DailyJournal {...defaultProps} onSave={onSave} />);
 
-    fireEvent.change(screen.getByRole('textbox'), {
-      target: { value: 'I learned about CSS Modules.' },
-    });
+    fireEvent.change(
+      screen.getByRole('textbox', {
+        name: 'Daily journal response',
+      }),
+      {
+        target: { value: 'I learned about CSS Modules.' },
+      }
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'Save Journal' }));
 
@@ -107,7 +118,9 @@ describe('DailyJournal', () => {
   it('disables the save button and displays Saving when isSaving is true', () => {
     render(<DailyJournal {...defaultProps} isSaving={true} />);
 
-    const saveButton = screen.getByRole('button', { name: 'Saving...' });
+    const saveButton = screen.getByRole('button', {
+      name: 'Saving...',
+    });
 
     expect(saveButton).toBeDisabled();
     expect(saveButton).toHaveTextContent('Saving...');
@@ -125,5 +138,18 @@ describe('DailyJournal', () => {
     expect(
       screen.queryByText('Journal is optional and does not affect day completion')
     ).not.toBeInTheDocument();
+  });
+
+  it('renders multiple journal prompts', () => {
+    render(
+      <DailyJournal
+        {...defaultProps}
+        prompts={['What did you learn today?', 'What was challenging?']}
+      />
+    );
+
+    expect(screen.getByText('What did you learn today?')).toBeInTheDocument();
+
+    expect(screen.getByText('What was challenging?')).toBeInTheDocument();
   });
 });

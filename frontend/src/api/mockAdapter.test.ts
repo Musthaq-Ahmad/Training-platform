@@ -1,12 +1,18 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import axios from 'axios';
-import type { TaskCodeResponse, TaskResponse } from '@itp/types';
-import type { DayTask, DayCurrentStatus, DayJournal } from '@itp/types';
+import type {
+  TaskCodeResponse,
+  TaskResponse,
+  DayTask,
+  DayCurrentStatus,
+  DayJournal,
+  DashboardResponse,
+  DaySummary,
+} from '@itp/types';
 import { installMockAdapter } from './mockAdapter';
 import { mockDayContents } from './dayOverview';
 import { mockTasksByDay } from '../test/fixtures/dayTasks';
 import { mockJournalByDay, mockStatusByDay } from '../test/fixtures/dayStatus';
-import type { DashboardResponse, DaySummary } from '@itp/types';
 import { CURRICULUM_COURSES } from '../constants/courses';
 
 function createClient() {
@@ -20,13 +26,21 @@ function findUnlockedDayId(): string {
   const dayId = Object.keys(mockDayContents).find(
     (id) => mockStatusByDay[id] && !mockStatusByDay[id].isLocked
   );
-  if (!dayId) throw new Error('No unlocked day fixture found');
+
+  if (!dayId) {
+    throw new Error('No unlocked day fixture found');
+  }
+
   return dayId;
 }
 
 function findLockedDayId(): string {
   const dayId = Object.keys(mockDayContents).find((id) => mockStatusByDay[id]?.isLocked);
-  if (!dayId) throw new Error('No locked day fixture found');
+
+  if (!dayId) {
+    throw new Error('No locked day fixture found');
+  }
+
   return dayId;
 }
 
@@ -39,26 +53,45 @@ describe('mockAdapter', () => {
 
   it('returns the node fixture for GET /tasks/t-node', async () => {
     const res = await client.get<TaskResponse>('/tasks/t-node');
+
     expect(res.data.runtime).toBe('node');
   });
 
   it('rejects GET /tasks/locked with 403 DAY_LOCKED', async () => {
     await expect(client.get('/tasks/locked')).rejects.toMatchObject({
-      response: { status: 403, data: { error: { code: 'DAY_LOCKED' } } },
+      response: {
+        status: 403,
+        data: {
+          error: {
+            code: 'DAY_LOCKED',
+          },
+        },
+      },
     });
   });
 
   it('returns the saved files after a PUT then GET on the same code endpoint', async () => {
-    const files = [{ path: 'a.js', content: 'console.log(1)' }];
-    await client.put('/tasks/t-browser/code', { files });
+    const files = [
+      {
+        path: 'a.js',
+        content: 'console.log(1)',
+      },
+    ];
+
+    await client.put('/tasks/t-browser/code', {
+      files,
+    });
 
     const res = await client.get<TaskCodeResponse>('/tasks/t-browser/code');
+
     expect(res.data.files).toEqual(files);
   });
 
   it('no longer answers the removed /sql routes (SQL runs in the browser now)', async () => {
     await expect(client.get('/sql/database')).rejects.toMatchObject({
-      response: { status: 404 },
+      response: {
+        status: 404,
+      },
     });
   });
 
@@ -71,8 +104,13 @@ describe('mockAdapter', () => {
         title: 'Personal Profile Page',
         runtime: 'browser',
         status: 'completed',
-        day: { id: 'html-day-01', dayNumber: 1, courseTitle: 'HTML' },
+        day: {
+          id: 'html-day-01',
+          dayNumber: 1,
+          courseTitle: 'HTML',
+        },
       });
+
       expect(res.data.instructionsMarkdown).toContain('profile.html');
     });
 
@@ -93,38 +131,118 @@ describe('mockAdapter', () => {
       const dayId = findLockedDayId();
 
       await expect(client.get(`/tasks/${dayId}-t-1`)).rejects.toMatchObject({
-        response: { status: 403, data: { error: { code: 'DAY_LOCKED' } } },
+        response: {
+          status: 403,
+          data: {
+            error: {
+              code: 'DAY_LOCKED',
+            },
+          },
+        },
       });
     });
 
     it('rejects an unknown task with 404 NOT_FOUND', async () => {
       await expect(client.get('/tasks/no-such-task')).rejects.toMatchObject({
-        response: { status: 404, data: { error: { code: 'NOT_FOUND' } } },
+        response: {
+          status: 404,
+          data: {
+            error: {
+              code: 'NOT_FOUND',
+            },
+          },
+        },
       });
     });
   });
 
   describe('error scenarios', () => {
     it('fails the save for t-save-error', async () => {
-      await expect(client.put('/tasks/t-save-error/code', { files: [] })).rejects.toMatchObject({
-        response: { status: 500, data: { error: { code: 'INTERNAL_ERROR' } } },
+      await expect(
+        client.put('/tasks/t-save-error/code', {
+          files: [],
+        })
+      ).rejects.toMatchObject({
+        response: {
+          status: 500,
+          data: {
+            error: {
+              code: 'INTERNAL_ERROR',
+            },
+          },
+        },
       });
     });
 
     it('rejects the submit for t-submit-error', async () => {
       await expect(client.post('/tasks/t-submit-error/submit')).rejects.toMatchObject({
-        response: { status: 403, data: { error: { code: 'CHECKLIST_INCOMPLETE' } } },
+        response: {
+          status: 403,
+          data: {
+            error: {
+              code: 'CHECKLIST_INCOMPLETE',
+            },
+          },
+        },
       });
     });
 
     it('fails the task load for t-server-error', async () => {
       await expect(client.get('/tasks/t-server-error')).rejects.toMatchObject({
-        response: { status: 500, data: { error: { code: 'INTERNAL_ERROR' } } },
+        response: {
+          status: 500,
+          data: {
+            error: {
+              code: 'INTERNAL_ERROR',
+            },
+          },
+        },
       });
     });
   });
 
   describe('days', () => {
+    it('PUT /days/:id/journal returns 404 NOT_FOUND for an unknown day', async () => {
+      await expect(
+        client.put('/days/unknown-day/journal', {
+          responseText: 'hello',
+        })
+      ).rejects.toMatchObject({
+        response: {
+          status: 404,
+          data: {
+            error: {
+              code: 'NOT_FOUND',
+            },
+          },
+        },
+      });
+    });
+
+    it('keeps a saved journal in localStorage so it survives a refresh', async () => {
+      const dayId = findUnlockedDayId();
+
+      const originalJournal = mockJournalByDay[dayId] ?? {
+        responseText: null,
+      };
+
+      try {
+        await client.put(`/days/${dayId}/journal`, {
+          responseText: 'persist me',
+        });
+
+        const stored = JSON.parse(localStorage.getItem('itp-mock-journals-v1') ?? '{}') as Record<
+          string,
+          string | null
+        >;
+
+        expect(stored[dayId]).toBe('persist me');
+      } finally {
+        mockJournalByDay[dayId] = originalJournal;
+        localStorage.removeItem('itp-mock-journals-v1');
+      }
+    });
+
     it('returns tasks for GET /days/:dayId/tasks', async () => {
       const dayId = findUnlockedDayId();
 
@@ -136,7 +254,14 @@ describe('mockAdapter', () => {
 
     it('rejects GET /days/missing/tasks with 404 NOT_FOUND', async () => {
       await expect(client.get('/days/missing/tasks')).rejects.toMatchObject({
-        response: { status: 404, data: { error: { code: 'NOT_FOUND' } } },
+        response: {
+          status: 404,
+          data: {
+            error: {
+              code: 'NOT_FOUND',
+            },
+          },
+        },
       });
     });
 
@@ -144,7 +269,14 @@ describe('mockAdapter', () => {
       const dayId = findLockedDayId();
 
       await expect(client.get(`/days/${dayId}/tasks`)).rejects.toMatchObject({
-        response: { status: 403, data: { error: { code: 'DAY_LOCKED' } } },
+        response: {
+          status: 403,
+          data: {
+            error: {
+              code: 'DAY_LOCKED',
+            },
+          },
+        },
       });
     });
 
@@ -168,8 +300,38 @@ describe('mockAdapter', () => {
 
     it('rejects GET /days/missing/status with 404 NOT_FOUND', async () => {
       await expect(client.get('/days/missing/status')).rejects.toMatchObject({
-        response: { status: 404, data: { error: { code: 'NOT_FOUND' } } },
+        response: {
+          status: 404,
+          data: {
+            error: {
+              code: 'NOT_FOUND',
+            },
+          },
+        },
       });
+    });
+
+    it('PUT /days/:id/journal returns 204 and stores the body', async () => {
+      const dayId = findUnlockedDayId();
+
+      const originalJournal = mockJournalByDay[dayId] ?? {
+        responseText: null,
+      };
+
+      try {
+        const put = await client.put(`/days/${dayId}/journal`, {
+          responseText: 'hello',
+        });
+
+        expect(put.status).toBe(204);
+
+        const get = await client.get<DayJournal>(`/days/${dayId}/journal`);
+
+        expect(get.status).toBe(200);
+        expect(get.data.responseText).toBe('hello');
+      } finally {
+        mockJournalByDay[dayId] = originalJournal;
+      }
     });
 
     it('returns the journal for GET /days/:dayId/journal', async () => {
@@ -178,14 +340,118 @@ describe('mockAdapter', () => {
       const res = await client.get<DayJournal>(`/days/${dayId}/journal`);
 
       expect(res.status).toBe(200);
-      expect(res.data).toEqual(mockJournalByDay[dayId] ?? { responseText: null });
+      expect(res.data).toEqual(
+        mockJournalByDay[dayId] ?? {
+          responseText: null,
+        }
+      );
     });
 
     it('returns an empty journal, not a 404, when the day has no journal row yet', async () => {
       const res = await client.get<DayJournal>('/days/no-journal-yet/journal');
 
       expect(res.status).toBe(200);
-      expect(res.data).toEqual({ responseText: null });
+      expect(res.data).toEqual({
+        responseText: null,
+      });
+    });
+
+    it('PATCH /days/:id/status returns 404 with NOT_FOUND for an unknown day', async () => {
+      await expect(client.patch('/days/unknown-day/status')).rejects.toMatchObject({
+        response: {
+          status: 404,
+          data: {
+            error: {
+              code: 'NOT_FOUND',
+            },
+          },
+        },
+      });
+    });
+
+    it('does not handle PUT /days/:id/status anymore because completion uses PATCH', async () => {
+      const dayId = findUnlockedDayId();
+
+      await expect(client.put(`/days/${dayId}/status`)).rejects.toMatchObject({
+        response: {
+          status: 404,
+        },
+      });
+    });
+
+    it('completes a day with PATCH /days/:dayId/status when all required tasks are completed', async () => {
+      const dayId = findUnlockedDayId();
+      const tasks = mockTasksByDay[dayId] ?? [];
+
+      const originalStatuses = tasks.map((task) => task.status);
+
+      const originalCompleted = mockStatusByDay[dayId].isCompleted;
+
+      try {
+        tasks.forEach((task) => {
+          if (!task.isStretchGoal) {
+            task.status = 'completed';
+          }
+        });
+
+        const res = await client.patch<DayCurrentStatus>(`/days/${dayId}/status`);
+
+        expect(res.status).toBe(200);
+        expect(res.data.isCompleted).toBe(true);
+      } finally {
+        tasks.forEach((task, index) => {
+          task.status = originalStatuses[index];
+        });
+
+        mockStatusByDay[dayId].isCompleted = originalCompleted;
+      }
+    });
+
+    it('rejects PATCH /days/:dayId/status when required tasks are incomplete', async () => {
+      const dayId = findUnlockedDayId();
+      const tasks = mockTasksByDay[dayId] ?? [];
+
+      const originalStatuses = tasks.map((task) => task.status);
+
+      try {
+        const requiredTask = tasks.find((task) => !task.isStretchGoal);
+
+        if (!requiredTask) {
+          throw new Error('No required task fixture found');
+        }
+
+        requiredTask.status = 'not_started';
+
+        await expect(client.patch(`/days/${dayId}/status`)).rejects.toMatchObject({
+          response: {
+            status: 400,
+            data: {
+              error: {
+                code: 'CHECKLIST_INCOMPLETE',
+              },
+            },
+          },
+        });
+      } finally {
+        tasks.forEach((task, index) => {
+          task.status = originalStatuses[index];
+        });
+      }
+    });
+
+    it('rejects PATCH /days/:dayId/status with 403 DAY_LOCKED for a locked day', async () => {
+      const dayId = findLockedDayId();
+
+      await expect(client.patch(`/days/${dayId}/status`)).rejects.toMatchObject({
+        response: {
+          status: 403,
+          data: {
+            error: {
+              code: 'DAY_LOCKED',
+            },
+          },
+        },
+      });
     });
   });
 
@@ -196,20 +462,24 @@ describe('mockAdapter', () => {
         codingSeconds: 0,
         readingSeconds: 0,
       });
+
       expect(res.status).toBe(204);
     });
 
     it('answers GET /activity/time with an empty list', async () => {
       const res = await client.get('/activity/time');
+
       expect(res.status).toBe(200);
       expect(res.data).toEqual([]);
     });
   });
+
   describe('dashboard', () => {
     async function getAllCourseDays(): Promise<DaySummary[]> {
       const responses = await Promise.all(
         CURRICULUM_COURSES.map((course) => client.get<DaySummary[]>(`/courses/${course.id}/days`))
       );
+
       return responses.flatMap((res) => res.data);
     }
 
@@ -217,9 +487,13 @@ describe('mockAdapter', () => {
       const res = await client.get<DashboardResponse>('/dashboard');
 
       expect(res.status).toBe(200);
+
       expect(res.data.today).toEqual(
-        expect.objectContaining({ activeSeconds: expect.any(Number) as number })
+        expect.objectContaining({
+          activeSeconds: expect.any(Number) as number,
+        })
       );
+
       expect(res.data.total.codingSeconds).toBeGreaterThanOrEqual(res.data.today.codingSeconds);
     });
 
@@ -227,30 +501,43 @@ describe('mockAdapter', () => {
       const res = await client.get<DashboardResponse>('/dashboard');
 
       expect(res.data).not.toHaveProperty('courses');
+
       expect(res.data).not.toHaveProperty('currentDay');
     });
 
     it('returns an unlocked next day with the total number of days in its course', async () => {
       const dashboard = await client.get<DashboardResponse>('/dashboard');
+
       const nextDay = dashboard.data.nextDay;
-      if (!nextDay) throw new Error('Expected the fixture to have a next day');
+
+      if (!nextDay) {
+        throw new Error('Expected the fixture to have a next day');
+      }
 
       expect(nextDay.status).toBe('UNLOCKED');
 
       const courseDays = await client.get<DaySummary[]>(`/courses/${nextDay.courseId}/days`);
+
       expect(nextDay.courseTotalDays).toBe(courseDays.data.length);
+
       expect(nextDay.description.length).toBeGreaterThan(0);
     });
 
     it('lists the next day in its own course with the same status', async () => {
       const dashboard = await client.get<DashboardResponse>('/dashboard');
+
       const nextDay = dashboard.data.nextDay;
-      if (!nextDay) throw new Error('Expected the fixture to have a next day');
+
+      if (!nextDay) {
+        throw new Error('Expected the fixture to have a next day');
+      }
 
       const courseDays = await client.get<DaySummary[]>(`/courses/${nextDay.courseId}/days`);
-      const listed = courseDays.data.find((d) => d.id === nextDay.id);
+
+      const listed = courseDays.data.find((day) => day.id === nextDay.id);
 
       expect(listed?.status).toBe(nextDay.status);
+
       expect(listed?.title).toBe(nextDay.title);
     });
 
@@ -261,23 +548,27 @@ describe('mockAdapter', () => {
       ]);
 
       expect(dashboard.data.totalDaysOverall).toBe(allDays.length);
+
       expect(dashboard.data.totalDaysCompleteOverall).toBe(
-        allDays.filter((d) => d.status === 'COMPLETED').length
+        allDays.filter((day) => day.status === 'COMPLETED').length
       );
     });
 
     it('has exactly one unlocked day across all courses', async () => {
       const allDays = await getAllCourseDays();
 
-      expect(allDays.filter((d) => d.status === 'UNLOCKED')).toHaveLength(1);
+      expect(allDays.filter((day) => day.status === 'UNLOCKED')).toHaveLength(1);
     });
 
     it('returns typing results with a latest attempt and a trend in date order', async () => {
       const res = await client.get<DashboardResponse>('/dashboard');
+
       const { latest, trend } = res.data.typing;
 
       expect(latest?.wpm).toBeGreaterThan(0);
+
       const dates = trend.map((point) => point.date);
+
       expect(dates).toEqual([...dates].sort());
     });
   });
@@ -288,35 +579,58 @@ describe('mockAdapter', () => {
 
       expect(res.status).toBe(200);
       expect(res.data.length).toBeGreaterThan(0);
-      expect(res.data.every((d) => d.courseId === 'css')).toBe(true);
+
+      expect(res.data.every((day) => day.courseId === 'css')).toBe(true);
     });
 
     it('returns the days in day-number order', async () => {
       const res = await client.get<DaySummary[]>('/courses/css/days');
-      const numbers = res.data.map((d) => d.dayNumber);
+
+      const numbers = res.data.map((day) => day.dayNumber);
 
       expect(numbers).toEqual([...numbers].sort((a, b) => a - b));
     });
 
     it('never has a completed day after a locked one within a course', async () => {
       const res = await client.get<DaySummary[]>('/courses/css/days');
-      const firstLocked = res.data.findIndex((d) => d.status === 'LOCKED');
+
+      const firstLocked = res.data.findIndex((day) => day.status === 'LOCKED');
 
       if (firstLocked !== -1) {
-        expect(res.data.slice(firstLocked).every((d) => d.status === 'LOCKED')).toBe(true);
+        expect(res.data.slice(firstLocked).every((day) => day.status === 'LOCKED')).toBe(true);
       }
     });
 
     it('includes a description on every day', async () => {
       const res = await client.get<DaySummary[]>('/courses/css/days');
 
-      expect(res.data.every((d) => d.description.length > 0)).toBe(true);
+      expect(res.data.every((day) => day.description.length > 0)).toBe(true);
     });
 
     it('rejects GET /courses/missing/days with 404 NOT_FOUND', async () => {
       await expect(client.get('/courses/missing/days')).rejects.toMatchObject({
-        response: { status: 404, data: { error: { code: 'NOT_FOUND' } } },
+        response: {
+          status: 404,
+          data: {
+            error: {
+              code: 'NOT_FOUND',
+            },
+          },
+        },
       });
+    });
+  });
+
+  it('returns 404 for an unknown route', async () => {
+    await expect(client.get('/nothing-here')).rejects.toMatchObject({
+      response: {
+        status: 404,
+        data: {
+          error: {
+            code: 'NOT_FOUND',
+          },
+        },
+      },
     });
   });
 });
