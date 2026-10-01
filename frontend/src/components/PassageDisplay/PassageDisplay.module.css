@@ -1,10 +1,12 @@
 .passage {
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 22px;
   line-height: 2;
   white-space: pre-wrap;
   word-break: break-word;
   user-select: none;
+  transition: transform 0.12s ease-out;
+  will-change: transform;
 }
 
 .pending {
@@ -24,4 +26,10 @@
   color: var(--color-text-primary);
   background: var(--color-accent-purple-wash);
   border-bottom: 2px solid var(--color-accent-purple);
+}
+/* Exactly 4 lines tall; the passage scrolls inside it one line at a time */
+.viewport {
+  position: relative;
+  overflow: hidden;
+  flex: none;
 }
