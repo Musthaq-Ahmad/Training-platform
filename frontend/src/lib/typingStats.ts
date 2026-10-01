@@ -28,7 +28,7 @@ export function buildPassage(
   options: PassageOptions = DEFAULT_PASSAGE_OPTIONS,
   random: () => number = Math.random
 ): string {
-  const targetLength = durationSeconds * CHARS_PER_SECOND;
+  const targetLength = durationSeconds * CHARS_PER_SECOND + 1;
   const tokens: string[] = [];
   let length = 0;
   let wordsLeftInSentence = 0;
