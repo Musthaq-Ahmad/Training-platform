@@ -61,6 +61,7 @@ export default function TypingTestPage() {
     handleInput,
     restart,
     toggleOption,
+    isPaused,
   } = useTypingTest(DEFAULT_DURATION, handleFinish);
 
   function clearMessages() {
@@ -87,10 +88,7 @@ export default function TypingTestPage() {
       <div className={styles.page}>
         <div>
           <h1 className={styles.title}>Typing Test</h1>
-          <p className={styles.subtitle}>
-            Test your typing speed and accuracy against internal enterprise codebases and
-            engineering passages.
-          </p>
+          <p className={styles.subtitle}>Test your typing speed and accuracy!</p>
         </div>
 
         <div className={styles.card}>
@@ -138,43 +136,64 @@ export default function TypingTestPage() {
           </div>
 
           {/* Clicking the passage refocuses the hidden input that receives the keystrokes */}
-          <div
-            className={styles.arena}
-            onClick={() => inputRef.current?.focus()}
-            role="presentation"
-          >
-            <PassageDisplay passage={passage} typed={typed} />
-            <input
-              ref={inputRef}
-              className={styles.hiddenInput}
-              value={typed}
-              onChange={(event) => handleInput(event.target.value)}
-              onPaste={(event) => event.preventDefault()}
-              onDrop={(event) => event.preventDefault()}
-              aria-label="Type the text shown above"
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck={false}
-            />
-          </div>
+          <div className={styles.arenaWrap}>
+            {/* Clicking the passage refocuses the hidden input that receives the keystrokes */}
+            <div
+              className={styles.arena}
+              onClick={() => inputRef.current?.focus()}
+              role="presentation"
+            >
+              <PassageDisplay passage={passage} typed={typed} />
+              <input
+                ref={inputRef}
+                className={styles.hiddenInput}
+                value={typed}
+                onChange={(event) => handleInput(event.target.value)}
+                onPaste={(event) => event.preventDefault()}
+                onDrop={(event) => event.preventDefault()}
+                readOnly={status === 'finished' || isPaused}
+                aria-label="Type the text shown above"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+              />
+            </div>
 
-          {status === 'finished' && lastResult && (
-            <p className={styles.result} role="status">
-              Test complete: <strong>{lastResult.wpm} WPM</strong> at{' '}
-              <strong>{lastResult.accuracy}%</strong> accuracy.
-              {isSaving ? ' Saving...' : ''}
-            </p>
-          )}
-          {saveError && (
-            <p className={styles.error} role="alert">
-              Your result could not be saved: {saveError.message}
-            </p>
-          )}
+            {status === 'finished' && (
+              <div className={styles.timeoutOverlay} role="status">
+                <p className={styles.timeoutTitle}>Time&apos;s up!</p>
+
+                {lastResult && (
+                  <div className={styles.resultStats}>
+                    <div className={styles.resultStat}>
+                      <span className={styles.resultValue}>{lastResult.wpm}</span>
+                      <span className={styles.resultLabel}>WPM</span>
+                    </div>
+                    <div className={styles.resultStat}>
+                      <span className={styles.resultValueGreen}>{lastResult.accuracy}%</span>
+                      <span className={styles.resultLabel}>ACCURACY</span>
+                    </div>
+                  </div>
+                )}
+
+                {isSaving && <p className={styles.timeoutHint}>Saving result...</p>}
+                {saveError && (
+                  <p className={styles.error} role="alert">
+                    Could not save your result: {saveError.message}
+                  </p>
+                )}
+
+                <p className={styles.timeoutHint}>
+                  Press <kbd>Enter</kbd> or Restart Test to try again
+                </p>
+              </div>
+            )}
+          </div>
 
           <div className={styles.footer}>
             <p className={styles.hint}>
-              Press <kbd>Esc</kbd> to restart test
+              Press <kbd>Enter</kbd> to restart test
             </p>
             <button
               type="button"

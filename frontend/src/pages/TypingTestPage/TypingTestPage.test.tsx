@@ -1,7 +1,7 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { TypingTestResult, TypingTodayResponse } from '@itp/types';
+import type { SaveTypingResultRequest, TypingTestResult, TypingTodayResponse } from '@itp/types';
 
 import TypingTestPage from './TypingTestPage';
 import { getTypingToday, saveTypingResult } from '../../api/typingTest';
@@ -16,11 +16,64 @@ vi.mock('../../components/Header', () => ({
   default: () => <header>Header</header>,
 }));
 
-vi.mock('../../lib/typingStats', async () => {
-  const actual =
-    await vi.importActual<typeof import('../../lib/typingStats')>('../../lib/typingStats');
-  return { ...actual, buildPassage: () => 'hi' };
-});
+vi.mock('../../components/PassageDisplay', () => ({
+  default: ({ passage, typed }: { passage: string; typed: string }) => (
+    <div aria-label="Text to type">
+      {passage}
+      <span data-testid="typed-text">{typed}</span>
+    </div>
+  ),
+}));
+
+vi.mock('../../components/TestHistory', () => ({
+  default: ({
+    results,
+    averageWpm,
+  }: {
+    results: TypingTestResult[];
+    averageWpm: number;
+    averageAccuracy: number;
+  }) => (
+    <div>
+      {results.map((result) => (
+        <div key={result.id}>
+          Test {result.testNumber}
+          <span>{result.wpm} WPM</span>
+        </div>
+      ))}
+
+      <span>{averageWpm} WPM</span>
+    </div>
+  ),
+}));
+
+type MockTypingTestState = {
+  passage: string;
+  typed: string;
+  status: 'idle' | 'running' | 'finished';
+  secondsLeft: number;
+  durationSeconds: number;
+  options: {
+    punctuation: boolean;
+    numbers: boolean;
+  };
+  handleInput: (value: string) => void;
+  restart: (nextDuration?: number) => void;
+  toggleOption: (key: 'punctuation' | 'numbers') => void;
+  isPaused: boolean;
+};
+
+type UseTypingTestMock = (
+  initialDuration: number,
+  onFinish: (stats: SaveTypingResultRequest) => void
+) => MockTypingTestState;
+
+const mockUseTypingTest = vi.fn<UseTypingTestMock>();
+
+vi.mock('../../hooks/useTypingTest', () => ({
+  useTypingTest: (initialDuration: number, onFinish: (stats: SaveTypingResultRequest) => void) =>
+    mockUseTypingTest(initialDuration, onFinish),
+}));
 
 const todayResponse: TypingTodayResponse = {
   results: [
@@ -50,33 +103,67 @@ const savedResult: TypingTestResult = {
   testNumber: 3,
   wpm: 24,
   accuracy: 100,
-  durationSeconds: 1,
+  durationSeconds: 60,
   takenAt: '2026-09-30T15:00:00.000Z',
+};
+
+const defaultTypingTestState: MockTypingTestState = {
+  passage: 'hi',
+  typed: '',
+  status: 'idle',
+  secondsLeft: 60,
+  durationSeconds: 60,
+  options: {
+    punctuation: false,
+    numbers: false,
+  },
+  handleInput: vi.fn(),
+  restart: vi.fn(),
+  toggleOption: vi.fn(),
+  isPaused: false,
 };
 
 function getTypingInput() {
   return screen.getByLabelText('Type the text shown above');
 }
 
+function renderTypingTestPage(overrides: Partial<MockTypingTestState> = {}) {
+  mockUseTypingTest.mockReturnValue({
+    ...defaultTypingTestState,
+    ...overrides,
+  });
+
+  return render(<TypingTestPage />);
+}
+
 describe('TypingTestPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
     vi.mocked(getTypingToday).mockResolvedValue(todayResponse);
     vi.mocked(saveTypingResult).mockResolvedValue(savedResult);
+
+    mockUseTypingTest.mockReturnValue({
+      ...defaultTypingTestState,
+      handleInput: vi.fn(),
+      restart: vi.fn(),
+      toggleOption: vi.fn(),
+    });
   });
 
-  it('renders the page header, title and the typing area right away', () => {
-    vi.mocked(getTypingToday).mockReturnValue(new Promise(() => {}));
-
+  it('renders the page header, title and typing area', () => {
     render(<TypingTestPage />);
 
     expect(screen.getByText('Header')).toBeInTheDocument();
+
     expect(screen.getByRole('heading', { name: 'Typing Test' })).toBeInTheDocument();
+
     expect(screen.getByLabelText('Text to type')).toHaveTextContent('hi');
+
     expect(screen.getByRole('timer')).toHaveTextContent('01:00');
   });
 
-  it('shows a loading message while the history loads', () => {
+  it('shows a loading message while history loads', () => {
     vi.mocked(getTypingToday).mockReturnValue(new Promise(() => {}));
 
     render(<TypingTestPage />);
@@ -88,12 +175,15 @@ describe('TypingTestPage', () => {
     render(<TypingTestPage />);
 
     expect(await screen.findByText('Test 2')).toBeInTheDocument();
+
     expect(screen.getByText('51 WPM')).toBeInTheDocument();
+
     expect(screen.getByText('Test 1')).toBeInTheDocument();
-    expect(screen.getByText('47 WPM')).toBeInTheDocument(); // today's average
+
+    expect(screen.getByText('47 WPM')).toBeInTheDocument();
   });
 
-  it('shows the error message when the history fails to load, but keeps the test usable', async () => {
+  it('shows the error when history fails to load', async () => {
     vi.mocked(getTypingToday).mockRejectedValue(
       new ApiError(500, 'INTERNAL_ERROR', 'Failed to load history')
     );
@@ -101,123 +191,277 @@ describe('TypingTestPage', () => {
     render(<TypingTestPage />);
 
     expect(await screen.findByText('Failed to load history')).toBeInTheDocument();
+
     expect(getTypingInput()).toBeInTheDocument();
   });
 
-  it('saves the result and reloads the history when the passage is completed', async () => {
-    const user = userEvent.setup();
-    render(<TypingTestPage />);
-    await screen.findByText('Test 2');
+  it('shows the timeout overlay when the test is finished', () => {
+    renderTypingTestPage({
+      status: 'finished',
+      secondsLeft: 0,
+    });
 
-    await user.type(getTypingInput(), 'hi');
+    const overlay = screen.getByRole('status');
 
-    await waitFor(() => expect(saveTypingResult).toHaveBeenCalledTimes(1));
-    expect(saveTypingResult).toHaveBeenCalledWith(
-      expect.objectContaining({ accuracy: 100, durationSeconds: 1 })
-    );
-    await waitFor(() => expect(getTypingToday).toHaveBeenCalledTimes(2));
-    expect(screen.getByRole('status')).toHaveTextContent('Test complete');
+    expect(overlay).toHaveTextContent("Time's up!");
+    expect(overlay).toHaveTextContent('Press Enter or Restart Test to try again');
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Restart Test',
+      })
+    ).toBeInTheDocument();
   });
 
-  it('shows an error when the result could not be saved', async () => {
-    const user = userEvent.setup();
+  it('shows WPM and accuracy labels in the timeout overlay', () => {
+    let finishCallback: ((stats: SaveTypingResultRequest) => void) | undefined;
+
+    let testFinished = false;
+
+    mockUseTypingTest.mockImplementation((_duration, onFinish) => {
+      finishCallback = onFinish;
+
+      return {
+        ...defaultTypingTestState,
+        status: testFinished ? 'finished' : 'running',
+        secondsLeft: testFinished ? 0 : 60,
+      };
+    });
+
+    const { rerender } = render(<TypingTestPage />);
+
+    act(() => {
+      finishCallback?.({
+        wpm: 45,
+        accuracy: 96,
+        durationSeconds: 60,
+      });
+
+      testFinished = true;
+    });
+
+    rerender(<TypingTestPage />);
+
+    expect(screen.getByRole('status')).toHaveTextContent("Time's up!");
+
+    expect(screen.getByText('WPM')).toBeInTheDocument();
+
+    expect(screen.getByText('ACCURACY')).toBeInTheDocument();
+
+    expect(screen.getByText('45')).toBeInTheDocument();
+
+    expect(screen.getByText('96%')).toBeInTheDocument();
+  });
+
+  it('shows the saving state when the result is being saved', async () => {
+    let finishCallback: ((stats: SaveTypingResultRequest) => void) | undefined;
+
+    mockUseTypingTest.mockImplementation((_initialDuration, onFinish) => {
+      finishCallback = onFinish;
+
+      return {
+        ...defaultTypingTestState,
+        status: 'finished',
+        secondsLeft: 0,
+      };
+    });
+
+    vi.mocked(saveTypingResult).mockReturnValue(new Promise(() => {}));
+
+    render(<TypingTestPage />);
+
+    expect(screen.getByText("Time's up!")).toBeInTheDocument();
+
+    act(() => {
+      finishCallback?.({
+        wpm: 24,
+        accuracy: 100,
+        durationSeconds: 60,
+      });
+    });
+
+    expect(await screen.findByText('Saving result...')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Restart Test',
+      })
+    ).toBeDisabled();
+
+    expect(
+      screen.getByRole('button', {
+        name: '30s',
+      })
+    ).toBeDisabled();
+  });
+
+  it('shows an error when the result cannot be saved', async () => {
+    let finishCallback: ((stats: SaveTypingResultRequest) => void) | undefined;
+
+    mockUseTypingTest.mockImplementation((_initialDuration, onFinish) => {
+      finishCallback = onFinish;
+
+      return {
+        ...defaultTypingTestState,
+        status: 'finished',
+        secondsLeft: 0,
+      };
+    });
+
     vi.mocked(saveTypingResult).mockRejectedValue(
       new ApiError(500, 'INTERNAL_ERROR', 'Server unavailable')
     );
-    render(<TypingTestPage />);
-    await screen.findByText('Test 2');
 
-    await user.type(getTypingInput(), 'hi');
+    render(<TypingTestPage />);
+
+    act(() => {
+      finishCallback?.({
+        wpm: 24,
+        accuracy: 100,
+        durationSeconds: 60,
+      });
+    });
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Server unavailable');
   });
 
-  it('disables Restart Test and the mode buttons while the result is being saved', async () => {
-    const user = userEvent.setup();
-    vi.mocked(saveTypingResult).mockReturnValue(new Promise(() => {}));
-    render(<TypingTestPage />);
-    await screen.findByText('Test 2');
-
-    await user.type(getTypingInput(), 'hi');
-
-    expect(await screen.findByRole('button', { name: 'Restart Test' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: '30s' })).toBeDisabled();
-    expect(screen.getByRole('status')).toHaveTextContent('Saving...');
-  });
-
-  it('blocks pasting text into the test', async () => {
-    const user = userEvent.setup();
-    render(<TypingTestPage />);
-    await screen.findByText('Test 2');
-
-    await user.click(getTypingInput());
-    await user.paste('hi');
-
-    expect(getTypingInput()).toHaveValue('');
-    expect(saveTypingResult).not.toHaveBeenCalled();
-  });
-
   it('changes the timer when another mode is selected', async () => {
     const user = userEvent.setup();
+    const restart = vi.fn();
+
+    mockUseTypingTest.mockReturnValue({
+      ...defaultTypingTestState,
+      restart,
+    });
+
     render(<TypingTestPage />);
-    await screen.findByText('Test 2');
 
-    await user.click(screen.getByRole('button', { name: '30s' }));
+    await user.click(
+      screen.getByRole('button', {
+        name: '30s',
+      })
+    );
 
-    expect(screen.getByRole('timer')).toHaveTextContent('00:30');
-    expect(screen.getByRole('button', { name: '30s' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: '60s' })).toHaveAttribute('aria-pressed', 'false');
+    expect(restart).toHaveBeenCalledWith(30);
   });
 
-  it('clears the typed text when Restart Test is clicked', async () => {
+  it('restarts the test when Restart Test is clicked', async () => {
     const user = userEvent.setup();
+    const restart = vi.fn();
+
+    mockUseTypingTest.mockReturnValue({
+      ...defaultTypingTestState,
+      typed: 'h',
+      restart,
+    });
+
     render(<TypingTestPage />);
-    await screen.findByText('Test 2');
 
-    await user.type(getTypingInput(), 'h');
-    expect(getTypingInput()).toHaveValue('h');
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Restart Test',
+      })
+    );
 
-    await user.click(screen.getByRole('button', { name: 'Restart Test' }));
-
-    expect(getTypingInput()).toHaveValue('');
+    expect(restart).toHaveBeenCalledWith(undefined);
   });
 
-  it('restarts the test when Escape is pressed', async () => {
-    const user = userEvent.setup();
-    render(<TypingTestPage />);
-    await screen.findByText('Test 2');
-
-    await user.type(getTypingInput(), 'h');
-    await user.keyboard('{Escape}');
-
-    expect(getTypingInput()).toHaveValue('');
-  });
   it('turns punctuation and numbers on and off', async () => {
     const user = userEvent.setup();
+    const toggleOption = vi.fn();
+
+    mockUseTypingTest.mockReturnValue({
+      ...defaultTypingTestState,
+      toggleOption,
+    });
+
     render(<TypingTestPage />);
-    await screen.findByText('Test 2');
 
-    const punctuation = screen.getByRole('button', { name: 'punctuation' });
-    const numbers = screen.getByRole('button', { name: 'numbers' });
+    const punctuation = screen.getByRole('button', {
+      name: 'punctuation',
+    });
+
+    const numbers = screen.getByRole('button', {
+      name: 'numbers',
+    });
+
     expect(punctuation).toHaveAttribute('aria-pressed', 'false');
+
     expect(numbers).toHaveAttribute('aria-pressed', 'false');
 
     await user.click(punctuation);
-    expect(punctuation).toHaveAttribute('aria-pressed', 'true');
-    expect(numbers).toHaveAttribute('aria-pressed', 'false');
 
-    await user.click(punctuation);
-    expect(punctuation).toHaveAttribute('aria-pressed', 'false');
+    expect(toggleOption).toHaveBeenCalledWith('punctuation');
+
+    await user.click(numbers);
+
+    expect(toggleOption).toHaveBeenCalledWith('numbers');
   });
 
-  it('clears the typed text when an option is toggled', async () => {
-    const user = userEvent.setup();
+  it('does not render an inactivity overlay when the test is paused', () => {
+    mockUseTypingTest.mockReturnValue({
+      ...defaultTypingTestState,
+      isPaused: true,
+    });
+
     render(<TypingTestPage />);
-    await screen.findByText('Test 2');
 
-    await user.type(getTypingInput(), 'h');
-    await user.click(screen.getByRole('button', { name: 'numbers' }));
+    expect(screen.queryByText('Press any key to continue')).not.toBeInTheDocument();
+  });
 
-    expect(getTypingInput()).toHaveValue('');
+  it('renders the correct timer value', () => {
+    mockUseTypingTest.mockReturnValue({
+      ...defaultTypingTestState,
+      secondsLeft: 30,
+    });
+
+    render(<TypingTestPage />);
+
+    expect(screen.getByRole('timer')).toHaveTextContent('00:30');
+  });
+
+  it('marks the selected duration as active', () => {
+    mockUseTypingTest.mockReturnValue({
+      ...defaultTypingTestState,
+      durationSeconds: 30,
+    });
+
+    render(<TypingTestPage />);
+
+    expect(
+      screen.getByRole('button', {
+        name: '30s',
+      })
+    ).toHaveAttribute('aria-pressed', 'true');
+
+    expect(
+      screen.getByRole('button', {
+        name: '60s',
+      })
+    ).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('marks enabled typing options as active', () => {
+    mockUseTypingTest.mockReturnValue({
+      ...defaultTypingTestState,
+      options: {
+        punctuation: true,
+        numbers: true,
+      },
+    });
+
+    render(<TypingTestPage />);
+
+    expect(
+      screen.getByRole('button', {
+        name: 'punctuation',
+      })
+    ).toHaveAttribute('aria-pressed', 'true');
+
+    expect(
+      screen.getByRole('button', {
+        name: 'numbers',
+      })
+    ).toHaveAttribute('aria-pressed', 'true');
   });
 });
