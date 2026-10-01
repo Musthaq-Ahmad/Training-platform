@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { FlagEventType } from '@itp/types';
 import { logFlagEvent } from '../api/activity';
+import { isFullscreenActive } from '../lib/IsfullscreenActive';
 
 export const LEFT_WORKSPACE_WARNING =
   'You left the workspace. This has been noted for your mentor.';
@@ -20,7 +21,8 @@ export function useFlagTracking({ taskId, onWarning }: Options): void {
 
   useEffect(() => {
     let isAway = document.visibilityState === 'hidden';
-    let wasFullscreen = Boolean(document.fullscreenElement);
+    let wasFullscreen = isFullscreenActive();
+    let resizeTimeout: ReturnType<typeof setTimeout> | undefined;
 
     function log(type: FlagEventType) {
       void logFlagEvent(taskId, { type }).catch(() => {});
@@ -38,19 +40,36 @@ export function useFlagTracking({ taskId, onWarning }: Options): void {
     }
 
     function handleFullscreenChange() {
-      const isFullscreen = Boolean(document.fullscreenElement);
+      const isFullscreen = isFullscreenActive();
       if (wasFullscreen && !isFullscreen) {
         log('FULLSCREEN_EXIT');
         onWarningRef.current(LEFT_WORKSPACE_WARNING);
       }
       wasFullscreen = isFullscreen;
     }
+    function handleResize() {
+      // F11 can trigger multiple resize events.
+      // Wait until the browser finishes resizing before checking fullscreen state.
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+
+      resizeTimeout = setTimeout(() => {
+        handleFullscreenChange();
+      }, 150);
+    }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
+    // window.addEventListener('resize', handleFullscreenChange);
+    window.addEventListener('resize', handleResize);
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      window.removeEventListener('resize', handleResize);
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
     };
   }, [taskId]);
 }
