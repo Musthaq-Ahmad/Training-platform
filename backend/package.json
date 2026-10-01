@@ -10,7 +10,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "db:seed": "tsx src/lib/seed.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "test:api": "vitest run --config vitest.api.config.ts"
   },
   "keywords": [],
   "author": "",
