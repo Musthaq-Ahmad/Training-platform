@@ -18,7 +18,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'import { db } from "./prisma/db";\n\n// Every published post\nconst posts = await db.orm.public.Post.where({ published: true }).all();\n\n// One user, or null\nconst user = await db.orm.public.User.where({ email: "alice@prisma.io" }).first();',
+          code: "import { db } from './prisma/db';\n\n// Every published post\nconst posts = await db.orm.public.Post.where({ published: true }).all();\n\n// One user, or null\nconst user = await db.orm.public.User.where({ email: 'alice@prisma.io' }).first();",
         },
       },
       {
@@ -26,7 +26,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'import { db } from "./prisma/db";\n\n// Every published post\nconst posts = await db.orm.posts.where({ published: true }).all();\n\n// One user, or null\nconst user = await db.orm.users.where({ email: "alice@prisma.io" }).first();',
+          code: "import { db } from './prisma/db';\n\n// Every published post\nconst posts = await db.orm.posts.where({ published: true }).all();\n\n// One user, or null\nconst user = await db.orm.users.where({ email: 'alice@prisma.io' }).first();",
         },
       },
       {
@@ -122,7 +122,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const user = await db.orm.public.User.where({ email: "alice@prisma.io" }).first();',
+          code: "const user = await db.orm.public.User.where({ email: 'alice@prisma.io' }).first();",
         },
       },
       {
@@ -190,7 +190,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const recentPosts = await db.orm.public.Post\n  .where((p) => p.createdAt.gte(start))\n  .where((p) => p.createdAt.lte(end))\n  .all();',
+          code: 'const recentPosts = await db.orm.public.Post.where((p) => p.createdAt.gte(start))\n  .where((p) => p.createdAt.lte(end))\n  .all();',
         },
       },
       {
@@ -207,7 +207,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: '// Case-insensitive text search\nconst matchingPosts = await db.orm.public.Post\n  .where((p) => p.title.ilike("%prisma%"))\n  .all();\n\n// One of several values\nconst team = await db.orm.public.User\n  .where((u) => u.email.in(["alice@prisma.io", "bob@prisma.io"]))\n  .all();',
+          code: "// Case-insensitive text search\nconst matchingPosts = await db.orm.public.Post.where((p) => p.title.ilike('%prisma%')).all();\n\n// One of several values\nconst team = await db.orm.public.User.where((u) =>\n  u.email.in(['alice@prisma.io', 'bob@prisma.io'])\n).all();",
         },
       },
       {
@@ -219,7 +219,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'import { and, not, or } from "@prisma/orm-postgres/orm-client";\n\nconst highlighted = await db.orm.public.Post\n  .where((p) => or(p.title.ilike("%hello%"), p.title.ilike("%prisma%")))\n  .all();\n\nconst publishedPrismaPosts = await db.orm.public.Post\n  .where((p) => and(p.published.eq(true), p.title.ilike("%prisma%")))\n  .all();\n\nconst notHello = await db.orm.public.Post\n  .where((p) => not(p.title.eq("Hello")))\n  .all();',
+          code: "import { and, not, or } from '@prisma/orm-postgres/orm-client';\n\nconst highlighted = await db.orm.public.Post.where((p) =>\n  or(p.title.ilike('%hello%'), p.title.ilike('%prisma%'))\n).all();\n\nconst publishedPrismaPosts = await db.orm.public.Post.where((p) =>\n  and(p.published.eq(true), p.title.ilike('%prisma%'))\n).all();\n\nconst notHello = await db.orm.public.Post.where((p) => not(p.title.eq('Hello'))).all();",
         },
       },
       {
@@ -248,7 +248,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'import { MongoFieldFilter } from "@prisma/orm-mongo/query-ast/execution";\n\nconst junePosts = await db.orm.posts\n  .where(MongoFieldFilter.gte("createdAt", new Date("2026-06-01")))\n  .where(MongoFieldFilter.lt("createdAt", new Date("2026-07-01")))\n  .all();',
+          code: "import { MongoFieldFilter } from '@prisma/orm-mongo/query-ast/execution';\n\nconst junePosts = await db.orm.posts\n  .where(MongoFieldFilter.gte('createdAt', new Date('2026-06-01')))\n  .where(MongoFieldFilter.lt('createdAt', new Date('2026-07-01')))\n  .all();",
         },
       },
       {
@@ -260,7 +260,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'import { MongoFieldFilter, MongoOrExpr } from "@prisma/orm-mongo/query-ast/execution";\n\nconst notAlice = await db.orm.users\n  .where(MongoFieldFilter.eq("name", "Alice").not())\n  .all();\n\nconst oldOrNew = await db.orm.posts\n  .where(\n    MongoOrExpr.of([\n      MongoFieldFilter.eq("title", "Old"),\n      MongoFieldFilter.eq("title", "New"),\n    ]),\n  )\n  .all();',
+          code: "import { MongoFieldFilter, MongoOrExpr } from '@prisma/orm-mongo/query-ast/execution';\n\nconst notAlice = await db.orm.users.where(MongoFieldFilter.eq('name', 'Alice').not()).all();\n\nconst oldOrNew = await db.orm.posts\n  .where(MongoOrExpr.of([MongoFieldFilter.eq('title', 'Old'), MongoFieldFilter.eq('title', 'New')]))\n  .all();",
         },
       },
       {
@@ -280,7 +280,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const users = await db.orm.public.User.select("id", "email").all();',
+          code: "const users = await db.orm.public.User.select('id', 'email').all();",
         },
       },
       {
@@ -288,7 +288,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const users = await db.orm.users.select("_id", "email").all();',
+          code: "const users = await db.orm.users.select('_id', 'email').all();",
         },
       },
       {
@@ -296,7 +296,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "[\n  { id: 'cuid20000000000000000001', email: 'alice@prisma.io' },\n  { id: 'cuid20000000000000000002', email: 'bob@prisma.io' }\n]",
+          code: "[\n  { id: 'cuid20000000000000000001', email: 'alice@prisma.io' },\n  { id: 'cuid20000000000000000002', email: 'bob@prisma.io' },\n];",
         },
       },
       {
@@ -312,7 +312,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: '// Second page of posts, newest first\nconst page = await db.orm.public.Post\n  .orderBy((p) => p.createdAt.desc())\n  .limit(20)\n  .offset(20)\n  .all();',
+          code: '// Second page of posts, newest first\nconst page = await db.orm.public.Post.orderBy((p) => p.createdAt.desc())\n  .limit(20)\n  .offset(20)\n  .all();',
         },
       },
       {
@@ -320,7 +320,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: '// Second page of posts, newest first\nconst page = await db.orm.posts\n  .orderBy({ createdAt: -1 })\n  .limit(20)\n  .offset(20)\n  .all();',
+          code: '// Second page of posts, newest first\nconst page = await db.orm.posts.orderBy({ createdAt: -1 }).limit(20).offset(20).all();',
         },
       },
       {
@@ -332,7 +332,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const posts = await db.orm.public.Post\n  .orderBy([(p) => p.createdAt.desc(), (p) => p.id.desc()])\n  .all();',
+          code: 'const posts = await db.orm.public.Post.orderBy([\n  (p) => p.createdAt.desc(),\n  (p) => p.id.desc(),\n]).all();',
         },
       },
       {
@@ -344,7 +344,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: '// Posts by their author\'s name\nconst byAuthor = await db.orm.public.Post\n  .orderBy([(p) => p.author.name.asc(), (p) => p.id.asc()])\n  .all();\n\n// Users by how many posts they have\nconst mostPosts = await db.orm.public.User\n  .orderBy((u) => u.posts.count().desc())\n  .all();\n\n// Posts without content go last\nconst titled = await db.orm.public.Post\n  .orderBy((p) => p.content.desc({ nulls: "last" }))\n  .all();',
+          code: "// Posts by their author's name\nconst byAuthor = await db.orm.public.Post.orderBy([\n  (p) => p.author.name.asc(),\n  (p) => p.id.asc(),\n]).all();\n\n// Users by how many posts they have\nconst mostPosts = await db.orm.public.User.orderBy((u) => u.posts.count().desc()).all();\n\n// Posts without content go last\nconst titled = await db.orm.public.Post.orderBy((p) => p.content.desc({ nulls: 'last' })).all();",
         },
       },
       {
@@ -373,7 +373,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const page1 = await db.orm.public.Post\n  .orderBy([(p) => p.createdAt.desc(), (p) => p.id.desc()])\n  .limit(20)\n  .all();\n\nconst last = page1[page1.length - 1]!;\nconst page2 = await db.orm.public.Post\n  .orderBy([(p) => p.createdAt.desc(), (p) => p.id.desc()])\n  .cursor({ createdAt: last.createdAt, id: last.id })\n  .limit(20)\n  .all();',
+          code: 'const page1 = await db.orm.public.Post.orderBy([(p) => p.createdAt.desc(), (p) => p.id.desc()])\n  .limit(20)\n  .all();\n\nconst last = page1[page1.length - 1]!;\nconst page2 = await db.orm.public.Post.orderBy([(p) => p.createdAt.desc(), (p) => p.id.desc()])\n  .cursor({ createdAt: last.createdAt, id: last.id })\n  .limit(20)\n  .all();',
         },
       },
       {
@@ -393,7 +393,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const result = await db.orm.public.Post\n  .where({ published: true })\n  .aggregate((a) => ({ total: a.count() }));',
+          code: 'const result = await db.orm.public.Post.where({ published: true }).aggregate((a) => ({\n  total: a.count(),\n}));',
         },
       },
       {
@@ -401,7 +401,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: '{ total: 2 }',
+          code: '{\n  total: 2;\n}',
         },
       },
       {
@@ -413,7 +413,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const stats = await db.orm.public.Post\n  .where({ published: true })\n  .aggregate((a) => ({ total: a.count(), newest: a.max("createdAt") }));',
+          code: "const stats = await db.orm.public.Post.where({ published: true }).aggregate((a) => ({\n  total: a.count(),\n  newest: a.max('createdAt'),\n}));",
         },
       },
       {
@@ -429,7 +429,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'import { db } from "./prisma/db";\n\nconst built = db.query\n  .from("posts")\n  // .match((f) => f.published.eq(true)) counts only a subset\n  .count("total")\n  .build();\n\nconst [result] = await (await db.runtime()).query(built);',
+          code: "import { db } from './prisma/db';\n\nconst built = db.query\n  .from('posts')\n  // .match((f) => f.published.eq(true)) counts only a subset\n  .count('total')\n  .build();\n\nconst [result] = await (await db.runtime()).query(built);",
         },
       },
       {
@@ -437,7 +437,7 @@ export const prismareadingdataTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: '{ total: 2 }',
+          code: '{\n  total: 2;\n}',
         },
       },
       {
