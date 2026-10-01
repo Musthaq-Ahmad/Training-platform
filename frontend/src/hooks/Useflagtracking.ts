@@ -6,6 +6,9 @@ import { isFullscreenActive } from '../lib/IsfullscreenActive';
 export const LEFT_WORKSPACE_WARNING =
   'You left the workspace. This has been noted for your mentor.';
 
+export const LEFT_WORKSPACE_WINDOW_WARNING =
+  'You left the workspace window. This has been noted for your mentor.';
+
 type Options = {
   taskId: string;
   onWarning: (message: string) => void;
@@ -22,7 +25,9 @@ export function useFlagTracking({ taskId, onWarning }: Options): void {
   useEffect(() => {
     let isAway = document.visibilityState === 'hidden';
     let wasFullscreen = isFullscreenActive();
+    let isUnfocused = !document.hasFocus();
     let resizeTimeout: ReturnType<typeof setTimeout> | undefined;
+    let windowBlurTimeout: ReturnType<typeof setTimeout> | undefined;
 
     function log(type: FlagEventType) {
       void logFlagEvent(taskId, { type }).catch(() => {});
@@ -32,10 +37,14 @@ export function useFlagTracking({ taskId, onWarning }: Options): void {
       if (document.visibilityState === 'hidden') {
         if (isAway) return; // already logged this hidden period
         isAway = true;
-        log('TAB_SWITCH');
+        if (isFullscreenActive()) {
+          log('TAB_SWITCH');
+        }
       } else if (isAway) {
         isAway = false;
-        onWarningRef.current(LEFT_WORKSPACE_WARNING);
+        if (isFullscreenActive()) {
+          onWarningRef.current(LEFT_WORKSPACE_WARNING);
+        }
       }
     }
 
@@ -46,6 +55,43 @@ export function useFlagTracking({ taskId, onWarning }: Options): void {
         onWarningRef.current(LEFT_WORKSPACE_WARNING);
       }
       wasFullscreen = isFullscreen;
+    }
+    // NEW — window-level focus loss. Overlaps with TAB_SWITCH for a full
+    // tab/app switch (both will fire), but also catches cases visibilitychange
+    // misses entirely: DevTools focus, address bar clicks, a second-monitor
+    // window that stays visible but loses OS focus.
+    function handleWindowBlur() {
+      if (windowBlurTimeout) {
+        clearTimeout(windowBlurTimeout);
+      }
+      windowBlurTimeout = setTimeout(() => {
+        if (!isFullscreenActive()) {
+          return;
+        }
+        // If the document became hidden, this was a tab switch.
+        // visibilitychange handles it, so don't log WINDOW_BLUR.
+        if (document.visibilityState === 'hidden') {
+          return;
+        }
+
+        if (isUnfocused) return;
+
+        isUnfocused = true;
+        log('WINDOW_BLUR');
+      }, 100);
+    }
+    function handleWindowFocus() {
+      if (!isFullscreenActive()) {
+        isUnfocused = false;
+        return;
+      }
+      if (document.visibilityState === 'hidden') {
+        return;
+      }
+      if (isUnfocused) {
+        isUnfocused = false;
+        onWarningRef.current(LEFT_WORKSPACE_WINDOW_WARNING);
+      }
     }
     function handleResize() {
       // F11 can trigger multiple resize events.
@@ -63,12 +109,19 @@ export function useFlagTracking({ taskId, onWarning }: Options): void {
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     // window.addEventListener('resize', handleFullscreenChange);
     window.addEventListener('resize', handleResize);
+    window.addEventListener('blur', handleWindowBlur); // NEW
+    window.addEventListener('focus', handleWindowFocus); // NEW
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('blur', handleWindowBlur); // NEW
+      window.removeEventListener('focus', handleWindowFocus); // NEW
       if (resizeTimeout) {
         clearTimeout(resizeTimeout);
+      }
+      if (windowBlurTimeout) {
+        clearTimeout(windowBlurTimeout);
       }
     };
   }, [taskId]);

@@ -25,6 +25,7 @@ enum flag_event_type {
   FULLSCREEN_EXIT
   TAB_SWITCH
   PASTE_BLOCKED
+  WINDOW_BLUR
 }
 
 enum review_priority {
