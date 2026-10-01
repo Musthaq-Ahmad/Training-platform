@@ -1,5 +1,5 @@
 import Prism from 'prismjs';
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router';
 import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-css';
@@ -17,6 +17,8 @@ import { getDayReference } from '../../content/data/getDayReference';
 import type { ContentBlock } from '../../content/types';
 import styles from './ReferencePage.module.css';
 import Header from '../../components/Header';
+import ReferenceSearch from '../../components/ReferenceSearch';
+import ScrollToTopButton from '../../components/ScrollToTopButton';
 import ArrowIcon from './assets/ArrowIcon';
 
 type ReferencePageProps = {
@@ -278,6 +280,7 @@ const renderVideos = (videos: { title: string; embedUrl: string }[]) => (
 );
 
 const ReferencePage = ({ dayId }: ReferencePageProps) => {
+  const contentRef = useRef<HTMLDivElement>(null); // must stay above the early return
   const content = getDayReference(dayId);
 
   if (!content) {
@@ -293,12 +296,16 @@ const ReferencePage = ({ dayId }: ReferencePageProps) => {
       <Header />
 
       <div className={styles.contentWrapper}>
-        <Link to={`/days/${dayId}`} className={styles.backLink}>
-          <ArrowIcon direction="left" />
-          <span>Back to day overview</span>
-        </Link>
+        <div className={styles.toolbar}>
+          <Link to={`/days/${dayId}`} className={styles.backLink}>
+            <ArrowIcon direction="left" />
+            <span>Back to day overview</span>
+          </Link>
 
-        <div className={styles.referenceContainer}>
+          <ReferenceSearch containerRef={contentRef} contentKey={dayId} />
+        </div>
+
+        <div ref={contentRef} className={styles.referenceContainer}>
           {content.instruction && (
             <div className={styles.instructionBox}>{content.instruction}</div>
           )}
@@ -379,6 +386,8 @@ const ReferencePage = ({ dayId }: ReferencePageProps) => {
           </Link>
         </div>
       </div>
+
+      <ScrollToTopButton />
     </main>
   );
 };

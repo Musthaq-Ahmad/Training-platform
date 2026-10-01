@@ -397,3 +397,13 @@ ol {
   outline: 2px solid var(--color-accent-purple);
   outline-offset: 2px;
 }
+
+::highlight(reference-search) {
+  background-color: var(--color-accent-glow-600);
+  color: var(--color-text-primary);
+}
+
+::highlight(reference-search-current) {
+  background-color: var(--color-accent-purple);
+  color: var(--color-text-on-accent);
+}
