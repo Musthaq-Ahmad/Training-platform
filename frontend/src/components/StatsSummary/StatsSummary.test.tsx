@@ -1,16 +1,11 @@
-import { cleanup, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
-
+import { render, screen, within } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import StatsSummary from './StatsSummary';
-
-afterEach(() => {
-  cleanup();
-});
 
 describe('StatsSummary', () => {
   const total = {
     activeSeconds: 153000,
-    readingSeconds: 51300,
+    codingSeconds: 51300,
   };
 
   const typing = {
@@ -18,16 +13,37 @@ describe('StatsSummary', () => {
     latestAccuracy: 98.4,
   };
 
-  it('renders total active time', () => {
+  it('renders total time', () => {
     render(<StatsSummary total={total} typing={typing} />);
 
-    expect(screen.getByText('42h 30m')).toBeInTheDocument();
+    const stats = screen.getByRole('region', {
+      name: 'Training statistics',
+    });
+
+    expect(within(stats).getByText('TOTAL TIME')).toBeInTheDocument();
+    expect(within(stats).getByText('42h 30m')).toBeInTheDocument();
   });
 
-  it('renders reading time', () => {
+  it('renders active coding time', () => {
     render(<StatsSummary total={total} typing={typing} />);
 
-    expect(screen.getByText('14h 15m')).toBeInTheDocument();
+    const stats = screen.getByRole('region', {
+      name: 'Training statistics',
+    });
+
+    expect(within(stats).getByText('ACTIVE CODING')).toBeInTheDocument();
+    expect(within(stats).getByText('14h 15m')).toBeInTheDocument();
+  });
+
+  it('renders reading and lessons time as total minus coding time', () => {
+    render(<StatsSummary total={total} typing={typing} />);
+
+    const stats = screen.getByRole('region', {
+      name: 'Training statistics',
+    });
+
+    expect(within(stats).getByText('READING & LESSONS')).toBeInTheDocument();
+    expect(within(stats).getByText('28h 15m')).toBeInTheDocument();
   });
 
   it('renders latest typing speed', () => {
@@ -43,16 +59,8 @@ describe('StatsSummary', () => {
   });
 
   it('renders unavailable typing speed when latest WPM is null', () => {
-    render(
-      <StatsSummary
-        total={total}
-        typing={{
-          latestWpm: null,
-          latestAccuracy: null,
-        }}
-      />
-    );
+    render(<StatsSummary total={total} typing={{ latestWpm: null, latestAccuracy: null }} />);
 
-    expect(screen.getByText(/N\/A|—|Not available/i)).toBeInTheDocument();
+    expect(screen.getByText('—')).toBeInTheDocument();
   });
 });

@@ -13,8 +13,11 @@ vi.mock('../../context/Useauth', () => ({
       name: 'Rahul Sharma',
       email: 'rahul@example.com',
     },
-    isLoading: false,
+    status: 'authenticated',
+    isAuthenticated: true,
+    login: vi.fn(),
     logout: vi.fn(),
+    refresh: vi.fn(),
   }),
 }));
 
@@ -46,7 +49,7 @@ describe('ProfilePage', () => {
     },
     total: {
       activeSeconds: 153000,
-      readingSeconds: 51300,
+      codingSeconds: 51300,
     },
     typing: {
       latestWpm: 74,
@@ -98,10 +101,24 @@ describe('ProfilePage', () => {
       name: 'Training statistics',
     });
 
-    expect(stats).toHaveTextContent('42h 30m');
-    expect(stats).toHaveTextContent('14h 15m');
-    expect(stats).toHaveTextContent('74 WPM');
-    expect(stats).toHaveTextContent('98.4% accuracy');
+    expect(within(stats).getByText('TOTAL TIME')).toBeInTheDocument();
+    expect(within(stats).getByText('ACTIVE CODING')).toBeInTheDocument();
+    expect(within(stats).getByText('READING & LESSONS')).toBeInTheDocument();
+
+    // Total time: activeSeconds = 42h 30m
+    const totalCard = within(stats).getByText('TOTAL TIME').parentElement!;
+    expect(within(totalCard).getByText('42h 30m')).toBeInTheDocument();
+
+    // Active coding: codingSeconds = 14h 15m
+    const codingCard = within(stats).getByText('ACTIVE CODING').parentElement!;
+    expect(within(codingCard).getByText('14h 15m')).toBeInTheDocument();
+
+    // Reading: activeSeconds - codingSeconds = 28h 15m
+    const readingCard = within(stats).getByText('READING & LESSONS').parentElement!;
+    expect(within(readingCard).getByText('28h 15m')).toBeInTheDocument();
+
+    expect(within(stats).getByText('74 WPM')).toBeInTheDocument();
+    expect(within(stats).getByText('98.4% accuracy')).toBeInTheDocument();
   });
 
   it('renders the daily activity from the profile data', async () => {
@@ -118,7 +135,7 @@ describe('ProfilePage', () => {
     expect(screen.getByText('72 WPM')).toBeInTheDocument();
   });
 
-  it('renders an error/empty state when loading the profile fails', async () => {
+  it('renders an error state when loading the profile fails', async () => {
     vi.mocked(getProfile).mockRejectedValue(new Error('Failed to load profile'));
 
     renderProfilePage();

@@ -16,7 +16,7 @@ export type ProfileData = {
 
   total: {
     activeSeconds: number;
-    readingSeconds: number;
+    codingSeconds: number;
   };
 
   typing: {

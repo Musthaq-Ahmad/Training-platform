@@ -8,7 +8,7 @@ type StatsSummaryProps = {
 };
 
 export default function StatsSummary({ total, typing }: StatsSummaryProps) {
-  const totalSeconds = total.activeSeconds + total.readingSeconds;
+  const totalSeconds = total.activeSeconds;
 
   return (
     <section className={styles.summary} aria-label="Training statistics">
@@ -21,13 +21,15 @@ export default function StatsSummary({ total, typing }: StatsSummaryProps) {
       <div className={styles.item}>
         <span className={styles.label}>ACTIVE CODING</span>
 
-        <strong className={styles.value}>{formatDurationHM(total.activeSeconds)}</strong>
+        <strong className={styles.value}>{formatDurationHM(total.codingSeconds)}</strong>
       </div>
 
       <div className={styles.item}>
         <span className={styles.label}>READING &amp; LESSONS</span>
 
-        <strong className={styles.value}>{formatDurationHM(total.readingSeconds)}</strong>
+        <strong className={styles.value}>
+          {formatDurationHM(total.activeSeconds - total.codingSeconds)}
+        </strong>
       </div>
 
       <div className={styles.item}>
