@@ -53,3 +53,9 @@ export class NotProvisionedError extends AppError {
     );
   }
 }
+
+export class DayLockedError extends AppError {
+  constructor() {
+    super(403, 'DAY_LOCKED', "This day isn't unlocked yet.");
+  }
+}
