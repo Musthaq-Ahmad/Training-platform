@@ -44,11 +44,13 @@ export type DayReferenceConfig = {
   id: string;
   courseId: string;
   dayNumber: number;
+  instruction?: string;
   videos?: ReferenceVideo[];
   videoAfterTopicId?: string;
   videoAtStart?: boolean;
   resources?: DayReferenceResource[];
   topicIds: string[];
+  prerequisiteLinks?: PrerequisiteLink[];
 };
 
 export type ResolvedSection = ContentTopic & {
@@ -58,8 +60,14 @@ export type ResolvedSection = ContentTopic & {
 export type DayReferenceContent = {
   courseId: string;
   dayNumber: number;
+  instruction?: string;
   videos?: ReferenceVideo[];
   videoAfterTopicId?: string;
   sections: ResolvedSection[];
   videoAtStart?: boolean;
+  prerequisiteLinks?: PrerequisiteLink[];
+};
+export type PrerequisiteLink = {
+  label: string;
+  dayId: string;
 };

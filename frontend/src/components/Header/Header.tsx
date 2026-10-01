@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '../../context/Useauth';
 import styles from './Header.module.css';
 import { useActivity } from '../../context/useActivity';
+import { NavLink } from 'react-router';
 
 type HeaderProps = {
   /** Replaces the app name on the left. The task page puts its breadcrumb here. */
@@ -15,16 +16,6 @@ export default function Header({ leading, status }: HeaderProps) {
   const activity = useActivity();
   const { user, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  const handleProfileClick = () => {
-    // TODO: replace with <NavLink to="/profile"> once routing exists
-    console.log('profile clicked');
-  };
-
-  const handleDashboardClick = () => {
-    // TODO: replace with <NavLink to="/"> once routing exists
-    console.log('dashboard clicked');
-  };
 
   const handleLogout = async () => {
     // TODO: replace with useAuth().logout() once AuthContext exists
@@ -51,13 +42,22 @@ export default function Header({ leading, status }: HeaderProps) {
         <div className={styles.end}>
           {status}
           <nav className={styles.nav}>
-            <button className={styles.pageLabel} onClick={handleDashboardClick}>
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+            >
               Dashboard
-            </button>
+            </NavLink>
+
             <span className={styles.divider}>/</span>
-            <button className={styles.userName} onClick={handleProfileClick}>
+
+            <NavLink
+              to="/profile"
+              className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+            >
               {user?.name}
-            </button>
+            </NavLink>
             <span className={styles.divider}>/</span>
             <button
               className={styles.logoutButton}

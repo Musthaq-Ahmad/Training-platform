@@ -3,7 +3,7 @@ import type { DayContent } from '@itp/types';
 // Tuesday — Web Storage, Browser APIs & Service Workers
 export const jsDay07: DayContent = {
   dayId: 'js-day-07',
-  courseSlug: 'javascript',
+  courseSlug: 'js',
   courseTitle: 'JavaScript',
   dayNumber: 7,
   totalDays: 10,

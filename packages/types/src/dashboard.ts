@@ -5,14 +5,21 @@ export type DaySummary = {
   courseId: string;
   dayNumber: number;
   title: string;
-  description?: string; // short blurb shown on the dashboard's current-lesson card
+  description: string; // curriculum_day.description, shown on the current-lesson card
   status: DayStatus;
 };
 
-export type CourseSummary = {
-  id: string;
-  title: string;
-  days: DaySummary[];
+/** GET /api/courses/:courseId/days */
+export type CourseDaysResponse = DaySummary[];
+
+export type NextDay = DaySummary & {
+  courseTotalDays: number; // number of curriculum_day rows in this day's course
+};
+
+export type TimeTotals = {
+  activeSeconds: number;
+  codingSeconds: number;
+  readingSeconds: number;
 };
 
 export type TypingSummaryResponse = {
@@ -23,12 +30,10 @@ export type TypingSummaryResponse = {
 
 /** GET /api/dashboard */
 export type DashboardResponse = {
-  currentDay: DaySummary | null;
-  currentCourseId: string;
-  courses: CourseSummary[];
+  nextDay: NextDay | null; // computed by the backend; null = everything completed
   totalDaysCompleteOverall: number;
   totalDaysOverall: number;
-  today: { activeSeconds: number; codingSeconds: number; readingSeconds: number };
-  total: { activeSeconds: number; codingSeconds: number; readingSeconds: number };
-  typing: TypingSummaryResponse;
+  today: TimeTotals; // activity_log rows where date = today
+  total: TimeTotals; // sum of all activity_log rows
+  typing: TypingSummaryResponse; // from typing_test_result
 };

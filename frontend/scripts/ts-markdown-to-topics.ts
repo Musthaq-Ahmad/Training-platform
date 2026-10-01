@@ -4,8 +4,65 @@ import { marked, type Token } from 'marked';
 
 import type { ContentTopic, ContentBlock } from '../src/content/types.ts';
 
+const COURSE = process.argv[2];
+
+if (!COURSE) {
+  console.error('Usage: npx tsx scripts/ts-markdown-to-topics.ts <course>  (e.g. node, ts)');
+  process.exit(1);
+}
+
 const INPUT_DIR = 'src/content/references';
-const OUTPUT_DIR = 'src/content/topics/ts';
+const OUTPUT_DIR = `src/content/topics/${COURSE}`;
+
+const DEFAULT_LANGUAGES: Record<string, string> = {
+  ts: 'typescript',
+  postgres: 'sql',
+  prisma: 'typescript',
+  react: 'jsx',
+};
+
+const DEFAULT_LANGUAGE = DEFAULT_LANGUAGES[COURSE] ?? 'javascript';
+function detectLanguage(lang: string | undefined, code: string): string {
+  const label = (lang ?? '').trim().toLowerCase();
+
+  if (label) return LANGUAGE_ALIASES[label] ?? label;
+
+  // Shell commands
+  if (
+    /^\s*\$ /.test(code) ||
+    /^\s*(createdb|dropdb|psql|pg_\w+|initdb|postgres|npm|npx|node|yarn|pnpm|cd|mkdir|curl|sudo|brew|apt|git)\b/.test(
+      code
+    ) ||
+    /^\s*export [A-Z_]+=/.test(code)
+  ) {
+    return 'bash';
+  }
+
+  // JavaScript inside SQL courses (e.g. the env variables page)
+  if (
+    DEFAULT_LANGUAGE === 'sql' &&
+    /^\s*(const |let |var |import |require\(|process\.|console\.|function |export (const|default|function))/m.test(
+      code
+    )
+  ) {
+    return 'javascript';
+  }
+
+  return DEFAULT_LANGUAGE;
+}
+const LANGUAGE_ALIASES: Record<string, string> = {
+  ts: 'typescript',
+  js: 'javascript',
+  mjs: 'javascript',
+  cjs: 'javascript',
+  sh: 'bash',
+  psql: 'sql',
+  shell: 'bash',
+  console: 'bash',
+  npm: 'bash',
+  zsh: 'bash',
+  prisma: 'graphql',
+};
 
 function slugify(value: string): string {
   return value
@@ -37,6 +94,8 @@ function cleanText(value: string): string {
     .replace(/<[^>]+>/g, '')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
     .replace(/__ANGLE_PLACEHOLDER_(\d+)__/g, (_, index: string) => placeholders[Number(index)])
@@ -114,7 +173,7 @@ function tokenToBlocks(tokens: Token[]): ContentBlock[] {
         type: 'code',
         code: {
           filename: 'example',
-          language: token.lang === 'ts' ? 'typescript' : token.lang || 'typescript',
+          language: detectLanguage(token.lang, token.text),
           code: token.text,
         },
       });
@@ -205,7 +264,7 @@ async function main() {
   });
 
   for (const dayDir of dayDirs) {
-    if (!dayDir.isDirectory() || !dayDir.name.startsWith('ts-day-')) {
+    if (!dayDir.isDirectory() || !dayDir.name.startsWith(`${COURSE}-day-`)) {
       continue;
     }
 
