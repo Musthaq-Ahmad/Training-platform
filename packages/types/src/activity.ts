@@ -1,4 +1,4 @@
-export type FlagEventType = 'FULLSCREEN_EXIT' | 'TAB_SWITCH' | 'PASTE_BLOCKED';
+export type FlagEventType = 'FULLSCREEN_EXIT' | 'TAB_SWITCH' | 'PASTE_BLOCKED' | 'WINDOW_BLUR';
 
 /** POST /api/activity/:taskId/events — the server sets the timestamp */
 export type LogFlagEventRequest = {
