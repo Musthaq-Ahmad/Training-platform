@@ -202,6 +202,47 @@ describe('mockAdapter', () => {
   });
 
   describe('days', () => {
+    it('PUT /days/:id/journal returns 404 NOT_FOUND for an unknown day', async () => {
+      await expect(
+        client.put('/days/unknown-day/journal', {
+          responseText: 'hello',
+        })
+      ).rejects.toMatchObject({
+        response: {
+          status: 404,
+          data: {
+            error: {
+              code: 'NOT_FOUND',
+            },
+          },
+        },
+      });
+    });
+
+    it('keeps a saved journal in localStorage so it survives a refresh', async () => {
+      const dayId = findUnlockedDayId();
+
+      const originalJournal = mockJournalByDay[dayId] ?? {
+        responseText: null,
+      };
+
+      try {
+        await client.put(`/days/${dayId}/journal`, {
+          responseText: 'persist me',
+        });
+
+        const stored = JSON.parse(localStorage.getItem('itp-mock-journals-v1') ?? '{}') as Record<
+          string,
+          string | null
+        >;
+
+        expect(stored[dayId]).toBe('persist me');
+      } finally {
+        mockJournalByDay[dayId] = originalJournal;
+        localStorage.removeItem('itp-mock-journals-v1');
+      }
+    });
+
     it('returns tasks for GET /days/:dayId/tasks', async () => {
       const dayId = findUnlockedDayId();
 

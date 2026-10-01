@@ -209,7 +209,7 @@ function DayOverviewContent() {
             <SelfCheckChecklist items={day.selfCheckItems} />
 
             <DailyJournal
-              prompt={day.journalPrompt ?? []}
+              prompts={day.journalPrompt ? [day.journalPrompt] : []}
               initialResponse={journalResponse}
               isSaving={isSavingJournal}
               isSaved={isJournalSaved}

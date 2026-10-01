@@ -1,16 +1,37 @@
 import { useState } from 'react';
 import styles from './DailyJournal.module.css';
 
-import type { DailyJournalProps } from '@itp/types';
+const MAX_JOURNAL_LENGTH = 10_000; // keep in sync with saveJournalBodySchema on the backend
+
+type DailyJournalProps = {
+  prompts: string[];
+  initialResponse?: string | null;
+  isSaving: boolean;
+  isSaved: boolean;
+  onSave: (responseText: string) => void;
+};
 
 export default function DailyJournal({
-  prompt,
+  prompts,
   initialResponse,
   isSaving,
   isSaved,
   onSave,
 }: DailyJournalProps) {
   const [response, setResponse] = useState(initialResponse ?? '');
+  const [hasEditedSinceSave, setHasEditedSinceSave] = useState(false);
+
+  const showSaved = isSaved && !hasEditedSinceSave;
+
+  function handleChange(text: string) {
+    setResponse(text);
+    setHasEditedSinceSave(true);
+  }
+
+  function handleSave() {
+    setHasEditedSinceSave(false);
+    onSave(response);
+  }
 
   return (
     <section className={styles.journal}>
@@ -19,19 +40,25 @@ export default function DailyJournal({
         <span className={styles.optionalBadge}>OPTIONAL</span>
       </div>
 
-      <p className={styles.prompt}>{prompt}</p>
+      {prompts.map((prompt, index) => (
+        <p key={`${index}-${prompt}`} className={styles.prompt}>
+          {prompt}
+        </p>
+      ))}
 
       <textarea
         className={styles.textarea}
         value={response}
-        onChange={(event) => setResponse(event.target.value)}
+        onChange={(event) => handleChange(event.target.value)}
         placeholder="Document technical takeaways, quirks encountered, or architectural notes..."
+        aria-label="Daily journal response"
+        maxLength={MAX_JOURNAL_LENGTH}
         rows={6}
       />
 
       <div className={styles.actions}>
-        <span className={isSaved ? styles.savedMessage : styles.footnote}>
-          {isSaved
+        <span className={showSaved ? styles.savedMessage : styles.footnote} role="status">
+          {showSaved
             ? 'Saved successfully'
             : 'Journal is optional and does not affect day completion'}
         </span>
@@ -39,7 +66,7 @@ export default function DailyJournal({
         <button
           type="button"
           className={styles.saveButton}
-          onClick={() => onSave(response)}
+          onClick={handleSave}
           disabled={isSaving}
         >
           {isSaving ? 'Saving...' : 'Save Journal'}

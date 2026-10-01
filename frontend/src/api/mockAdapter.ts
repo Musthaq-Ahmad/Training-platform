@@ -30,6 +30,31 @@ import { addTypingResult, buildTypingToday } from '../test/fixtures/typingTest';
 const MOCK_DELAY_MS = 300;
 
 const savedFiles = new Map<string, TaskFile[]>();
+const JOURNAL_STORAGE_KEY = 'itp-mock-journals-v1';
+
+function readSavedJournals(): Record<string, string | null> {
+  try {
+    const raw = localStorage.getItem(JOURNAL_STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as Record<string, string | null>;
+  } catch {
+    // storage unavailable or corrupted: start fresh
+  }
+  return {};
+}
+
+function writeSavedJournals(journals: Record<string, string | null>): void {
+  try {
+    localStorage.setItem(JOURNAL_STORAGE_KEY, JSON.stringify(journals));
+  } catch {
+    // ignore: the mock still works in memory
+  }
+}
+
+const savedJournals = readSavedJournals();
+
+for (const [dayId, responseText] of Object.entries(savedJournals)) {
+  mockJournalByDay[dayId] = { responseText };
+}
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -242,6 +267,8 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
 
     const body = JSON.parse(config.data as string) as SaveJournalRequest;
     mockJournalByDay[dayId] = { responseText: body.responseText };
+    savedJournals[dayId] = body.responseText;
+    writeSavedJournals(savedJournals);
     return respond(config, 204, undefined);
   }
 
