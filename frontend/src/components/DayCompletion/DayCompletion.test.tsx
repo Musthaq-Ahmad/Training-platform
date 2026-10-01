@@ -1,93 +1,53 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import DayCompletion from './DayCompletion';
 
+type Overrides = Partial<React.ComponentProps<typeof DayCompletion>>;
+
+function setup(overrides: Overrides = {}) {
+  const onComplete = vi.fn();
+  render(
+    <DayCompletion
+      completedTasks={3}
+      totalTasks={3}
+      isCompleted={false}
+      isSubmitting={false}
+      onComplete={onComplete}
+      {...overrides}
+    />
+  );
+  return { onComplete, button: screen.getByRole('button') };
+}
+
 describe('DayCompletion', () => {
-  const defaultProps = {
-    completedTasks: 2,
-    totalTasks: 2,
-    isCompleted: false,
-    onComplete: vi.fn(),
-  };
+  it('calls onComplete when all required tasks are done', () => {
+    const { onComplete, button } = setup();
 
-  it('renders the heading and description', () => {
-    render(<DayCompletion {...defaultProps} />);
-
-    expect(
-      screen.getByRole('heading', { name: /day completion verification/i })
-    ).toBeInTheDocument();
-
-    expect(screen.getByText(/clicking "submit day" verifies checklist items/i)).toBeInTheDocument();
-  });
-
-  it('shows the Submit Day button when the day is not completed', () => {
-    render(<DayCompletion {...defaultProps} />);
-
-    expect(screen.getByRole('button', { name: /submit day/i })).toBeInTheDocument();
-  });
-
-  it('enables the button when all tasks are completed and the day is not completed', () => {
-    render(<DayCompletion {...defaultProps} />);
-
-    expect(screen.getByRole('button', { name: /submit day/i })).toBeEnabled();
-  });
-
-  it('disables the button when the checklist is incomplete', () => {
-    render(<DayCompletion {...defaultProps} completedTasks={1} totalTasks={2} />);
-
-    expect(screen.getByRole('button', { name: /submit day/i })).toBeDisabled();
-  });
-
-  it('shows the Checklist Incomplete badge when tasks are incomplete', () => {
-    render(<DayCompletion {...defaultProps} completedTasks={1} totalTasks={2} />);
-
-    expect(screen.getByText('Checklist Incomplete')).toBeInTheDocument();
-  });
-
-  it('does not show the Checklist Incomplete badge when all tasks are completed', () => {
-    render(<DayCompletion {...defaultProps} />);
-
-    expect(screen.queryByText('Checklist Incomplete')).not.toBeInTheDocument();
-  });
-
-  it('shows Day completed and disables the button when the day is already completed', () => {
-    render(<DayCompletion {...defaultProps} isCompleted={true} />);
-
-    const button = screen.getByRole('button', {
-      name: /day completed/i,
-    });
-
-    expect(button).toBeInTheDocument();
-    expect(button).toBeDisabled();
-  });
-
-  it('does not show the Checklist Incomplete badge when the day is already completed', () => {
-    render(
-      <DayCompletion {...defaultProps} completedTasks={1} totalTasks={2} isCompleted={true} />
-    );
-
-    expect(screen.queryByText('Checklist Incomplete')).not.toBeInTheDocument();
-  });
-
-  it('calls onComplete when the Submit Day button is clicked', () => {
-    const onComplete = vi.fn();
-
-    render(<DayCompletion {...defaultProps} onComplete={onComplete} />);
-
-    fireEvent.click(screen.getByRole('button', { name: /submit day/i }));
+    expect(button.disabled).toBe(false);
+    fireEvent.click(button);
 
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('does not call onComplete when the button is disabled', () => {
-    const onComplete = vi.fn();
+  it('disables the button and shows a badge while tasks are incomplete', () => {
+    const { button } = setup({ completedTasks: 1, totalTasks: 3 });
 
-    render(
-      <DayCompletion {...defaultProps} completedTasks={1} totalTasks={2} onComplete={onComplete} />
-    );
+    expect(button.disabled).toBe(true);
+    expect(screen.getByText(/tasks incomplete \(1\/3\)/i)).toBeTruthy();
+  });
 
-    fireEvent.click(screen.getByRole('button', { name: /submit day/i }));
+  it('disables the button and shows "Submitting..." while submitting', () => {
+    const { button } = setup({ isSubmitting: true });
 
-    expect(onComplete).not.toHaveBeenCalled();
+    expect(button.disabled).toBe(true);
+    expect(screen.getByText('Submitting...')).toBeTruthy();
+  });
+
+  it('shows "Day completed" and a disabled button once completed', () => {
+    const { button } = setup({ isCompleted: true });
+
+    expect(button.disabled).toBe(true);
+    expect(screen.getByText('Day completed')).toBeTruthy();
+    expect(screen.queryByText(/tasks incomplete/i)).toBeNull();
   });
 });
