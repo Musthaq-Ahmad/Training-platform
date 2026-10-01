@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import type { DayTask, DayContent, DayCurrentStatus } from '@itp/types';
-import { getDayTasks, getDayStatus, getDayJournal } from '../../api/days';
+import { getDayTasks, getDayStatus, getDayJournal, saveJournal, completeDay } from '../../api/days';
 import { mockDayContents } from '../../api/dayOverview';
 import DaySummary from '../../components/DaySummary/DaySummary';
 import LessonSummary from '../../components/LessonSummary/LessonSummary';
@@ -21,11 +21,27 @@ type LoadResult =
   | { dayId: string; tasks: DayTask[]; status: DayCurrentStatus; journalResponse: string }
   | { dayId: string; error: ApiError };
 
+function getErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback;
+}
+
+/**
+ * `key={dayId}` remounts the content when the day changes, so saved/error/submitting
+ * state from one day can never leak into another.
+ */
 export default function DayOverviewPage() {
+  const { dayId } = useParams();
+  return <DayOverviewContent key={dayId} />;
+}
+
+function DayOverviewContent() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isJournalSaved, setIsJournalSaved] = useState(false);
+  const [isSavingJournal, setIsSavingJournal] = useState(false);
+  const [isCompletingDay, setIsCompletingDay] = useState(false);
   const [result, setResult] = useState<LoadResult | null>(null);
-  const isSavingJournal = false;
+  const [journalError, setJournalError] = useState<string | null>(null);
+  const [completionError, setCompletionError] = useState<string | null>(null);
 
   // dayId is an opaque string. Never parse or build it here.
   const { dayId } = useParams();
@@ -86,15 +102,7 @@ export default function DayOverviewPage() {
   }
 
   if (isLoading) {
-    return (
-      <>
-        {/* <Header />
-        <main className={styles.dayOverview}>
-          <p>Loading...</p>
-        </main> */}
-        <Loader />
-      </>
-    );
+    return <Loader />;
   }
 
   if (status?.isLocked || error?.code === 'DAY_LOCKED') {
@@ -113,6 +121,7 @@ export default function DayOverviewPage() {
       </>
     );
   }
+
   if (error || !status) {
     return (
       <>
@@ -134,6 +143,42 @@ export default function DayOverviewPage() {
     (task) => task.status === 'completed' && !task.isStretchGoal
   ).length;
   const requiredTasks = tasks.filter((task) => !task.isStretchGoal).length;
+
+  async function handleSaveJournal(responseText: string) {
+    if (!day) return;
+    setJournalError(null);
+    setIsSavingJournal(true);
+    setIsJournalSaved(false);
+
+    try {
+      await saveJournal(day.dayId, responseText);
+      setIsJournalSaved(true);
+    } catch (err) {
+      setJournalError(getErrorMessage(err, 'Failed to save journal response.'));
+    } finally {
+      setIsSavingJournal(false);
+    }
+  }
+
+  async function handleCompleteDay() {
+    if (!day) return;
+    setCompletionError(null);
+    setIsCompletingDay(true);
+
+    try {
+      // The server decides whether the day can be completed (rule 2).
+      const updatedStatus = await completeDay(day.dayId);
+
+      setResult((previous) => {
+        if (!previous || 'error' in previous) return previous;
+        return { ...previous, status: updatedStatus };
+      });
+    } catch (err) {
+      setCompletionError(getErrorMessage(err, 'Failed to complete the day.'));
+    } finally {
+      setIsCompletingDay(false);
+    }
+  }
 
   return (
     <>
@@ -164,15 +209,17 @@ export default function DayOverviewPage() {
             <SelfCheckChecklist items={day.selfCheckItems} />
 
             <DailyJournal
-              prompt={day.journalPrompt}
+              prompt={day.journalPrompt ?? []}
               initialResponse={journalResponse}
               isSaving={isSavingJournal}
               isSaved={isJournalSaved}
-              onSave={(responseText) => {
-                console.log('Journal response:', responseText);
-                setIsJournalSaved(true);
-              }}
+              onSave={(responseText) => void handleSaveJournal(responseText)}
             />
+            {journalError && (
+              <p className={styles.error} role="alert">
+                {journalError}
+              </p>
+            )}
           </div>
         </div>
 
@@ -180,10 +227,14 @@ export default function DayOverviewPage() {
           completedTasks={completedTasks}
           totalTasks={requiredTasks}
           isCompleted={status.isCompleted}
-          onComplete={() => {
-            console.log('Submit Day clicked');
-          }}
+          isSubmitting={isCompletingDay}
+          onComplete={handleCompleteDay}
         />
+        {completionError && (
+          <p className={styles.error} role="alert">
+            {completionError}
+          </p>
+        )}
       </main>
 
       <TaskModal

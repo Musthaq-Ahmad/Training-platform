@@ -10,10 +10,10 @@ import type {
   TaskCodeResponse,
   TaskFile,
   TaskResponse,
+  SaveJournalRequest,
 } from '@itp/types';
 import { mockUser } from '../test/fixtures/user';
-
-import { mockTaskStatus } from '../test/fixtures/dayTasks';
+import { mockTaskStatus, mockTasksByDay } from '../test/fixtures/dayTasks';
 import {
   catalogTaskCode,
   catalogTaskResponse,
@@ -202,11 +202,49 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
     return respond(config, 200, status);
   }
 
+  if (method === 'patch' && dayStatusMatch) {
+    const dayId = dayStatusMatch[1];
+    const status = mockStatusByDay[dayId];
+
+    if (!mockDayContents[dayId] || !status) {
+      return errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
+    }
+    if (status.isLocked) {
+      return errorResponse(config, 403, 'DAY_LOCKED', "This day isn't unlocked yet.");
+    }
+
+    // Every required task must be completed (stretch goals don't count).
+    const hasIncompleteRequired = (mockTasksByDay[dayId] ?? []).some(
+      (task) => !task.isStretchGoal && task.status !== 'completed'
+    );
+    if (hasIncompleteRequired) {
+      return errorResponse(
+        config,
+        400,
+        'CHECKLIST_INCOMPLETE',
+        'Check all required items before submitting.'
+      );
+    }
+
+    status.isCompleted = true;
+    return respond(config, 200, status);
+  }
+
   if (method === 'get' && dayJournalMatch) {
     // No journal row yet is normal for a new trainee: return an empty response, not a 404.
     const journal = mockJournalByDay[dayJournalMatch[1]] ?? { responseText: null };
     return respond(config, 200, journal);
   }
+
+  if (method === 'put' && dayJournalMatch) {
+    const dayId = dayJournalMatch[1];
+    if (!mockDayContents[dayId]) return errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
+
+    const body = JSON.parse(config.data as string) as SaveJournalRequest;
+    mockJournalByDay[dayId] = { responseText: body.responseText };
+    return respond(config, 204, undefined);
+  }
+
   if (method === 'get' && url === '/dashboard') {
     return respond(config, 200, buildDashboard());
   }
