@@ -446,18 +446,10 @@ export const dayReferences: DayReferenceConfig[] = [
     ],
   },
   {
-    id: 'prisma-day-04',
-    courseId: 'prisma',
-    dayNumber: 4,
-    instruction:
-      'Use all the previous reference materials and follow the folder structure provided in the coding area to complete the tasks.',
-    topicIds: [],
-  },
-  {
     id: 'prisma-day-05',
     courseId: 'prisma',
     dayNumber: 5,
-    topicIds: ['prismaOwaspPasswordStrength', 'prismaOwaspAuthErrors', 'nodeexpressmiddleware'],
+    topicIds: ['prismaowasppasswordstrength', 'prismaowaspautherrors', 'nodeexpressmiddleware'],
   },
   {
     id: 'prisma-day-06',
@@ -469,6 +461,77 @@ export const dayReferences: DayReferenceConfig[] = [
     id: 'prisma-day-07',
     courseId: 'prisma',
     dayNumber: 7,
+    topicIds: ['prismanodesecurity'],
+  },
+  {
+    id: 'prisma-day-08',
+    courseId: 'prisma',
+    dayNumber: 8,
     topicIds: ['prismaexpressdebugging'],
+  },
+  {
+    id: 'react-day-01',
+    courseId: 'react',
+    dayNumber: 1,
+    topicIds: ['reactfirstcomponent', 'reactimportexport', 'reactjsx', 'viteguide'],
+  },
+  {
+    id: 'react-day-02',
+    courseId: 'react',
+    dayNumber: 2,
+    topicIds: ['reactrenderinglists', 'reactconditionalrendering'],
+  },
+  {
+    id: 'react-day-03',
+    courseId: 'react',
+    dayNumber: 3,
+    topicIds: ['reactrespondingtoevents', 'reactstate', 'reactupdatingarraysinstate'],
+  },
+  {
+    id: 'react-day-04',
+    courseId: 'react',
+    dayNumber: 4,
+    topicIds: ['reactcontrolledinput'],
+  },
+  {
+    id: 'react-day-05',
+    courseId: 'react',
+    dayNumber: 5,
+    topicIds: ['reactlearnday05'],
+  },
+  {
+    id: 'react-day-06',
+    courseId: 'react',
+    dayNumber: 6,
+    topicIds: ['reactrouterinstallation'],
+  },
+  {
+    id: 'react-day-07',
+    courseId: 'react',
+    dayNumber: 7,
+    topicIds: ['reactfetchapi'],
+  },
+  {
+    id: 'react-day-08',
+    courseId: 'react',
+    dayNumber: 8,
+    topicIds: ['reactsynchronizingwitheffects', 'reactyoumightnotneedaneffect'],
+  },
+  {
+    id: 'react-day-09',
+    courseId: 'react',
+    dayNumber: 9,
+    topicIds: ['reactcontext'],
+  },
+  {
+    id: 'react-day-10',
+    courseId: 'react',
+    dayNumber: 10,
+    topicIds: [
+      'reacttestinglibraryexample',
+      'reacttestinglibraryintro',
+      'reacttestinglibraryqueries',
+      'reacttestinglibrarysetup',
+    ],
   },
 ];

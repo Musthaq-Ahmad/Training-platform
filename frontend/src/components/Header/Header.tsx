@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useAuth } from '../../context/Useauth';
 import styles from './Header.module.css';
+import { useActivity } from '../../context/useActivity';
 import { NavLink } from 'react-router';
 
 type HeaderProps = {
@@ -12,10 +13,13 @@ type HeaderProps = {
 };
 
 export default function Header({ leading, status }: HeaderProps) {
+  const activity = useActivity();
   const { user, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    // TODO: replace with useAuth().logout() once AuthContext exists
+    await activity?.flushNow();
     setIsLoggingOut(true);
     try {
       await logout();

@@ -104,9 +104,18 @@ function cleanText(value: string): string {
 
 function tokenToBlocks(tokens: Token[]): ContentBlock[] {
   const blocks: ContentBlock[] = [];
+  let pendingFilename: string | null = null;
 
   for (const token of tokens) {
     if (token.type === 'paragraph') {
+      // A paragraph that is only a bold filename (e.g. **Gallery.js**) labels the next code block
+      const labelMatch = token.text.match(/^\*\*([A-Za-z0-9._/-]+)\*\*$/);
+
+      if (labelMatch) {
+        pendingFilename = labelMatch[1];
+        continue;
+      }
+
       const imageTokens = token.tokens?.filter((child) => child.type === 'image');
 
       if (imageTokens && imageTokens.length > 0) {
@@ -172,11 +181,13 @@ function tokenToBlocks(tokens: Token[]): ContentBlock[] {
       blocks.push({
         type: 'code',
         code: {
-          filename: 'example',
+          filename: pendingFilename ?? 'example',
           language: detectLanguage(token.lang, token.text),
           code: token.text,
         },
       });
+
+      pendingFilename = null;
 
       continue;
     }

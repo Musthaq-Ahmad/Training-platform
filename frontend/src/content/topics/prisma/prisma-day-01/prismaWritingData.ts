@@ -66,7 +66,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'import { db } from "./prisma/db";\n\nconst user = await db.orm.public.User.create({\n  email: "jane@prisma.io",\n  name: "Jane",\n});\n// user.id and user.createdAt are filled in',
+          code: "import { db } from './prisma/db';\n\nconst user = await db.orm.public.User.create({\n  email: 'jane@prisma.io',\n  name: 'Jane',\n});\n// user.id and user.createdAt are filled in",
         },
       },
       {
@@ -74,7 +74,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'import { db } from "./prisma/db";\n\nconst user = await db.orm.users.create({\n  email: "jane@prisma.io",\n  name: "Jane",\n  createdAt: new Date(),\n});\n// user._id is filled in by the server',
+          code: "import { db } from './prisma/db';\n\nconst user = await db.orm.users.create({\n  email: 'jane@prisma.io',\n  name: 'Jane',\n  createdAt: new Date(),\n});\n// user._id is filled in by the server",
         },
       },
       {
@@ -98,7 +98,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const account = await db.orm.public.User\n  .select("id", "email")\n  .create({ email: "jane@prisma.io", name: "Jane" });',
+          code: "const account = await db.orm.public.User.select('id', 'email').create({\n  email: 'jane@prisma.io',\n  name: 'Jane',\n});",
         },
       },
       {
@@ -122,7 +122,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'try {\n  await db.orm.public.User.create({ email: "jane@prisma.io", name: "Jane" });\n} catch (error) {\n  if ((error as { sqlState?: string }).sqlState === "23505") {\n    // that email is already taken\n  }\n}',
+          code: "try {\n  await db.orm.public.User.create({ email: 'jane@prisma.io', name: 'Jane' });\n} catch (error) {\n  if ((error as { sqlState?: string }).sqlState === '23505') {\n    // that email is already taken\n  }\n}",
         },
       },
       {
@@ -146,7 +146,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const user = await db.orm.public.User.create({\n  email: "jane@prisma.io",\n  name: "Jane",\n  posts: (p) =>\n    p.create([{ title: "First post", content: null, published: false }]),\n});',
+          code: "const user = await db.orm.public.User.create({\n  email: 'jane@prisma.io',\n  name: 'Jane',\n  posts: (p) => p.create([{ title: 'First post', content: null, published: false }]),\n});",
         },
       },
       {
@@ -162,7 +162,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'await db.orm.public.User\n  .where({ email: "jane@prisma.io" })\n  .update({ posts: (p) => p.connect([{ id: existingPostId }]) });',
+          code: "await db.orm.public.User.where({ email: 'jane@prisma.io' }).update({\n  posts: (p) => p.connect([{ id: existingPostId }]),\n});",
         },
       },
       {
@@ -182,7 +182,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const updatedUser = await db.orm.public.User\n  .where({ email: "jane@prisma.io" })\n  .update({ name: "Jane Doe" });',
+          code: "const updatedUser = await db.orm.public.User.where({ email: 'jane@prisma.io' }).update({\n  name: 'Jane Doe',\n});",
         },
       },
       {
@@ -190,7 +190,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const updatedUser = await db.orm.users\n  .where({ email: "jane@prisma.io" })\n  .update({ name: "Jane Doe" });',
+          code: "const updatedUser = await db.orm.users\n  .where({ email: 'jane@prisma.io' })\n  .update({ name: 'Jane Doe' });",
         },
       },
       {
@@ -218,7 +218,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'await db.orm.posts\n  .where({ title: "Draft thoughts" })\n  .update((p) => [p.content.set("Now filled in"), p.published.set(true)]);',
+          code: "await db.orm.posts\n  .where({ title: 'Draft thoughts' })\n  .update((p) => [p.content.set('Now filled in'), p.published.set(true)]);",
         },
       },
       {
@@ -250,7 +250,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const deletedUser = await db.orm.public.User\n  .where({ email: "jane@prisma.io" })\n  .delete();',
+          code: "const deletedUser = await db.orm.public.User.where({ email: 'jane@prisma.io' }).delete();",
         },
       },
       {
@@ -258,7 +258,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const deletedUser = await db.orm.users\n  .where({ email: "jane@prisma.io" })\n  .delete();',
+          code: "const deletedUser = await db.orm.users.where({ email: 'jane@prisma.io' }).delete();",
         },
       },
       {
@@ -274,7 +274,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'await db.orm.public.User.upsert({\n  create: { email: "eve@prisma.io", name: "Eve" },\n  update: { name: "Eve Exists" },\n  conflictOn: { email: "eve@prisma.io" },\n});',
+          code: "await db.orm.public.User.upsert({\n  create: { email: 'eve@prisma.io', name: 'Eve' },\n  update: { name: 'Eve Exists' },\n  conflictOn: { email: 'eve@prisma.io' },\n});",
         },
       },
       {
@@ -282,7 +282,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'await db.orm.users.where({ email: "eve@prisma.io" }).upsert({\n  create: { email: "eve@prisma.io", name: "Eve", createdAt: new Date() },\n  update: { name: "Eve Exists" },\n});',
+          code: "await db.orm.users.where({ email: 'eve@prisma.io' }).upsert({\n  create: { email: 'eve@prisma.io', name: 'Eve', createdAt: new Date() },\n  update: { name: 'Eve Exists' },\n});",
         },
       },
       {
@@ -302,7 +302,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const user = await db.orm.public.User.first({ email: "jane@prisma.io" });\nif (!user) throw new Error("no such user");\n// Insert many records\nconst newPosts = await db.orm.public.Post.createAll([\n  { title: "One", content: null, published: false, authorId: user.id },\n  { title: "Two", content: null, published: false, authorId: user.id },\n]);\n\n// Insert many, get back only the number inserted\nconst insertedCount = await db.orm.public.Post.createAndCount([\n  { title: "Three", content: null, published: false, authorId: user.id },\n]);\n\n// Update every match, get back only the number updated\nconst updatedCount = await db.orm.public.Post.where({ published: false }).updateAndCount({ published: true });\n\n// Delete every match, get back the deleted records\nconst deletedPosts = await db.orm.public.Post.where({ published: false }).deleteAll();\n\n// Delete every match, get back only the number deleted\nconst deletedCount = await db.orm.public.Post.where((p) => p.title.ilike("draft%")).deleteAndCount();',
+          code: "const user = await db.orm.public.User.first({ email: 'jane@prisma.io' });\nif (!user) throw new Error('no such user');\n// Insert many records\nconst newPosts = await db.orm.public.Post.createAll([\n  { title: 'One', content: null, published: false, authorId: user.id },\n  { title: 'Two', content: null, published: false, authorId: user.id },\n]);\n\n// Insert many, get back only the number inserted\nconst insertedCount = await db.orm.public.Post.createAndCount([\n  { title: 'Three', content: null, published: false, authorId: user.id },\n]);\n\n// Update every match, get back only the number updated\nconst updatedCount = await db.orm.public.Post.where({ published: false }).updateAndCount({\n  published: true,\n});\n\n// Delete every match, get back the deleted records\nconst deletedPosts = await db.orm.public.Post.where({ published: false }).deleteAll();\n\n// Delete every match, get back only the number deleted\nconst deletedCount = await db.orm.public.Post.where((p) =>\n  p.title.ilike('draft%')\n).deleteAndCount();",
         },
       },
       {
@@ -314,7 +314,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "[{ id: 'cuid20000000000000000101', title: 'One', published: false, /* ... */ }, { id: 'cuid20000000000000000102', title: 'Two', published: false, /* ... */ }]",
+          code: "[\n  { id: 'cuid20000000000000000101', title: 'One', published: false /* ... */ },\n  { id: 'cuid20000000000000000102', title: 'Two', published: false /* ... */ },\n];",
         },
       },
       {
@@ -367,7 +367,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const publishedPosts = await db.orm.public.Post\n  .where({ published: false })\n  .updateAll({ published: true });',
+          code: 'const publishedPosts = await db.orm.public.Post.where({ published: false }).updateAll({\n  published: true,\n});',
         },
       },
       {
@@ -375,7 +375,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "[{ id: 'cuid20000000000000000101', title: 'One', published: true, /* ... */ }, { id: 'cuid20000000000000000102', title: 'Two', published: true, /* ... */ }]",
+          code: "[\n  { id: 'cuid20000000000000000101', title: 'One', published: true /* ... */ },\n  { id: 'cuid20000000000000000102', title: 'Two', published: true /* ... */ },\n];",
         },
       },
       {
@@ -424,7 +424,7 @@ export const prismawritingdataTopics = {
         code: {
           filename: 'example',
           language: 'typescript',
-          code: 'const updatedCount = await db.orm.public.Post\n  .where({ published: false })\n  .updateAndCount({ published: true });',
+          code: 'const updatedCount = await db.orm.public.Post.where({ published: false }).updateAndCount({\n  published: true,\n});',
         },
       },
       {

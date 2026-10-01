@@ -62,6 +62,19 @@
     {
       "id": "prisma-day-07",
       "dayNumber": 7,
+      "title": "Node.js Security",
+      "references": [
+        {
+          "name": "prismaNodeSecurity",
+          "title": "Node.js Security Cheat Sheet",
+          "source": "web",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Nodejs_Security_Cheat_Sheet.html"
+        }
+      ]
+    },
+    {
+      "id": "prisma-day-08",
+      "dayNumber": 8,
       "title": "Debugging",
       "references": [
         {
