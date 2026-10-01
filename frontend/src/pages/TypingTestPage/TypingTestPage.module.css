@@ -103,8 +103,6 @@
 
 .arena {
   position: relative;
-  min-height: 180px;
-  overflow-y: auto;
   background: var(--color-bg-code-block);
   border: 1px solid var(--color-border-default);
   border-radius: 8px;
@@ -154,8 +152,8 @@
 }
 
 .result {
-  font-size: 14px;
-  color: var(--color-text-secondary);
+  font-size: 18px;
+  color: var(--color-text-primary);
 }
 
 .result strong {
@@ -176,4 +174,94 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
+}
+.arenaWrap {
+  position: relative;
+}
+
+.timeoutOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-bg-card) 35%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.timeoutTitle {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-text-bright);
+}
+
+.timeoutHint {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.timeoutHint kbd {
+  font-size: 11px;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border-default);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.pauseOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-bg-card) 35%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.pauseTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text-bright);
+}
+.resultStats {
+  display: flex;
+  gap: 40px;
+  margin: 4px 0;
+}
+
+.resultStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.resultValue,
+.resultValueGreen {
+  font-family: var(--font-mono);
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.resultValue {
+  color: var(--color-accent-purple);
+}
+
+.resultValueGreen {
+  color: var(--color-text-green);
+}
+
+.resultLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
 }

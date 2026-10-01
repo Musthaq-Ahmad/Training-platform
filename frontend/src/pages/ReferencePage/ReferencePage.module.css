@@ -5,10 +5,30 @@
   padding: 0;
   color: var(--color-text-primary);
 }
+
 .contentWrapper {
   width: min(100% - 48px, 1160px);
   margin: 0 auto;
 }
+
+/* =========================
+   Toolbar
+   ========================= */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.toolbar .backLink {
+  flex-shrink: 0;
+  margin: 0;
+}
+
 /* =========================
    Back Navigation
    ========================= */
@@ -92,6 +112,7 @@
   font-weight: 700;
   line-height: 1.4;
 }
+
 .definitions {
   margin: 20px 0;
 }
@@ -113,6 +134,7 @@
   font-size: 14px;
   line-height: 1.7;
 }
+
 .tableWrapper {
   width: 100%;
   margin: 24px 0;
@@ -358,9 +380,11 @@
   font-family: var(--font-mono);
   font-size: 13px;
 }
+
 /* =========================
    Return button
    ========================= */
+
 .returnButton {
   display: inline-flex;
   align-items: center;
@@ -368,21 +392,19 @@
   margin-top: 32px;
   padding: 12px 20px;
   line-height: 1;
-
   background: var(--color-bg-base);
   color: var(--color-text-primary);
   border-radius: 8px;
-
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
-
   transition: opacity 0.2s ease;
 }
 
 .returnButton:hover {
   opacity: 0.9;
 }
+
 /* =========================
    Responsive
    ========================= */
@@ -398,6 +420,18 @@
 
   .sectionTitle {
     font-size: 20px;
+  }
+}
+
+@media (max-width: 760px) {
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .toolbar .backLink {
+    align-self: flex-start;
   }
 }
 
@@ -429,6 +463,7 @@
     font-size: 11px;
   }
 }
+
 /* =========================
    Prism Syntax Highlighting
    ========================= */
@@ -482,6 +517,7 @@
 .codeBlock :global(.token.number) {
   color: var(--color-status-warning);
 }
+
 .table :global(.token.tag) {
   color: var(--color-accent-purple);
 }
@@ -528,6 +564,7 @@
   font-family: monospace;
   font-size: 0.9em;
 }
+
 .htmlTableWrapper {
   width: 100%;
   margin: 24px 0;
@@ -576,6 +613,7 @@
 .htmlTable col {
   background: transparent;
 }
+
 /* Prism syntax highlighting */
 .codeBlock :global(.token.comment),
 .codeBlock :global(.token.prolog),
@@ -635,6 +673,7 @@
 .codeBlock :global(.token.bold) {
   font-weight: 600;
 }
+
 /* =========================
    Accordions
    ========================= */
@@ -716,6 +755,7 @@
   background: var(--color-bg-card);
   border: 1px solid var(--color-border-card);
 }
+
 .instructionBox {
   margin-bottom: 24px;
   padding: 16px 20px;
