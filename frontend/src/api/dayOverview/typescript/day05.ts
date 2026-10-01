@@ -2,7 +2,7 @@ import type { DayContent } from '@itp/types';
 
 export const tsDay05: DayContent = {
   dayId: 'ts-day-05',
-  courseSlug: 'typescript',
+  courseSlug: 'ts',
   courseTitle: 'TypeScript',
   dayNumber: 5,
   totalDays: 5,

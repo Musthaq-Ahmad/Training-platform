@@ -84,6 +84,7 @@ export default function CodeEditor({
         theme={isDark ? 'itp-dark' : 'itp-light'}
         onMount={handleMount}
         onChange={(value) => onChangeRef.current(path, value ?? '')}
+        loading={<></>}
         options={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: 14,

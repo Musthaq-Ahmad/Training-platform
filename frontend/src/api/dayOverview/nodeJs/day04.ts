@@ -1,8 +1,8 @@
 import type { DayContent } from '@itp/types';
 
 export const nodejsDay04: DayContent = {
-  dayId: 'nodejs-day-04',
-  courseSlug: 'nodejs',
+  dayId: 'node-day-04',
+  courseSlug: 'node',
   courseTitle: 'Node.js',
   dayNumber: 4,
   totalDays: 5,
@@ -12,27 +12,27 @@ export const nodejsDay04: DayContent = {
     'Migrate the Task API to Express and restructure the codebase using routes, controllers, services, and repositories. Preserve existing endpoints, add request logging and a health endpoint, and implement centralized not-found and error handlers.',
   learningObjectives: [
     {
-      id: 'nodejs-day-04-lo-01',
+      id: 'node-day-04-lo-01',
       code: 'LO1',
       title: 'Use Express routing and middleware',
       description: 'Use Express routers, route methods, route parameters, and middleware.',
     },
     {
-      id: 'nodejs-day-04-lo-02',
+      id: 'node-day-04-lo-02',
       code: 'LO2',
       title: 'Apply layered architecture',
       description:
         'Separate routes, controllers, services, and repositories according to their responsibilities.',
     },
     {
-      id: 'nodejs-day-04-lo-03',
+      id: 'node-day-04-lo-03',
       code: 'LO3',
       title: 'Centralize error handling',
       description:
         'Implement centralized not-found and error handlers and add request logging and a health endpoint.',
     },
     {
-      id: 'nodejs-day-04-lo-04',
+      id: 'node-day-04-lo-04',
       code: 'LO4',
       title: 'Refactor the Task API',
       description:
@@ -41,14 +41,14 @@ export const nodejsDay04: DayContent = {
   ],
   selfCheckItems: [
     {
-      id: 'nodejs-day-04-sc-01',
+      id: 'node-day-04-sc-01',
       code: 'SC1',
       label: 'Configure Express routes and middleware',
       description: 'I can use Express routers and middleware in the application.',
       isRequired: true,
     },
     {
-      id: 'nodejs-day-04-sc-02',
+      id: 'node-day-04-sc-02',
       code: 'SC2',
       label: 'Separate application layers',
       description:
@@ -56,7 +56,7 @@ export const nodejsDay04: DayContent = {
       isRequired: true,
     },
     {
-      id: 'nodejs-day-04-sc-03',
+      id: 'node-day-04-sc-03',
       code: 'SC3',
       label: 'Add centralized handlers and verify the API',
       description:

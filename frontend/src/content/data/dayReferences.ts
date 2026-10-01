@@ -417,7 +417,7 @@ export const dayReferences: DayReferenceConfig[] = [
     ],
   },
   {
-    id: 'postgres-day-06',
+    id: 'postgresql-day-06',
     courseId: 'postgres',
     dayNumber: 6,
     topicIds: ['nodeenvvariables'],

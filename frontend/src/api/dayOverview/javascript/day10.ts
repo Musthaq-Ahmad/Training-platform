@@ -3,7 +3,7 @@ import type { DayContent } from '@itp/types';
 // Friday — Week 4 Project: Mini SPA Without a Framework
 export const jsDay10: DayContent = {
   dayId: 'js-day-10',
-  courseSlug: 'javascript',
+  courseSlug: 'js',
   courseTitle: 'JavaScript',
   dayNumber: 10,
   totalDays: 10,

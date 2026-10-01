@@ -62,6 +62,68 @@ describe('mockAdapter', () => {
     });
   });
 
+  describe('curriculum tasks (from the trainee guides)', () => {
+    it('returns a real task for GET /tasks/:id with its day and runtime', async () => {
+      const res = await client.get<TaskResponse>('/tasks/html-day-01-t-2');
+
+      expect(res.data).toMatchObject({
+        id: 'html-day-01-t-2',
+        title: 'Personal Profile Page',
+        runtime: 'browser',
+        status: 'completed',
+        day: { id: 'html-day-01', dayNumber: 1, courseTitle: 'HTML' },
+      });
+      expect(res.data.instructionsMarkdown).toContain('profile.html');
+    });
+
+    it('returns starter files for GET /tasks/:id/code', async () => {
+      const res = await client.get<TaskCodeResponse>('/tasks/react-day-01-t-1/code');
+
+      expect(res.data.files.map((f) => f.path)).toContain('src/App.tsx');
+    });
+
+    it('gives SQL report days the Support Ticket schema as setupSql', async () => {
+      const res = await client.get<TaskResponse>('/tasks/postgresql-day-03-t-1');
+
+      expect(res.data.runtime).toBe('sql');
+      expect(res.data.setupSql).toContain('create table tickets');
+    });
+
+    it('rejects a task on a locked day with 403 DAY_LOCKED', async () => {
+      const dayId = findLockedDayId();
+
+      await expect(client.get(`/tasks/${dayId}-t-1`)).rejects.toMatchObject({
+        response: { status: 403, data: { error: { code: 'DAY_LOCKED' } } },
+      });
+    });
+
+    it('rejects an unknown task with 404 NOT_FOUND', async () => {
+      await expect(client.get('/tasks/no-such-task')).rejects.toMatchObject({
+        response: { status: 404, data: { error: { code: 'NOT_FOUND' } } },
+      });
+    });
+  });
+
+  describe('error scenarios', () => {
+    it('fails the save for t-save-error', async () => {
+      await expect(client.put('/tasks/t-save-error/code', { files: [] })).rejects.toMatchObject({
+        response: { status: 500, data: { error: { code: 'INTERNAL_ERROR' } } },
+      });
+    });
+
+    it('rejects the submit for t-submit-error', async () => {
+      await expect(client.post('/tasks/t-submit-error/submit')).rejects.toMatchObject({
+        response: { status: 403, data: { error: { code: 'CHECKLIST_INCOMPLETE' } } },
+      });
+    });
+
+    it('fails the task load for t-server-error', async () => {
+      await expect(client.get('/tasks/t-server-error')).rejects.toMatchObject({
+        response: { status: 500, data: { error: { code: 'INTERNAL_ERROR' } } },
+      });
+    });
+  });
+
   describe('days', () => {
     it('returns tasks for GET /days/:dayId/tasks', async () => {
       const dayId = findUnlockedDayId();

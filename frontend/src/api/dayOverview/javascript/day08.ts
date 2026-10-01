@@ -3,7 +3,7 @@ import type { DayContent } from '@itp/types';
 // Wednesday — Testing with Jest
 export const jsDay08: DayContent = {
   dayId: 'js-day-08',
-  courseSlug: 'javascript',
+  courseSlug: 'js',
   courseTitle: 'JavaScript',
   dayNumber: 8,
   totalDays: 10,
