@@ -24,6 +24,8 @@ import {
 import { mockStatusByDay, mockJournalByDay } from '../test/fixtures/dayStatus';
 import { mockDayContents } from './dayOverview';
 import { buildCourseDays, buildDashboard } from '../test/fixtures/dashboard';
+import type { SaveTypingResultRequest } from '@itp/types'; // add to your existing @itp/types import
+import { addTypingResult, buildTypingToday } from '../test/fixtures/typingTest';
 
 const MOCK_DELAY_MS = 300;
 
@@ -93,7 +95,7 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   const method = (config.method ?? 'get').toLowerCase();
   const url = config.url ?? '';
 
-  const codeMatch = /^\/tasks\/([^/]+)\/code$/.exec(url);
+  const codeMatch = /^\/?tasks\/([^/]+)\/code$/.exec(url);
   const taskMatch = /^\/tasks\/([^/]+)$/.exec(url);
   const submitMatch = /^\/tasks\/([^/]+)\/submit$/.exec(url);
   const activityMatch = /^\/activity\/([^/]+)\/events$/.exec(url);
@@ -206,6 +208,14 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
     return respond(config, 200, days);
   }
 
+  if (method === 'get' && url === '/typing-test/today') {
+    return respond(config, 200, buildTypingToday());
+  }
+
+  if (method === 'post' && url === '/typing-test/results') {
+    const body = JSON.parse(config.data as string) as SaveTypingResultRequest;
+    return respond(config, 201, addTypingResult(body));
+  }
   return errorResponse(config, 404, 'NOT_FOUND', 'Not found.');
 }
 

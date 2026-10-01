@@ -472,5 +472,15 @@ describe('DashboardPage', () => {
 
       expect(await screen.findByText('HTML Module — Schedule')).toBeInTheDocument();
     });
+    it('navigates to the typing test when the typing test button is clicked', async () => {
+      const user = userEvent.setup();
+      vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+
+      renderPage();
+
+      await user.click(await screen.findByRole('button', { name: /take a typing test/i }));
+
+      expect(navigate).toHaveBeenCalledWith('/typing-test');
+    });
   });
 });

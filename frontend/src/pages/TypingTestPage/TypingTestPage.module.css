@@ -1,0 +1,179 @@
+.page {
+  max-width: 60vw;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-text-bright);
+}
+
+.subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: var(--color-bg-panel);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.timerGroup {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.timerLabel,
+.modeLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.timer {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-accent-purple);
+}
+
+.modes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mode,
+.modeActive {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.mode {
+  background: var(--color-bg-pill-inactive);
+  color: var(--color-text-secondary);
+}
+
+.mode:hover {
+  color: var(--color-text-primary);
+}
+
+.modeActive {
+  background: var(--color-button-primary-bg);
+  color: var(--color-button-primary-text);
+  font-weight: 700;
+}
+
+.modeActive:hover {
+  background: var(--color-button-primary-bg-hover);
+}
+
+.mode:disabled,
+.modeActive:disabled,
+.restart:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.arena {
+  position: relative;
+  min-height: 180px;
+  overflow-y: auto;
+  background: var(--color-bg-code-block);
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
+  padding: 40px 40px;
+  cursor: text;
+  text-align: justify;
+}
+
+/* Receives the keystrokes but is not visible */
+.hiddenInput {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.hint kbd {
+  font-size: 11px;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border-default);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.restart {
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--color-bg-button-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+
+.restart:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+}
+
+.result {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.result strong {
+  color: var(--color-text-green);
+}
+
+.error {
+  font-size: 13px;
+  color: var(--color-status-error-text);
+}
+
+.status {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+.controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
