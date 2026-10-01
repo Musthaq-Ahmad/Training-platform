@@ -17,8 +17,8 @@ const prisma = new PrismaClient({ adapter });
 // ---------- Data ----------
 
 const trainees = [
-  { email: 'aswin.vijayan@vonnue.com', name: 'Aswin Vijayan' },
   { email: 'hawas.backer@vonnue.com', name: 'Hawas Backer' },
+  { email: 'aswin.vijayan@vonnue.com', name: 'Aswin Vijayan' },
   { email: 'fathima.fadwah@vonnue.com', name: 'Fathima Fadwah' },
   { email: 'ameesha.t@vonnue.com', name: 'Ameesha T' },
 ];

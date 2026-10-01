@@ -26,6 +26,7 @@ import { mockDayContents } from './dayOverview';
 import { buildCourseDays, buildDashboard } from '../test/fixtures/dashboard';
 import type { SaveTypingResultRequest } from '@itp/types'; // add to your existing @itp/types import
 import { addTypingResult, buildTypingToday } from '../test/fixtures/typingTest';
+import { mockProfile } from '../test/fixtures/profile';
 
 const MOCK_DELAY_MS = 300;
 
@@ -208,8 +209,13 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
     const journal = mockJournalByDay[dayJournalMatch[1]] ?? { responseText: null };
     return respond(config, 200, journal);
   }
+
   if (method === 'get' && url === '/dashboard') {
     return respond(config, 200, buildDashboard());
+  }
+
+  if (method === 'get' && url === '/profile') {
+    return respond(config, 200, mockProfile);
   }
 
   if (method === 'get' && courseDaysMatch) {
