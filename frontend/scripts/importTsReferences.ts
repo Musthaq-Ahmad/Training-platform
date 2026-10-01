@@ -51,9 +51,111 @@ const turndown = new TurndownService({
 turndown.use(gfm);
 
 turndown.remove(['script', 'style', 'iframe', 'nav']);
-function normalizeCodeBlocks(document: Document) {
+
+type SandpackFile = { path: string; lang: string; code: string };
+
+// react.dev ships code as escaped JSON inside <script> tags (two escape layers)
+const SANDPACK_FILE_RE =
+  /\\"className\\":\\"language-([\w-]+)\\",\\"meta\\":\\"([^\\]*)\\",\\"children\\":\\"((?:\\\\\\\\|\\\\\\"|\\\\[nrt\/]|\\u[0-9a-fA-F]{4}|[^\\])*)\\"/g;
+
+function decodePayload(raw: string): string | null {
+  try {
+    const once = JSON.parse(`"${raw}"`) as string;
+    return JSON.parse(`"${once}"`) as string;
+  } catch {
+    return null;
+  }
+}
+
+function parseSandpackFiles(html: string): SandpackFile[] {
+  const files: SandpackFile[] = [];
+
+  for (const match of html.matchAll(SANDPACK_FILE_RE)) {
+    const code = decodePayload(match[3]);
+    if (code === null) continue;
+
+    files.push({
+      path: match[2].split(/\s+/)[0].replace(/^\//, ''),
+      lang: match[1],
+      code,
+    });
+  }
+
+  return files;
+}
+
+function normalizeCodeBlocks(document: Document, sandpackFiles: SandpackFile[] = []) {
   // Drop "Try" playground links (adjust selector if the class differs)
   document.querySelectorAll('pre.playground-link').forEach((el) => el.remove());
+  // react.dev Sandpack examples: keep the pre-rendered code, drop the editor chrome
+  const norm = (s: string) => s.replace(/\s+/g, ' ').trim();
+  let cursor = 0;
+
+  document.querySelectorAll('.sp-wrapper').forEach((wrapper) => {
+    const source = wrapper.querySelector('.sp-pre-placeholder') ?? wrapper.querySelector('pre');
+    if (!source) return;
+
+    // Multi-file example: rebuild every visible tab from the payload
+    const tabs = Array.from(wrapper.querySelectorAll('.sp-tab-button')).map((b) =>
+      (b.getAttribute('title') ?? '').replace(/^\//, '')
+    );
+
+    if (tabs.length > 1 && sandpackFiles.length > 0) {
+      const placeholder = norm(source.textContent ?? '');
+      const indexed = sandpackFiles.map((file, i) => ({ file, i }));
+      const anchors = indexed.filter(({ file }) => norm(file.code) === placeholder);
+      const anchor = anchors.find((a) => a.i >= cursor) ?? anchors[0];
+
+      if (anchor) {
+        const nodes: Node[] = [];
+
+        for (const tab of tabs) {
+          const candidates = indexed.filter(({ file }) => file.path === tab);
+          if (candidates.length === 0) continue;
+
+          const best = candidates.reduce((a, b) =>
+            Math.abs(a.i - anchor.i) <= Math.abs(b.i - anchor.i) ? a : b
+          );
+
+          const label = document.createElement('p');
+          const strong = document.createElement('strong');
+          strong.textContent = tab.split('/').pop() ?? tab;
+          label.appendChild(strong);
+
+          const pre = document.createElement('pre');
+          const code = document.createElement('code');
+          code.className = `language-${best.file.lang === 'js' ? 'jsx' : best.file.lang}`;
+          code.textContent = best.file.code.replace(/\n+$/, '');
+          pre.appendChild(code);
+
+          nodes.push(label, pre);
+        }
+
+        if (nodes.length > 0) {
+          cursor = anchor.i + 1;
+          (wrapper as Element).replaceWith(...(nodes as Element[]));
+          return;
+        }
+      }
+    }
+
+    // Single-file example (or no match): use the pre-rendered placeholder
+    source.querySelectorAll('br').forEach((br) => br.replaceWith('\n'));
+
+    const lineEls = source.querySelectorAll('.cm-line');
+    const raw = lineEls.length
+      ? Array.from(lineEls)
+          .map((l) => l.textContent ?? '')
+          .join('\n')
+      : (source.textContent ?? '');
+
+    const cleanPre = document.createElement('pre');
+    const code = document.createElement('code');
+    code.className = 'language-jsx';
+    code.textContent = raw.replace(/\n+$/, '');
+    cleanPre.appendChild(code);
+    wrapper.replaceWith(cleanPre);
+  });
 
   document.querySelectorAll('pre').forEach((pre) => {
     pre.querySelectorAll('br').forEach((br) => br.replaceWith('\n'));
@@ -94,6 +196,30 @@ function normalizeCodeBlocks(document: Document) {
     pre.replaceWith(cleanPre);
   });
 }
+function extractByRange(document: Document, heading: Element, level: number): string {
+  const FOLLOWING = 4; // Node.DOCUMENT_POSITION_FOLLOWING
+
+  const boundary = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6')).find(
+    (h) =>
+      !heading.contains(h) &&
+      (heading.compareDocumentPosition(h) & FOLLOWING) !== 0 &&
+      Number(h.tagName[1]) <= level
+  );
+
+  const range = document.createRange();
+  range.setStartBefore(heading);
+
+  if (boundary) {
+    range.setEndBefore(boundary);
+  } else {
+    const root = document.querySelector('main') ?? document.body;
+    range.setEndAfter(root.lastChild ?? root);
+  }
+
+  const wrapper = document.createElement('div');
+  wrapper.appendChild(range.cloneContents());
+  return wrapper.innerHTML;
+}
 function extractSection(document: Document, id: string): string | null {
   const target = document.getElementById(id);
   if (!target) return null;
@@ -114,20 +240,36 @@ function extractSection(document: Document, id: string): string | null {
       ? parent
       : heading;
 
+  // A sibling ends the section only if it is a heading itself,
+  // or a <section> that starts with a heading
   const levelOf = (el: Element): number | null => {
-    const h = el.matches(headingSelector) ? el : el.querySelector(headingSelector);
-    return h ? Number(h.tagName[1]) : null;
+    if (el.matches(headingSelector)) return Number(el.tagName[1]);
+
+    const first = el.firstElementChild;
+    if (el.tagName === 'SECTION' && first?.matches(headingSelector)) {
+      return Number(first.tagName[1]);
+    }
+
+    return null;
   };
 
   const parts = [start.outerHTML];
   let node = start.nextElementSibling;
+  let hitBoundary = false;
 
   while (node) {
     const nodeLevel = levelOf(node);
-    if (nodeLevel !== null && nodeLevel <= level) break;
+    if (nodeLevel !== null && nodeLevel <= level) {
+      hitBoundary = true;
+      break;
+    }
     parts.push(node.outerHTML);
     node = node.nextElementSibling;
   }
+
+  // Siblings ran out without a boundary: the content is nested elsewhere
+  // (react.dev), so fall back to document order
+  if (!hitBoundary) return extractByRange(document, heading, level);
 
   return parts.join('\n');
 }
@@ -152,7 +294,10 @@ async function urlToMarkdown(url: string): Promise<string> {
   const html = await response.text();
 
   const dom = new JSDOM(html, { url });
-  normalizeCodeBlocks(dom.window.document);
+
+  const sandpackFiles = parseSandpackFiles(html);
+  normalizeCodeBlocks(dom.window.document, sandpackFiles);
+
   const sectionId = new URL(url).hash.slice(1);
 
   if (sectionId) {

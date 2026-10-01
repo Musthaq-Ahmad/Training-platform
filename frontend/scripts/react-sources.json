@@ -1,0 +1,196 @@
+{
+  "courseId": "react",
+  "sources": {},
+  "days": [
+    {
+      "id": "react-day-01",
+      "dayNumber": 1,
+      "title": "React Fundamentals",
+      "references": [
+        {
+          "name": "reactFirstComponent",
+          "title": "Your First Component",
+          "source": "web",
+          "url": "https://react.dev/learn/describing-the-ui#your-first-component"
+        },
+        {
+          "name": "reactImportExport",
+          "title": "Importing and Exporting Components",
+          "source": "web",
+          "url": "https://react.dev/learn/describing-the-ui#importing-and-exporting-components"
+        },
+        {
+          "name": "reactJsx",
+          "title": "Writing Markup with JSX",
+          "source": "web",
+          "url": "https://react.dev/learn/describing-the-ui#writing-markup-with-jsx"
+        },
+        {
+          "name": "viteGuide",
+          "title": "Vite Guide",
+          "source": "web",
+          "url": "https://vite.dev/guide/"
+        }
+      ]
+    },
+    {
+      "id": "react-day-02",
+      "dayNumber": 2,
+      "title": "Lists and Conditional Rendering",
+      "references": [
+        {
+          "name": "reactRenderingLists",
+          "title": "Rendering Lists",
+          "source": "web",
+          "url": "https://react.dev/learn/describing-the-ui#rendering-lists"
+        },
+        {
+          "name": "reactConditionalRendering",
+          "title": "Conditional Rendering",
+          "source": "web",
+          "url": "https://react.dev/learn/describing-the-ui#conditional-rendering"
+        }
+      ]
+    },
+    {
+      "id": "react-day-03",
+      "dayNumber": 3,
+      "title": "Adding Interactivity",
+      "references": [
+        {
+          "name": "reactRespondingToEvents",
+          "title": "Responding to Events",
+          "source": "web",
+          "url": "https://react.dev/learn/adding-interactivity#responding-to-events"
+        },
+        {
+          "name": "reactState",
+          "title": "State: A Component's Memory",
+          "source": "web",
+          "url": "https://react.dev/learn/adding-interactivity#state-a-components-memory"
+        },
+        {
+          "name": "reactUpdatingArraysInState",
+          "title": "Updating Arrays in State",
+          "source": "web",
+          "url": "https://react.dev/learn/adding-interactivity#updating-arrays-in-state"
+        }
+      ]
+    },
+    {
+      "id": "react-day-04",
+      "dayNumber": 4,
+      "title": "Controlled Inputs",
+      "references": [
+        {
+          "name": "reactControlledInput",
+          "title": "Controlling an Input with a State Variable",
+          "source": "web",
+          "url": "https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable"
+        }
+      ]
+    },
+    {
+      "id": "react-day-05",
+      "dayNumber": 5,
+      "title": "React",
+      "references": [
+        {
+          "name": "reactLearnDay05",
+          "title": "React Learn",
+          "source": "web",
+          "url": "https://react.dev/learn"
+        }
+      ]
+    },
+    {
+      "id": "react-day-06",
+      "dayNumber": 6,
+      "title": "React Router",
+      "references": [
+        {
+          "name": "reactRouterInstallation",
+          "title": "React Router Installation",
+          "source": "web",
+          "url": "https://reactrouter.com/start/declarative/installation"
+        }
+      ]
+    },
+    {
+      "id": "react-day-07",
+      "dayNumber": 7,
+      "title": "Fetching Data",
+      "references": [
+        {
+          "name": "reactFetchApi",
+          "title": "Using the Fetch API",
+          "source": "web",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch"
+        }
+      ]
+    },
+    {
+      "id": "react-day-08",
+      "dayNumber": 8,
+      "title": "Effects",
+      "references": [
+        {
+          "name": "reactSynchronizingWithEffects",
+          "title": "Synchronizing with Effects",
+          "source": "web",
+          "url": "https://react.dev/learn/synchronizing-with-effects"
+        },
+        {
+          "name": "reactYouMightNotNeedAnEffect",
+          "title": "You Might Not Need an Effect",
+          "source": "web",
+          "url": "https://react.dev/learn/you-might-not-need-an-effect"
+        }
+      ]
+    },
+    {
+      "id": "react-day-09",
+      "dayNumber": 9,
+      "title": "Context",
+      "references": [
+        {
+          "name": "reactContext",
+          "title": "Passing Data Deeply with Context",
+          "source": "web",
+          "url": "https://react.dev/learn/passing-data-deeply-with-context"
+        }
+      ]
+    },
+    {
+      "id": "react-day-10",
+      "dayNumber": 10,
+      "title": "React Testing Library",
+      "references": [
+        {
+          "name": "reactTestingLibraryIntro",
+          "title": "React Testing Library Introduction",
+          "source": "web",
+          "url": "https://testing-library.com/docs/react-testing-library/intro/"
+        },
+        {
+          "name": "reactTestingLibraryExample",
+          "title": "React Testing Library Example",
+          "source": "web",
+          "url": "https://testing-library.com/docs/react-testing-library/example-intro"
+        },
+        {
+          "name": "reactTestingLibrarySetup",
+          "title": "React Testing Library Setup",
+          "source": "web",
+          "url": "https://testing-library.com/docs/react-testing-library/setup"
+        },
+        {
+          "name": "reactTestingLibraryQueries",
+          "title": "About Queries",
+          "source": "web",
+          "url": "https://testing-library.com/docs/queries/about/#priority"
+        }
+      ]
+    }
+  ]
+}

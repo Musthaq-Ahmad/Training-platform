@@ -31,6 +31,7 @@ import * as nodeTopics from '../topics/node';
 import { dayReferences } from './dayReferences';
 import * as postgresTopics from '../topics/postgres';
 import * as prismaTopics from '../topics/prisma';
+import * as reactTopics from '../topics/react';
 
 const courseTopics: Record<string, ContentTopic[]> = {
   html: [
@@ -71,6 +72,9 @@ const courseTopics: Record<string, ContentTopic[]> = {
     (topicCollection) => Object.values(topicCollection) as ContentTopic[]
   ),
   prisma: Object.values(prismaTopics).flatMap(
+    (topicCollection) => Object.values(topicCollection) as ContentTopic[]
+  ),
+  react: Object.values(reactTopics).flatMap(
     (topicCollection) => Object.values(topicCollection) as ContentTopic[]
   ),
 };

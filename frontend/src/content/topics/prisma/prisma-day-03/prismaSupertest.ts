@@ -38,7 +38,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "const request = require('supertest');\nconst express = require('express');\n\nconst app = express();\n\napp.get('/user', function(req, res) {\n  res.status(200).json({ name: 'john' });\n});\n\nrequest(app)\n  .get('/user')\n  .expect('Content-Type', /json/)\n  .expect('Content-Length', '15')\n  .expect(200)\n  .end(function(err, res) {\n    if (err) throw err;\n  });",
+          code: "const request = require('supertest');\nconst express = require('express');\n\nconst app = express();\n\napp.get('/user', function (req, res) {\n  res.status(200).json({ name: 'john' });\n});\n\nrequest(app)\n  .get('/user')\n  .expect('Content-Type', /json/)\n  .expect('Content-Length', '15')\n  .expect(200)\n  .end(function (err, res) {\n    if (err) throw err;\n  });",
         },
       },
       {
@@ -50,7 +50,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "const request = require('supertest');\nconst express = require('express');\n\nconst app = express();\n\napp.get('/user', function(req, res) {\n  res.status(200).json({ name: 'john' });\n});\n\nrequest(app, { http2: true })\n  .get('/user')\n  .expect('Content-Type', /json/)\n  .expect('Content-Length', '15')\n  .expect(200)\n  .end(function(err, res) {\n    if (err) throw err;\n  });\n\nrequest.agent(app, { http2: true })\n  .get('/user')\n  .expect('Content-Type', /json/)\n  .expect('Content-Length', '15')\n  .expect(200)\n  .end(function(err, res) {\n    if (err) throw err;\n  });",
+          code: "const request = require('supertest');\nconst express = require('express');\n\nconst app = express();\n\napp.get('/user', function (req, res) {\n  res.status(200).json({ name: 'john' });\n});\n\nrequest(app, { http2: true })\n  .get('/user')\n  .expect('Content-Type', /json/)\n  .expect('Content-Length', '15')\n  .expect(200)\n  .end(function (err, res) {\n    if (err) throw err;\n  });\n\nrequest\n  .agent(app, { http2: true })\n  .get('/user')\n  .expect('Content-Type', /json/)\n  .expect('Content-Length', '15')\n  .expect(200)\n  .end(function (err, res) {\n    if (err) throw err;\n  });",
         },
       },
       {
@@ -62,7 +62,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "describe('GET /user', function() {\n  it('responds with json', function(done) {\n    request(app)\n      .get('/user')\n      .set('Accept', 'application/json')\n      .expect('Content-Type', /json/)\n      .expect(200, done);\n  });\n});",
+          code: "describe('GET /user', function () {\n  it('responds with json', function (done) {\n    request(app)\n      .get('/user')\n      .set('Accept', 'application/json')\n      .expect('Content-Type', /json/)\n      .expect(200, done);\n  });\n});",
         },
       },
       {
@@ -74,7 +74,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "describe('GET /user', function() {\n  it('responds with json', function(done) {\n    request(app)\n      .get('/user')\n      .auth('username', 'password')\n      .set('Accept', 'application/json')\n      .expect('Content-Type', /json/)\n      .expect(200, done);\n  });\n});",
+          code: "describe('GET /user', function () {\n  it('responds with json', function (done) {\n    request(app)\n      .get('/user')\n      .auth('username', 'password')\n      .set('Accept', 'application/json')\n      .expect('Content-Type', /json/)\n      .expect(200, done);\n  });\n});",
         },
       },
       {
@@ -90,7 +90,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "describe('POST /users', function() {\n  it('responds with json', function(done) {\n    request(app)\n      .post('/users')\n      .send({name: 'john'})\n      .set('Accept', 'application/json')\n      .expect('Content-Type', /json/)\n      .expect(200)\n      .end(function(err, res) {\n        if (err) return done(err);\n        return done();\n      });\n  });\n});",
+          code: "describe('POST /users', function () {\n  it('responds with json', function (done) {\n    request(app)\n      .post('/users')\n      .send({ name: 'john' })\n      .set('Accept', 'application/json')\n      .expect('Content-Type', /json/)\n      .expect(200)\n      .end(function (err, res) {\n        if (err) return done(err);\n        return done();\n      });\n  });\n});",
         },
       },
       {
@@ -102,7 +102,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "describe('GET /users', function() {\n  it('responds with json', function() {\n    return request(app)\n      .get('/users')\n      .set('Accept', 'application/json')\n      .expect('Content-Type', /json/)\n      .expect(200)\n      .then(response => {\n         expect(response.body.email).toEqual('foo@bar.com');\n      })\n  });\n});",
+          code: "describe('GET /users', function () {\n  it('responds with json', function () {\n    return request(app)\n      .get('/users')\n      .set('Accept', 'application/json')\n      .expect('Content-Type', /json/)\n      .expect(200)\n      .then((response) => {\n        expect(response.body.email).toEqual('foo@bar.com');\n      });\n  });\n});",
         },
       },
       {
@@ -114,7 +114,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "describe('GET /users', function() {\n  it('responds with json', async function() {\n    const response = await request(app)\n      .get('/users')\n      .set('Accept', 'application/json')\n    expect(response.headers[\"content-type\"]).toMatch(/json/);\n    expect(response.status).toEqual(200);\n    expect(response.body.email).toEqual('foo@bar.com');\n  });\n});",
+          code: "describe('GET /users', function () {\n  it('responds with json', async function () {\n    const response = await request(app).get('/users').set('Accept', 'application/json');\n    expect(response.headers['content-type']).toMatch(/json/);\n    expect(response.status).toEqual(200);\n    expect(response.body.email).toEqual('foo@bar.com');\n  });\n});",
         },
       },
       {
@@ -126,7 +126,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "describe('POST /user', function() {\n  it('user.name should be an case-insensitive match for \"john\"', function(done) {\n    request(app)\n      .post('/user')\n      .send('name=john') // x-www-form-urlencoded upload\n      .set('Accept', 'application/json')\n      .expect(function(res) {\n        res.body.id = 'some fixed id';\n        res.body.name = res.body.name.toLowerCase();\n      })\n      .expect(200, {\n        id: 'some fixed id',\n        name: 'john'\n      }, done);\n  });\n});",
+          code: "describe('POST /user', function () {\n  it('user.name should be an case-insensitive match for \"john\"', function (done) {\n    request(app)\n      .post('/user')\n      .send('name=john') // x-www-form-urlencoded upload\n      .set('Accept', 'application/json')\n      .expect(function (res) {\n        res.body.id = 'some fixed id';\n        res.body.name = res.body.name.toLowerCase();\n      })\n      .expect(\n        200,\n        {\n          id: 'some fixed id',\n          name: 'john',\n        },\n        done\n      );\n  });\n});",
         },
       },
       {
@@ -150,7 +150,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "request = request('http://localhost:5555');\n\nrequest.get('/').expect(200, function(err){\n  console.log(err);\n});\n\nrequest.get('/').expect('heya', function(err){\n  console.log(err);\n});",
+          code: "request = request('http://localhost:5555');\n\nrequest.get('/').expect(200, function (err) {\n  console.log(err);\n});\n\nrequest.get('/').expect('heya', function (err) {\n  console.log(err);\n});",
         },
       },
       {
@@ -162,7 +162,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "const request = require('supertest');\nconst should = require('should');\nconst express = require('express');\nconst cookieParser = require('cookie-parser');\n\ndescribe('request.agent(app)', function() {\n  const app = express();\n  app.use(cookieParser());\n\n  app.get('/', function(req, res) {\n    res.cookie('cookie', 'hey');\n    res.send();\n  });\n\n  app.get('/return', function(req, res) {\n    if (req.cookies.cookie) res.send(req.cookies.cookie);\n    else res.send(':(')\n  });\n\n  const agent = request.agent(app);\n\n  it('should save cookies', function(done) {\n    agent\n    .get('/')\n    .expect('set-cookie', 'cookie=hey; Path=/', done);\n  });\n\n  it('should send cookies', function(done) {\n    agent\n    .get('/return')\n    .expect('hey', done);\n  });\n});",
+          code: "const request = require('supertest');\nconst should = require('should');\nconst express = require('express');\nconst cookieParser = require('cookie-parser');\n\ndescribe('request.agent(app)', function () {\n  const app = express();\n  app.use(cookieParser());\n\n  app.get('/', function (req, res) {\n    res.cookie('cookie', 'hey');\n    res.send();\n  });\n\n  app.get('/return', function (req, res) {\n    if (req.cookies.cookie) res.send(req.cookies.cookie);\n    else res.send(':(');\n  });\n\n  const agent = request.agent(app);\n\n  it('should save cookies', function (done) {\n    agent.get('/').expect('set-cookie', 'cookie=hey; Path=/', done);\n  });\n\n  it('should send cookies', function (done) {\n    agent.get('/return').expect('hey', done);\n  });\n});",
         },
       },
       {
@@ -235,7 +235,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "request(app)\n  .get('/')\n  .expect(hasPreviousAndNextKeys)\n  .end(done);\n\nfunction hasPreviousAndNextKeys(res) {\n  if (!('next' in res.body)) throw new Error(\"missing next key\");\n  if (!('prev' in res.body)) throw new Error(\"missing prev key\");\n}",
+          code: "request(app).get('/').expect(hasPreviousAndNextKeys).end(done);\n\nfunction hasPreviousAndNextKeys(res) {\n  if (!('next' in res.body)) throw new Error('missing next key');\n  if (!('prev' in res.body)) throw new Error('missing prev key');\n}",
         },
       },
       {
@@ -256,7 +256,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "// setup super-test\nconst request = require('supertest');\nconst express = require('express');\nconst cookies = request.cookies;\n\n// setup express test service\nconst app = express();\n\napp.get('/users', function(req, res) {\n  res.cookie('alpha', 'one', { domain: 'domain.com', path: '/', httpOnly: true });\n  res.send(200, { name: 'tobi' });\n});\n\n// test request to service\nrequest(app)\n  .get('/users')\n  .expect('Content-Type', /json/)\n  .expect('Content-Length', '15')\n  .expect(200)\n  // assert 'alpha' cookie is set with domain, path, and httpOnly options\n  .expect(cookies.set({ name: 'alpha', options: ['domain', 'path', 'httponly'] }))\n  // assert 'bravo' cookie is NOT set\n  .expect(cookies.not('set', { name: 'bravo' }))\n  .end(function(err, res) {\n    if (err) {\n      throw err;\n    }\n  });",
+          code: "// setup super-test\nconst request = require('supertest');\nconst express = require('express');\nconst cookies = request.cookies;\n\n// setup express test service\nconst app = express();\n\napp.get('/users', function (req, res) {\n  res.cookie('alpha', 'one', { domain: 'domain.com', path: '/', httpOnly: true });\n  res.send(200, { name: 'tobi' });\n});\n\n// test request to service\nrequest(app)\n  .get('/users')\n  .expect('Content-Type', /json/)\n  .expect('Content-Length', '15')\n  .expect(200)\n  // assert 'alpha' cookie is set with domain, path, and httpOnly options\n  .expect(cookies.set({ name: 'alpha', options: ['domain', 'path', 'httponly'] }))\n  // assert 'bravo' cookie is NOT set\n  .expect(cookies.not('set', { name: 'bravo' }))\n  .end(function (err, res) {\n    if (err) {\n      throw err;\n    }\n  });",
         },
       },
       {
@@ -268,7 +268,7 @@ export const prismasupertestTopics = {
         code: {
           filename: 'example',
           language: 'javascript',
-          code: "cookies.set({/* ... */}).not('set', {/* ... */})",
+          code: "cookies.set({/* ... */}).not('set', {/* ... */});",
         },
       },
       {
