@@ -155,6 +155,7 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   }
 
   if (method === 'post' && activityMatch) {
+    console.log(config.data);
     return respond(config, 204, undefined);
   }
   if (method === 'post' && url === '/activity/time') {
