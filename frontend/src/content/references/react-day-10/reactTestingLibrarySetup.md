@@ -1,0 +1,405 @@
+# React Testing Library Setup
+
+`React Testing Library` does not require any configuration to be used. However, there are some things you can do when configuring your testing framework to reduce some boilerplate. In these docs we'll demonstrate configuring Jest, but you should be able to do similar things with [any testing framework](#using-without-jest) (React Testing Library does not require that you use Jest).
+
+## Global Config[​](#global-config 'Direct link to heading')
+
+Adding options to your global test config can simplify the setup and teardown of tests in individual files.
+
+## Custom Render[​](#custom-render 'Direct link to heading')
+
+It's often useful to define a custom render method that includes things like global context providers, data stores, etc. To make this available globally, one approach is to define a utility file that re-exports everything from `React Testing Library`. You can replace React Testing Library with this file in all your imports. See [below](#configuring-jest-with-test-utils) for a way to make your test util file accessible without using relative paths.
+
+The example below sets up data providers using the [`wrapper`](https://testing-library.com/docs/react-testing-library/api#wrapper) option to `render`.
+
+- JavaScript
+- TypeScript
+
+my-component.test.jsx
+
+```
+ import { render, fireEvent } from '@testing-library/react';
+
+ import { render, fireEvent } from '../test-utils';
+```
+
+test-utils.jsx
+
+```
+import React from 'react'
+import {render} from '@testing-library/react'
+import {ThemeProvider} from 'my-ui-lib'
+import {TranslationProvider} from 'my-i18n-lib'
+import defaultStrings from 'i18n/en-x-default'
+
+const AllTheProviders = ({children}) => {
+  return (
+    <ThemeProvider theme="light">
+      <TranslationProvider messages={defaultStrings}>
+        {children}
+      </TranslationProvider>
+    </ThemeProvider>
+  )
+}
+
+const customRender = (ui, options) =>
+  render(ui, {wrapper: AllTheProviders, ...options})
+
+// re-export everything
+export * from '@testing-library/react'
+
+// override render method
+export {customRender as render}
+```
+
+> **Note**
+>
+> Babel versions lower than 7 throw an error when trying to override the named export in the example above. See [#169](https://github.com/testing-library/react-testing-library/issues/169) and the workaround below.
+
+Workaround for Babel 6
+
+You can use CommonJS modules instead of ES modules, which should work in Node:
+
+test-utils.js
+
+```
+const rtl = require('@testing-library/react')
+
+const customRender = (ui, options) =>
+  rtl.render(ui, {
+    myDefaultOption: 'something',
+    ...options,
+  })
+
+module.exports = {
+  ...rtl,
+  render: customRender,
+}
+```
+
+### Add custom queries[​](#add-custom-queries 'Direct link to heading')
+
+> **Note**
+>
+> Generally you should not need to create custom queries for react-testing-library. Where you do use it, you should consider whether your new queries encourage you to test in a user-centric way, without testing implementation details.
+
+You can define your own custom queries as described in the [Custom Queries](https://testing-library.com/docs/dom-testing-library/api-custom-queries) documentation, or via the [`buildQueries`](https://testing-library.com/docs/dom-testing-library/api-custom-queries#buildqueries) helper. Then you can use them in any render call using the `queries` option. To make the custom queries available globally, you can add them to your custom render method as shown below.
+
+In the example below, a new set of query variants are created for getting elements by `data-cy`, a "test ID" convention mentioned in the [Cypress.io](https://docs.cypress.io/guides/references/best-practices.html#Selecting-Elements) documentation.
+
+- JavaScript
+- TypeScript
+
+custom-queries.js
+
+```
+import {queryHelpers, buildQueries} from '@testing-library/react'
+
+// The queryAllByAttribute is a shortcut for attribute-based matchers
+// You can also use document.querySelector or a combination of existing
+// testing library utilities to find matching nodes for your query
+const queryAllByDataCy = (...args) =>
+  queryHelpers.queryAllByAttribute('data-cy', ...args)
+
+const getMultipleError = (c, dataCyValue) =>
+  `Found multiple elements with the data-cy attribute of: ${dataCyValue}`
+const getMissingError = (c, dataCyValue) =>
+  `Unable to find an element with the data-cy attribute of: ${dataCyValue}`
+
+const [
+  queryByDataCy,
+  getAllByDataCy,
+  getByDataCy,
+  findAllByDataCy,
+  findByDataCy,
+] = buildQueries(queryAllByDataCy, getMultipleError, getMissingError)
+
+export {
+  queryByDataCy,
+  queryAllByDataCy,
+  getByDataCy,
+  getAllByDataCy,
+  findAllByDataCy,
+  findByDataCy,
+}
+```
+
+You can then override and append the new queries via the render function by passing a [`queries`](https://testing-library.com/docs/react-testing-library/api#render-options) option.
+
+If you want to add custom queries globally, you can do this by defining your customized `render`, `screen` and `within` methods:
+
+- JavaScript
+- TypeScript
+
+test-utils.js
+
+```
+import {render, queries, within} from '@testing-library/react'
+import * as customQueries from './custom-queries'
+
+const allQueries = {
+  ...queries,
+  ...customQueries,
+}
+
+const customScreen = within(document.body, allQueries)
+const customWithin = element => within(element, allQueries)
+const customRender = (ui, options) =>
+  render(ui, {queries: allQueries, ...options})
+
+// re-export everything
+export * from '@testing-library/react'
+
+// override render method
+export {customScreen as screen, customWithin as within, customRender as render}
+```
+
+You can then use your custom queries as you would any other query:
+
+```
+const {getByDataCy} = render(<Component />)
+
+expect(getByDataCy('my-component')).toHaveTextContent('Hello')
+```
+
+### Configuring Jest with Test Utils[​](#configuring-jest-with-test-utils 'Direct link to heading')
+
+To make your custom test file accessible in your Jest test files without using relative imports (`../../test-utils`), add the folder containing the file to the Jest `moduleDirectories` option.
+
+This will make all the `.js` files in the test-utils directory importable without `../`.
+
+my-component.test.js
+
+```
+ import { render, fireEvent } from '../test-utils';
+
+ import { render, fireEvent } from 'test-utils';
+```
+
+jest.config.js
+
+```
+ moduleDirectories: [
+
+   'node_modules',
+
+   // add the directory with the test-utils.js file, for example:
+
+   'utils', // a utility folder
+
+    __dirname, // the root directory
+
+ ],
+
+ // ... other options ...
+```
+
+If you're using TypeScript, merge this into your `tsconfig.json`. If you're using Create React App without TypeScript, save this to `jsconfig.json` instead.
+
+tsconfig.json
+
+```
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "test-utils": ["./utils/test-utils"]
+    }
+  }
+}
+```
+
+### Jest 28[​](#jest-28 'Direct link to heading')
+
+If you're using Jest 28 or later, jest-environment-jsdom package now must be installed separately.
+
+- npm
+- Yarn
+
+```
+npm install --save-dev jest-environment-jsdom
+```
+
+`jsdom` is also no longer the default environment. You can enable `jsdom` globally by editing `jest.config.js`:
+
+jest.config.js
+
+```
+module.exports = {
+
+  testEnvironment: 'jsdom',
+
+  // ... other options ...
+
+}
+```
+
+Or if you only need `jsdom` in some of your tests, you can enable it as and when needed using [docblocks](https://jestjs.io/docs/configuration#testenvironment-string):
+
+```
+/**
+ * @jest-environment jsdom
+ */
+```
+
+### Jest 27[​](#jest-27 'Direct link to heading')
+
+If you're using a recent version of Jest (27), `jsdom` is no longer the default environment. You can enable `jsdom` globally by editing `jest.config.js`:
+
+jest.config.js
+
+```
+module.exports = {
+
+  testEnvironment: 'jest-environment-jsdom',
+
+  // ... other options ...
+
+}
+```
+
+Or if you only need `jsdom` in some of your tests, you can enable it as and when needed using [docblocks](https://jestjs.io/docs/configuration#testenvironment-string):
+
+```
+/**
+ * @jest-environment jsdom
+ */
+```
+
+### Jest 24 (or lower) and defaults[​](#jest-24-or-lower-and-defaults 'Direct link to heading')
+
+If you're using the Jest testing framework version 24 or lower with the default configuration, it's recommended to use `jest-environment-jsdom-fifteen` package as Jest uses a version of the jsdom environment that misses some features and fixes, required by React Testing Library.
+
+First, install `jest-environment-jsdom-fifteen`.
+
+- npm
+- Yarn
+
+```
+npm install --save-dev jest-environment-jsdom-fifteen
+```
+
+Then specify `jest-environment-jsdom-fifteen` as the `testEnvironment`:
+
+jest.config.js
+
+```
+module.exports = {
+
+  testEnvironment: 'jest-environment-jsdom-fifteen',
+
+  // ... other options ...
+
+}
+```
+
+## Using without Jest[​](#using-without-jest 'Direct link to heading')
+
+If you're running your tests in the browser bundled with webpack (or similar) then `React Testing Library` should work out of the box for you. However, most people using React Testing Library are using it with the Jest testing framework with the `testEnvironment` set to `jest-environment-jsdom` (which is the default configuration with Jest 26 and earlier).
+
+`jsdom` is a pure JavaScript implementation of the DOM and browser APIs that runs in Node. If you're not using Jest and you would like to run your tests in Node, then you must install jsdom yourself. There's also a package called `global-jsdom` which can be used to setup the global environment to simulate the browser APIs.
+
+First, install `jsdom` and `global-jsdom`.
+
+- npm
+- Yarn
+
+```
+npm install --save-dev jsdom global-jsdom
+```
+
+With mocha, the test command would look something like this:
+
+```
+mocha --require global-jsdom/register
+```
+
+### Skipping Auto Cleanup[​](#skipping-auto-cleanup 'Direct link to heading')
+
+[`Cleanup`](https://testing-library.com/docs/react-testing-library/api#cleanup) is called after each test automatically by default if the testing framework you're using supports the `afterEach` global (like mocha, Jest, and Jasmine). However, you may choose to skip the auto cleanup by setting the `RTL_SKIP_AUTO_CLEANUP` env variable to 'true'. You can do this with [`cross-env`](https://github.com/kentcdodds/cross-env) like so:
+
+```
+cross-env RTL_SKIP_AUTO_CLEANUP=true jest
+```
+
+To make this even easier, you can also simply import `@testing-library/react/dont-cleanup-after-each` which will do the same thing. Just make sure you do this before importing `@testing-library/react`. You could do this with Jest's `setupFiles` configuration:
+
+```
+{
+  // ... other jest config
+  setupFiles: ['@testing-library/react/dont-cleanup-after-each']
+}
+```
+
+Or with mocha's `-r` flag:
+
+```
+mocha --require @testing-library/react/dont-cleanup-after-each
+```
+
+Alternatively, you could import `@testing-library/react/pure` in all your tests that you don't want the `cleanup` to run and the `afterEach` won't be setup automatically.
+
+### Auto Cleanup in Mocha's watch mode[​](#auto-cleanup-in-mochas-watch-mode 'Direct link to heading')
+
+When using Mocha in watch mode, the globally registered cleanup is run only the first time after each test. Therefore, subsequent runs will most likely fail with a _TestingLibraryElementError: Found multiple elements_ error.
+
+To enable automatic cleanup in Mocha's watch mode, add a cleanup [root hook](https://mochajs.org/#root-hook-plugins). Create a `mocha-watch-cleanup-after-each.js` file with the following contents:
+
+mocha-watch-cleanup-after-each.js
+
+```
+const {cleanup} = require('@testing-library/react')
+
+exports.mochaHooks = {
+  afterEach() {
+    cleanup()
+  },
+}
+```
+
+And register it using mocha's `-r` flag:
+
+```
+mocha --require ./mocha-watch-cleanup-after-each.js
+```
+
+### Auto Cleanup in Vitest[​](#auto-cleanup-in-vitest 'Direct link to heading')
+
+If you're using Vitest and want automatic cleanup to work, you can [enable globals](https://vitest.dev/config/#globals) through its configuration file:
+
+vitest.config.ts
+
+```
+import {defineConfig} from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    globals: true,
+  },
+})
+```
+
+If you don't want to enable globals, you can import `cleanup` and call it manually in a top-level `afterEach` hook:
+
+vitest.config.ts
+
+```
+import {defineConfig} from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    setupFiles: ['vitest-cleanup-after-each.ts'],
+  },
+})
+```
+
+vitest-cleanup-after-each.ts
+
+```
+import {cleanup} from '@testing-library/react'
+import {afterEach} from 'vitest'
+
+afterEach(() => {
+  cleanup()
+})
+```
