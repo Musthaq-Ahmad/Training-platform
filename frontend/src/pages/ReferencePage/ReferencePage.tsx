@@ -10,6 +10,8 @@ import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-jsx';
 import 'prismjs/components/prism-tsx';
+import 'prismjs/components/prism-graphql';
+import 'prismjs/components/prism-diff';
 
 import { getDayReference } from '../../content/data/getDayReference';
 import type { ContentBlock } from '../../content/types';
@@ -289,86 +291,93 @@ const ReferencePage = ({ dayId }: ReferencePageProps) => {
   return (
     <main className={styles.page}>
       <Header />
-      <Link to={`/days/${dayId}`} className={styles.backLink}>
-        <ArrowIcon direction="left" />
-        <span>Back to day overview</span>
-      </Link>
 
-      {/* Outer Reference Container */}
-      <div className={styles.referenceContainer}>
-        {content.videoAtStart && content.videos?.length ? renderVideos(content.videos) : null}
-
-        {/* Prerequisite links (e.g. Node Day 5) */}
-        {content.prerequisiteLinks?.length ? (
-          <section className={styles.prerequisites}>
-            <p className={styles.paragraph}>
-              The following references cover the concepts required for this day&apos;s task. Review
-              these materials before proceeding.
-            </p>
-
-            <ul className={styles.prerequisiteList}>
-              {content.prerequisiteLinks.map((link) => (
-                <li key={link.dayId} className={styles.prerequisiteItem}>
-                  <span className={styles.prerequisiteLabel}>{link.label}</span>
-
-                  <Link
-                    to={`/days/${link.dayId}/references`}
-                    className={`${styles.returnButton} ${styles.prerequisiteButton}`}
-                  >
-                    <span>View References</span>
-                    <ArrowIcon direction="right" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        {/* Reference Sections */}
-        {content.sections.map((section) => {
-          const isCollapsible = COLLAPSIBLE_TOPIC_IDS.has(section.id);
-          const grouped = isCollapsible ? groupBySubheading(section.blocks) : null;
-
-          return (
-            <React.Fragment key={section.id}>
-              <section className={styles.referenceSection}>
-                <h2 className={styles.sectionTitle}>
-                  <span className={styles.sectionAccent} />
-
-                  <span>
-                    {section.number}. {section.heading}
-                  </span>
-                </h2>
-
-                {grouped ? (
-                  <>
-                    {grouped.intro.map(renderBlock)}
-
-                    {grouped.groups.map((group, groupIndex) => (
-                      <details key={groupIndex} className={styles.accordion}>
-                        <summary className={styles.accordionSummary}>{group.title}</summary>
-
-                        <div className={styles.accordionBody}>{group.blocks.map(renderBlock)}</div>
-                      </details>
-                    ))}
-                  </>
-                ) : (
-                  section.blocks.map(renderBlock)
-                )}
-              </section>
-
-              {content.videoAfterTopicId === section.id && content.videos?.length
-                ? renderVideos(content.videos)
-                : null}
-            </React.Fragment>
-          );
-        })}
-
-        {/* Return to Day */}
-        <Link to={`/days/${dayId}`} className={styles.returnButton}>
+      <div className={styles.contentWrapper}>
+        <Link to={`/days/${dayId}`} className={styles.backLink}>
           <ArrowIcon direction="left" />
-          <span>Return to Day {content.dayNumber}</span>
+          <span>Back to day overview</span>
         </Link>
+
+        <div className={styles.referenceContainer}>
+          {content.instruction && (
+            <div className={styles.instructionBox}>{content.instruction}</div>
+          )}
+          {content.videoAtStart && content.videos?.length ? renderVideos(content.videos) : null}
+
+          {/* Prerequisite links (e.g. Node Day 5) */}
+          {content.prerequisiteLinks?.length ? (
+            <section className={styles.prerequisites}>
+              <p className={styles.paragraph}>
+                The following references cover the concepts required for this day&apos;s task.
+                Review these materials before proceeding.
+              </p>
+
+              <ul className={styles.prerequisiteList}>
+                {content.prerequisiteLinks.map((link) => (
+                  <li key={link.dayId} className={styles.prerequisiteItem}>
+                    <span className={styles.prerequisiteLabel}>{link.label}</span>
+
+                    <Link
+                      to={`/days/${link.dayId}/references`}
+                      className={`${styles.returnButton} ${styles.prerequisiteButton}`}
+                    >
+                      <span>View References</span>
+                      <ArrowIcon direction="right" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {/* Reference Sections */}
+          {content.sections.map((section) => {
+            const isCollapsible = COLLAPSIBLE_TOPIC_IDS.has(section.id);
+            const grouped = isCollapsible ? groupBySubheading(section.blocks) : null;
+
+            return (
+              <React.Fragment key={section.id}>
+                <section className={styles.referenceSection}>
+                  <h2 className={styles.sectionTitle}>
+                    <span className={styles.sectionAccent} />
+
+                    <span>
+                      {section.number}. {section.heading}
+                    </span>
+                  </h2>
+
+                  {grouped ? (
+                    <>
+                      {grouped.intro.map(renderBlock)}
+
+                      {grouped.groups.map((group, groupIndex) => (
+                        <details key={groupIndex} className={styles.accordion}>
+                          <summary className={styles.accordionSummary}>{group.title}</summary>
+
+                          <div className={styles.accordionBody}>
+                            {group.blocks.map(renderBlock)}
+                          </div>
+                        </details>
+                      ))}
+                    </>
+                  ) : (
+                    section.blocks.map(renderBlock)
+                  )}
+                </section>
+
+                {content.videoAfterTopicId === section.id && content.videos?.length
+                  ? renderVideos(content.videos)
+                  : null}
+              </React.Fragment>
+            );
+          })}
+
+          {/* Return to Day */}
+          <Link to={`/days/${dayId}`} className={styles.returnButton}>
+            <ArrowIcon direction="left" />
+            <span>Return to Day {content.dayNumber}</span>
+          </Link>
+        </div>
       </div>
     </main>
   );

@@ -422,4 +422,53 @@ export const dayReferences: DayReferenceConfig[] = [
     dayNumber: 6,
     topicIds: ['nodeenvvariables'],
   },
+  {
+    id: 'prisma-day-01',
+    courseId: 'prisma',
+    dayNumber: 1,
+    topicIds: ['prismagettingstarted', 'prismareadingdata', 'prismawritingdata'],
+  },
+  {
+    id: 'prisma-day-02',
+    courseId: 'prisma',
+    dayNumber: 2,
+    topicIds: ['nodeexpressrouting', 'prismafilterpagination'],
+  },
+  {
+    id: 'prisma-day-03',
+    courseId: 'prisma',
+    dayNumber: 3,
+    topicIds: [
+      'prismajestasync',
+      'prismajestsetupteardown',
+      'jest-mock-functions',
+      'prismasupertest',
+    ],
+  },
+  {
+    id: 'prisma-day-04',
+    courseId: 'prisma',
+    dayNumber: 4,
+    instruction:
+      'Use all the previous reference materials and follow the folder structure provided in the coding area to complete the tasks.',
+    topicIds: [],
+  },
+  {
+    id: 'prisma-day-05',
+    courseId: 'prisma',
+    dayNumber: 5,
+    topicIds: ['prismaOwaspPasswordStrength', 'prismaOwaspAuthErrors', 'nodeexpressmiddleware'],
+  },
+  {
+    id: 'prisma-day-06',
+    courseId: 'prisma',
+    dayNumber: 6,
+    topicIds: ['prismaowaspdenybydefault', 'prismaowasplookupids'],
+  },
+  {
+    id: 'prisma-day-07',
+    courseId: 'prisma',
+    dayNumber: 7,
+    topicIds: ['prismaexpressdebugging'],
+  },
 ];

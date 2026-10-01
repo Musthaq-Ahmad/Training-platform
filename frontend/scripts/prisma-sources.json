@@ -1,0 +1,76 @@
+{
+  "courseId": "prisma",
+  "sources": {},
+  "days": [
+    {
+      "id": "prisma-day-03",
+      "dayNumber": 3,
+      "title": "Testing",
+      "references": [
+        {
+          "name": "prismaJestAsync",
+          "title": "Testing Asynchronous Code",
+          "source": "web",
+          "url": "https://jestjs.io/docs/asynchronous"
+        },
+        {
+          "name": "prismaJestSetupTeardown",
+          "title": "Setup and Teardown",
+          "source": "web",
+          "url": "https://jestjs.io/docs/setup-teardown"
+        }
+      ]
+    },
+    {
+      "id": "prisma-day-05",
+      "dayNumber": 5,
+      "title": "Authentication",
+      "references": [
+        {
+          "name": "prismaOwaspPasswordStrength",
+          "title": "Implement Proper Password Strength Controls",
+          "source": "web",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#implement-proper-password-strength-controls"
+        },
+        {
+          "name": "prismaOwaspAuthErrors",
+          "title": "Authentication and Error Messages",
+          "source": "web",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#authentication-and-error-messages"
+        }
+      ]
+    },
+    {
+      "id": "prisma-day-06",
+      "dayNumber": 6,
+      "title": "Authorization",
+      "references": [
+        {
+          "name": "prismaOwaspDenyByDefault",
+          "title": "Deny by Default",
+          "source": "web",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html#deny-by-default"
+        },
+        {
+          "name": "prismaOwaspLookupIds",
+          "title": "Ensure Lookup IDs Are Not Accessible Even When Guessed or Cannot Be Tampered With",
+          "source": "web",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html#ensure-lookup-ids-are-not-accessible-even-when-guessed-or-cannot-be-tampered-with"
+        }
+      ]
+    },
+    {
+      "id": "prisma-day-07",
+      "dayNumber": 7,
+      "title": "Debugging",
+      "references": [
+        {
+          "name": "prismaExpressDebugging",
+          "title": "Debugging Express",
+          "source": "web",
+          "url": "https://expressjs.com/en/guide/debugging/"
+        }
+      ]
+    }
+  ]
+}

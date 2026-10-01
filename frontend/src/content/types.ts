@@ -44,6 +44,7 @@ export type DayReferenceConfig = {
   id: string;
   courseId: string;
   dayNumber: number;
+  instruction?: string;
   videos?: ReferenceVideo[];
   videoAfterTopicId?: string;
   videoAtStart?: boolean;
@@ -59,6 +60,7 @@ export type ResolvedSection = ContentTopic & {
 export type DayReferenceContent = {
   courseId: string;
   dayNumber: number;
+  instruction?: string;
   videos?: ReferenceVideo[];
   videoAfterTopicId?: string;
   sections: ResolvedSection[];
