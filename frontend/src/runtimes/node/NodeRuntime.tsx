@@ -57,7 +57,7 @@ export default function NodeRuntime({ task, isVisible }: NodeRuntimeProps) {
   const [server, setServer] = useState<{ port: number; url: string } | null>(null);
   useEffect(() => {
     if (!terminal) return;
-    const subscription = terminal.onData(() => markWork());
+    const subscription = terminal.onKey(() => markWork());
     return () => subscription.dispose();
   }, [terminal, markWork]);
 

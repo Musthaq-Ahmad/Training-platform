@@ -13,7 +13,6 @@ export function useTaskActivityMode(): {
   const [hasRecentWork, setHasRecentWork] = useState(false);
 
   const markWork = useCallback(() => {
-    console.trace('[ACTIVITY] markWork called');
     lastWorkAtRef.current = Date.now();
     setHasRecentWork(true); // no re-render when it's already true
   }, []);

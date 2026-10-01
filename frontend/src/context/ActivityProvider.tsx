@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import type { ActivityMode, ActivityTimeRequest } from '@itp/types';
 import { postActivityTime, postActivityTimeOnExit } from '../api/activity';
+import { todayKey } from '../lib/platformDate';
 import {
   addTick,
   emptyTotals,
@@ -26,7 +27,6 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
 
   const totalsRef = useRef<Totals>(emptyTotals());
   const modeRef = useRef<ActivityMode>('none');
-  const dayIdRef = useRef<string | null>(null);
   const lastInputAtRef = useRef(0);
   const lastTickAtRef = useRef(0);
 
@@ -53,11 +53,10 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
       totalsRef.current = rest;
       batches.push(batch);
     }
-    const dayId = dayIdRef.current;
 
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
-      const body: ActivityTimeRequest = { ...batch, ...(dayId ? { dayId } : {}) };
+      const body: ActivityTimeRequest = { ...batch, date: todayKey() };
       if (onExit) {
         postActivityTimeOnExit(body); // never waits
         continue;
@@ -127,15 +126,10 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<ActivityContextValue>(
     () => ({
-      reportMode: (mode, dayId) => {
-        tick(); // close the time so far under the previous mode
-        if (dayId !== dayIdRef.current) {
-          // Close the previous day's batch so its time isn't counted under the new day.
-          // flush() reads the old dayId before the line below changes it.
-          void flush(false);
-        }
+      reportMode: (mode) => {
+        if (mode === modeRef.current) return;
+        tick(); // give the time so far to the previous mode
         modeRef.current = mode;
-        dayIdRef.current = dayId;
       },
       flushNow: async () => {
         tick();

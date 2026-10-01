@@ -12,7 +12,7 @@ export type ActivityTimeRequest = {
   activeSeconds: number;
   codingSeconds: number;
   /** The curriculum day the trainee was looking at; omitted on dashboard/profile */
-  dayId?: string;
+  date: string;
 };
 
 /** GET /api/activity/time?days=N — one entry per calendar day, newest first */

@@ -12,14 +12,14 @@ export function useActivity(): ActivityContextValue | null {
  * 'none' happens once, on unmount. With a single effect, every mode change went through
  * ('none', null), which made the provider see a day change and flush twice.
  */
-export function useReportActivityMode(mode: ActivityMode, dayId: string | null): void {
+export function useReportActivityMode(mode: ActivityMode): void {
   const activity = useContext(ActivityContext);
 
   useEffect(() => {
-    activity?.reportMode(mode, dayId); // no provider (e.g. in component tests): do nothing
-  }, [activity, mode, dayId]);
+    activity?.reportMode(mode); // no provider (e.g. in component tests): do nothing
+  }, [activity, mode]);
 
   useEffect(() => {
-    return () => activity?.reportMode('none', null);
+    return () => activity?.reportMode('none');
   }, [activity]);
 }
