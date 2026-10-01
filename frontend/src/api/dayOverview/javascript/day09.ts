@@ -3,7 +3,7 @@ import type { DayContent } from '@itp/types';
 // Thursday — Advanced DOM, Canvas & Performance Optimisation
 export const jsDay09: DayContent = {
   dayId: 'js-day-09',
-  courseSlug: 'javascript',
+  courseSlug: 'js',
   courseTitle: 'JavaScript',
   dayNumber: 9,
   totalDays: 10,

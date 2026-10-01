@@ -109,7 +109,16 @@ function unlockRows(courseId: string, completed: number): DayUnlockRow[] {
 
 // Change these numbers to move the trainee's progress.
 // When a course is finished, add unlockRows('<next course>', 0) so its day 1 unlocks.
-const dayUnlocks: DayUnlockRow[] = [...unlockRows('html', 5), ...unlockRows('css', 2)];
+const dayUnlocks: DayUnlockRow[] = [
+  ...unlockRows('html', 5),
+  ...unlockRows('css', 5),
+  ...unlockRows('js', 10),
+  ...unlockRows('ts', 5),
+  ...unlockRows('node', 5),
+  ...unlockRows('postgresql', 6),
+  ...unlockRows('prisma', 8),
+  ...unlockRows('react', 1),
+];
 
 function isoDaysAgo(n: number): string {
   const d = new Date();
@@ -150,6 +159,17 @@ function statusOf(curriculumDayId: string): DayStatus {
   return unlock.isCompleted ? 'COMPLETED' : 'UNLOCKED';
 }
 
+/** Every day id, in curriculum order. The other mock fixtures are built from this list. */
+export const mockCurriculumDayIds: string[] = curriculumDays.map((d) => d.id);
+
+/**
+ * The trainee's progress on one day, from the same day_unlock rows as the dashboard.
+ * The day page and the task page read this too, so all three pages agree. Null for an unknown day.
+ */
+export function mockDayProgress(dayId: string): DayStatus | null {
+  return mockCurriculumDayIds.includes(dayId) ? statusOf(dayId) : null;
+}
+
 function toSummary(row: CurriculumDayRow): DaySummary {
   return { ...row, status: statusOf(row.id) };
 }
@@ -172,6 +192,7 @@ function average(nums: number[]): number {
 /** GET /courses/:courseId/days */
 export function buildCourseDays(courseId: string): DaySummary[] | null {
   if (!courses.some((c) => c.id === courseId)) return null;
+
   return curriculumDays
     .filter((d) => d.courseId === courseId)
     .sort((a, b) => a.dayNumber - b.dayNumber)

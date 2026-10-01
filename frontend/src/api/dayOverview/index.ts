@@ -92,11 +92,11 @@ export const mockDayContents: Record<string, DayContent> = {
   'ts-day-04': tsDay04,
   'ts-day-05': tsDay05,
 
-  'nodejs-day-01': nodejsDay01,
-  'nodejs-day-02': nodejsDay02,
-  'nodejs-day-03': nodejsDay03,
-  'nodejs-day-04': nodejsDay04,
-  'nodejs-day-05': nodejsDay05,
+  'node-day-01': nodejsDay01,
+  'node-day-02': nodejsDay02,
+  'node-day-03': nodejsDay03,
+  'node-day-04': nodejsDay04,
+  'node-day-05': nodejsDay05,
 
   'postgresql-day-01': postgresqlDay01,
   'postgresql-day-02': postgresqlDay02,
