@@ -39,7 +39,7 @@ type TaskWorkspaceProps = {
 export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
   const state = useWorkspaceState();
   const { mode, markWork } = useTaskActivityMode();
-  useReportActivityMode(mode, task.day.id);
+  useReportActivityMode(mode);
   const dispatch = useWorkspaceDispatch();
   const navigate = useNavigate();
   const runner = useRunner();
