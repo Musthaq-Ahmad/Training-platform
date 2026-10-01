@@ -11,6 +11,7 @@ import DashboardPage from './pages/DashboardPage';
 import DayOverviewPage from './pages/DayOverviewPage';
 import TaskPageSkeleton from './components/TaskPageSkeleton';
 import NotFoundPage from './pages/NotFoundPage';
+import TypingTestPage from './pages/TypingTestPage/TypingTestPage';
 
 const TaskPage = lazy(() => import('./pages/TaskPage'));
 import ReferencePage from './pages/ReferencePage';
@@ -34,6 +35,7 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/" element={<DashboardPage />} />
+              <Route path="/typing-test" element={<TypingTestPage />} />
               <Route
                 path="/tasks/:taskId"
                 element={

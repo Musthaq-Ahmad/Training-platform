@@ -1,0 +1,27 @@
+.passage {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  line-height: 2;
+  white-space: pre-wrap;
+  word-break: break-word;
+  user-select: none;
+}
+
+.pending {
+  color: var(--color-text-muted);
+}
+
+.correct {
+  color: var(--color-text-primary);
+}
+
+.incorrect {
+  color: var(--color-status-error-text);
+  background: var(--color-status-error-tint);
+}
+
+.current {
+  color: var(--color-text-primary);
+  background: var(--color-accent-purple-wash);
+  border-bottom: 2px solid var(--color-accent-purple);
+}

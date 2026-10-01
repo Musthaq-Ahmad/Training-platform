@@ -151,9 +151,7 @@ export default function DashboardPage() {
             totalActiveSeconds={dashboard.total.activeSeconds}
             totalCodingSeconds={dashboard.total.codingSeconds}
             latestWpm={dashboard.typing.latest?.wpm ?? null}
-            onTakeTypingTest={() => {
-              console.log('take typing test clicked');
-            }}
+            onTakeTypingTest={() => void navigate('/typing-test')}
           />
         </section>
       </div>
