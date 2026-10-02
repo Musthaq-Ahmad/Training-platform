@@ -3,7 +3,7 @@
   font-size: 0.8rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--color-bg-text-tertiary);
+  color: var(--color-text-tertiary);
   margin-bottom: 1rem;
 }
 
@@ -21,7 +21,7 @@
   font-family: var(--font-mono);
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-bg-text-primary);
+  color: var(--color-text-primary);
   text-align: center;
 }
 

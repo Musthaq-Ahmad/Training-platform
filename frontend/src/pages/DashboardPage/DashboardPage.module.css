@@ -15,7 +15,7 @@
 .status {
   padding: 4rem;
   text-align: center;
-  color: var(--color-bg-text-secondary);
+  color: var(--color-text-secondary);
 }
 
 .section {
@@ -34,14 +34,14 @@
   font-family: var(--font-mono);
   font-size: 0.8rem;
   letter-spacing: 0.05em;
-  color: var(--color-bg-text-tertiary);
+  color: var(--color-text-tertiary);
   text-transform: uppercase;
 }
 
 .overallProgress {
   font-family: var(--font-mono);
   font-size: 0.9rem;
-  color: var(--color-bg-text-secondary);
+  color: var(--color-text-secondary);
 }
 
 .divider {
