@@ -1,0 +1,197 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { NotFoundError } from '../../errors/AppError';
+
+const repo = vi.hoisted(() => ({
+  findDayWithCourseSize: vi.fn(),
+  findCourseWithDays: vi.fn(),
+  sumActivity: vi.fn(),
+  findActivityOn: vi.fn(),
+  findLatestTyping: vi.fn(),
+  findTypingSince: vi.fn(),
+}));
+const { mockGetDayStatuses } = vi.hoisted(() => ({ mockGetDayStatuses: vi.fn() }));
+
+vi.mock('./dashboard.repository', () => ({
+  DashboardRepository: class {
+    findDayWithCourseSize = repo.findDayWithCourseSize;
+    findCourseWithDays = repo.findCourseWithDays;
+    sumActivity = repo.sumActivity;
+    findActivityOn = repo.findActivityOn;
+    findLatestTyping = repo.findLatestTyping;
+    findTypingSince = repo.findTypingSince;
+  },
+}));
+
+vi.mock('../progress-module/progress.service', () => ({
+  ProgressService: class {
+    getDayStatuses = mockGetDayStatuses;
+  },
+}));
+
+import { DashboardService } from './dashboard.service';
+
+const traineeId = 'trainee-1';
+// 2026-10-01 10:00 in India.
+const NOW = new Date('2026-10-01T04:30:00.000Z');
+
+const html1 = {
+  id: 'html-day-01',
+  course_id: 'html',
+  day_number: 1,
+  title: 'Structure',
+  subtitle: 'Valid pages.',
+};
+const html2 = {
+  id: 'html-day-02',
+  course_id: 'html',
+  day_number: 2,
+  title: 'Semantics',
+  subtitle: 'Right tags.',
+};
+
+describe('DashboardService', () => {
+  let service: DashboardService;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    service = new DashboardService();
+
+    mockGetDayStatuses.mockResolvedValue([
+      { dayId: 'html-day-01', status: 'COMPLETED' },
+      { dayId: 'html-day-02', status: 'UNLOCKED' },
+      { dayId: 'css-day-01', status: 'LOCKED' },
+    ]);
+    repo.findDayWithCourseSize.mockResolvedValue({ ...html2, course: { _count: { days: 5 } } });
+    repo.sumActivity.mockResolvedValue({ _sum: { active_seconds: null, coding_seconds: null } });
+    repo.findActivityOn.mockResolvedValue(null);
+    repo.findLatestTyping.mockResolvedValue(null);
+    repo.findTypingSince.mockResolvedValue([]);
+  });
+
+  describe('getDashboard', () => {
+    it('sends the UNLOCKED day as nextDay, with its course size', async () => {
+      const dashboard = await service.getDashboard(traineeId, NOW);
+
+      expect(dashboard.nextDay).toEqual({
+        id: 'html-day-02',
+        courseId: 'html',
+        dayNumber: 2,
+        title: 'Semantics',
+        description: 'Right tags.',
+        status: 'UNLOCKED',
+        courseTotalDays: 5,
+      });
+      expect(repo.findDayWithCourseSize).toHaveBeenCalledWith('html-day-02');
+    });
+
+    it('sends nextDay null and skips the day lookup when every day is completed', async () => {
+      mockGetDayStatuses.mockResolvedValue([
+        { dayId: 'html-day-01', status: 'COMPLETED' },
+        { dayId: 'html-day-02', status: 'COMPLETED' },
+      ]);
+
+      const dashboard = await service.getDashboard(traineeId, NOW);
+
+      expect(dashboard.nextDay).toBeNull();
+      expect(dashboard.totalDaysCompleteOverall).toBe(2);
+      expect(repo.findDayWithCourseSize).not.toHaveBeenCalled();
+    });
+
+    it('counts completed days and all days', async () => {
+      const dashboard = await service.getDashboard(traineeId, NOW);
+
+      expect(dashboard.totalDaysCompleteOverall).toBe(1);
+      expect(dashboard.totalDaysOverall).toBe(3);
+    });
+
+    it('sends zeros when the trainee has no activity', async () => {
+      const dashboard = await service.getDashboard(traineeId, NOW);
+
+      expect(dashboard.today).toEqual({ activeSeconds: 0, codingSeconds: 0 });
+      expect(dashboard.total).toEqual({ activeSeconds: 0, codingSeconds: 0 });
+    });
+
+    it("sends today's row and the all-time sums", async () => {
+      repo.findActivityOn.mockResolvedValue({ active_seconds: 600, coding_seconds: 400 });
+      repo.sumActivity.mockResolvedValue({ _sum: { active_seconds: 9000, coding_seconds: 5000 } });
+
+      const dashboard = await service.getDashboard(traineeId, NOW);
+
+      expect(dashboard.today).toEqual({ activeSeconds: 600, codingSeconds: 400 });
+      expect(dashboard.total).toEqual({ activeSeconds: 9000, codingSeconds: 5000 });
+    });
+
+    it("looks up today's row by the India calendar date", async () => {
+      await service.getDashboard(traineeId, NOW);
+
+      expect(repo.findActivityOn).toHaveBeenCalledWith(
+        traineeId,
+        new Date('2026-10-01T00:00:00.000Z')
+      );
+    });
+
+    it('reads typing results from the start of the 30-day trend window', async () => {
+      await service.getDashboard(traineeId, NOW);
+
+      // 29 days before 2026-10-01 is 2026-09-02; the window starts at its India midnight.
+      expect(repo.findTypingSince).toHaveBeenCalledWith(
+        traineeId,
+        new Date('2026-09-02T00:00:00.000+05:30')
+      );
+    });
+
+    it('asks every query for the logged-in trainee only', async () => {
+      await service.getDashboard(traineeId, NOW);
+
+      expect(mockGetDayStatuses).toHaveBeenCalledWith(traineeId);
+      expect(repo.sumActivity).toHaveBeenCalledWith(traineeId);
+      expect(repo.findLatestTyping).toHaveBeenCalledWith(traineeId);
+    });
+
+    it('throws NotFoundError if the unlocked day has disappeared', async () => {
+      repo.findDayWithCourseSize.mockResolvedValue(null);
+
+      await expect(service.getDashboard(traineeId, NOW)).rejects.toBeInstanceOf(NotFoundError);
+    });
+  });
+
+  describe('getCourseDays', () => {
+    it("returns the course's days with this trainee's status", async () => {
+      repo.findCourseWithDays.mockResolvedValue({ id: 'html', days: [html1, html2] });
+
+      await expect(service.getCourseDays(traineeId, 'html')).resolves.toEqual([
+        {
+          id: 'html-day-01',
+          courseId: 'html',
+          dayNumber: 1,
+          title: 'Structure',
+          description: 'Valid pages.',
+          status: 'COMPLETED',
+        },
+        {
+          id: 'html-day-02',
+          courseId: 'html',
+          dayNumber: 2,
+          title: 'Semantics',
+          description: 'Right tags.',
+          status: 'UNLOCKED',
+        },
+      ]);
+    });
+
+    it('treats a day missing from the statuses as LOCKED', async () => {
+      const extra = { ...html2, id: 'html-day-03', day_number: 3 };
+      repo.findCourseWithDays.mockResolvedValue({ id: 'html', days: [extra] });
+
+      const [day] = await service.getCourseDays(traineeId, 'html');
+
+      expect(day.status).toBe('LOCKED');
+    });
+
+    it('throws NotFoundError for an unknown course', async () => {
+      repo.findCourseWithDays.mockResolvedValue(null);
+
+      await expect(service.getCourseDays(traineeId, 'cobol')).rejects.toBeInstanceOf(NotFoundError);
+    });
+  });
+});

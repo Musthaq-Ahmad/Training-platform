@@ -173,8 +173,8 @@ const mockDashboard: DashboardResponse = {
   nextDay: { ...JS_NEXT_DAY, courseTotalDays: 7 },
   totalDaysCompleteOverall: 17,
   totalDaysOverall: 60,
-  today: { activeSeconds: 5400, codingSeconds: 3600, readingSeconds: 1800 },
-  total: { activeSeconds: 153000, codingSeconds: 101700, readingSeconds: 51300 },
+  today: { activeSeconds: 5400, codingSeconds: 3600 },
+  total: { activeSeconds: 153000, codingSeconds: 101700 },
   typing: {
     latest: { wpm: 74, accuracy: 96, takenAt: '2026-09-26T09:00:00Z' },
     todayAverageWpm: 71,

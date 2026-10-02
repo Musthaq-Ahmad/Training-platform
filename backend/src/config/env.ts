@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { z } from 'zod';
 
 const envSchema = z.object({
-  PORT: z.coerce.number().default(4000),
+  PORT: z.coerce.number().default(3000), // the frontend's Vite proxy sends /api here
   DATABASE_URL: z.string().min(1),
   SESSION_SECRET: z.string().min(32),
   GOOGLE_CLIENT_ID: z.string().min(1),

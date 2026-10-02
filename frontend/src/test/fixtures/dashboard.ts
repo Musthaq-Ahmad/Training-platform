@@ -17,14 +17,13 @@ type DayUnlockRow = {
   unlocked: boolean;
   isCompleted: boolean;
 };
+// One row per trainee per calendar day, like the activity_log table.
 type ActivityLogRow = {
   id: string;
   traineeId: string;
-  curriculumDayId: string;
   date: string; // YYYY-MM-DD
   activeSeconds: number;
   codingSeconds: number;
-  readingSeconds: number;
 };
 type TypingTestResultRow = {
   id: string;
@@ -129,11 +128,9 @@ function isoDaysAgo(n: number): string {
 const activityLog: ActivityLogRow[] = [4, 3, 2, 1, 0].map((daysAgo, i) => ({
   id: `activity-${i}`,
   traineeId: TRAINEE_ID,
-  curriculumDayId: dayId('css', 3),
   date: isoDaysAgo(daysAgo).slice(0, 10),
   activeSeconds: 5400 + i * 600,
   codingSeconds: 3600 + i * 400,
-  readingSeconds: 1800 + i * 200,
 }));
 
 const typingResults: TypingTestResultRow[] = [
@@ -179,9 +176,8 @@ function sumActivity(rows: ActivityLogRow[]): TimeTotals {
     (acc, r) => ({
       activeSeconds: acc.activeSeconds + r.activeSeconds,
       codingSeconds: acc.codingSeconds + r.codingSeconds,
-      readingSeconds: acc.readingSeconds + r.readingSeconds,
     }),
-    { activeSeconds: 0, codingSeconds: 0, readingSeconds: 0 }
+    { activeSeconds: 0, codingSeconds: 0 }
   );
 }
 
