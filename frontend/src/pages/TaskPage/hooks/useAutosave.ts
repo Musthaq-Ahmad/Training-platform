@@ -237,12 +237,9 @@ export function useAutosave(options: UseAutosaveOptions): UseAutosaveResult {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
-      const { isDirty, getSnapshot, validate, save } = optionsRef.current;
-      if (!isDirty) return;
-      // Same check as a normal save: a save the server would reject isn't sent.
-      const files = getSnapshot();
-      if (validate?.(files)) return;
-      save(files).catch(() => {}); // the page is gone, so there is no one to show an error to
+      if (optionsRef.current.isDirty) {
+        void optionsRef.current.save(optionsRef.current.getSnapshot());
+      }
     };
   }, []);
 

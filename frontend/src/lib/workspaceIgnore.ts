@@ -9,12 +9,8 @@ export const IGNORED_DIRS = [
   'generated',
 ];
 export const IGNORED_FILES = ['package-lock.json', '.DS_Store'];
-/** Same limits as the backend's saveCodeBodySchema (see lib/saveRules.ts) */
+/** Same limit as the backend's saveCodeBodySchema */
 export const MAX_FILE_CHARS = 200_000;
-export const MAX_FILES_PER_TASK = 200;
-export const MAX_PATH_CHARS = 200;
-/** The backend accepts JSON bodies up to 5 MB; this leaves room for the JSON around the files. */
-export const MAX_SAVE_BYTES = 5_000_000;
 
 /** true for anything inside an ignored folder, an ignored file name, or a *.log file */
 export function isIgnoredPath(path: string): boolean {

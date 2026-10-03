@@ -9,8 +9,8 @@ import {
   selectFileCount,
   selectFilesForSave,
   selectIsDirty,
+  selectOversizedPath,
 } from '../../pages/TaskPage/state/selectors';
-import { findSaveProblem } from '../../lib/saveRules';
 import { useAutosave } from '../../pages/TaskPage/hooks/useAutosave';
 import { useRunner } from '../../runtimes/runnerContext';
 import RuntimeHost from '../../runtimes/RuntimeHost';
@@ -80,7 +80,10 @@ export default function TaskWorkspace({ task }: TaskWorkspaceProps) {
         type: 'saveSucceeded',
         snapshot: Object.fromEntries(files.map((f) => [f.path, f.content])),
       }),
-    validate: findSaveProblem,
+    validate: () => {
+      const path = selectOversizedPath(stateRef.current);
+      return path ? `${path} is too large to save (200,000 characters max).` : null;
+    },
   });
 
   const { flush } = autosave;

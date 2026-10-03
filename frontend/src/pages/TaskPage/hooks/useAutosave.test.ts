@@ -292,17 +292,6 @@ describe('useAutosave', () => {
     expect(save).toHaveBeenCalledTimes(1);
   });
 
-  it('does not save on unmount when validate() blocks the files', () => {
-    const save = vi.fn().mockResolvedValue(undefined);
-    const validate = vi.fn().mockReturnValue('a.txt is too large to save.');
-    const { result, unmount } = renderHook(() => useHarness({ save, validate }));
-    act(() => result.current.edit('b'));
-
-    unmount();
-
-    expect(save).not.toHaveBeenCalled();
-  });
-
   it('a save under 300ms never shows saving', async () => {
     const save = vi.fn().mockResolvedValue(undefined);
     const { result } = renderHook(() => useHarness({ save }));
