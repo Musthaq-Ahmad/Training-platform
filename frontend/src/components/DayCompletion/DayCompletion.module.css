@@ -59,9 +59,10 @@
   gap: 8px;
   flex-shrink: 0;
   padding: 10px 20px;
-  color: #475569;
-  background: transparent;
+  color: var(--color-text-on-accent);
+  background-color: var(--color-accent-purple);
   border: none;
+  border-radius: 8px;
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 700;
@@ -75,7 +76,6 @@
 }
 
 .dayCompletionButton:hover:not(:disabled) {
-  color: var(--color-accent-purple);
   opacity: 0.9;
 }
 
