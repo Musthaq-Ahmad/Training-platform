@@ -12,6 +12,7 @@ import { requireAuth } from './middleware/authMiddleware';
 import { dashboardRoutes } from './module/dashboard-module/dashboard.routes';
 import { courseRoutes } from './module/dashboard-module/dashboard.routes';
 import flagRoutes from './module/flag-module/flag.routes';
+import taskRoutes from './module/task-module/task.routes';
 
 const app: Express = express();
 
@@ -36,6 +37,7 @@ app.use('/api/activity', flagRoutes);
 app.use('/api/profile', requireAuth, profileRoutes);
 app.use('/api/dashboard', requireAuth, dashboardRoutes);
 app.use('/api/courses', requireAuth, courseRoutes);
+app.use('/api/tasks', requireAuth, taskRoutes);
 
 app.use(notFoundHandler);
 
