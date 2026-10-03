@@ -38,7 +38,7 @@
 .badgeGlow {
   position: absolute;
   inset: 0;
-  background-color: var(--color-accent-glow-700);
+  /* background-color: var(--color-accent-glow-700); */
   filter: blur(12px);
   border-radius: 12px;
 }
@@ -48,21 +48,12 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background-color: var(--color-bg-surface-1);
-  border: 1px solid var(--color-accent-icon-tint);
-  filter: drop-shadow(0px 0px 10px var(--color-accent-icon-shadow));
+  /* background-color: var(--color-bg-surface-1); */
+  /* border: 1px solid var(--color-accent-icon-tint); */
+  /* filter: drop-shadow(0px 0px 10px var(--color-accent-icon-shadow)); */
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.badgeText {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 28px;
-  letter-spacing: -0.45px;
-  color: var(--color-text-bright);
 }
 
 /* Headings */
@@ -72,7 +63,7 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 24px 28px 32px;
+  padding: 0px 28px 32px;
   box-sizing: border-box;
 }
 
@@ -95,7 +86,19 @@
 .up {
   color: var(--color-accent-purple);
 }
+.logo {
+  height: 28px;
+  width: auto; /* keeps the logo's proportions (about 1.5 : 1) */
+  color: var(--color-text-primary);
+  overflow: visible; /* the outline grows past the edge of the drawing area */
+}
 
+.logo path {
+  stroke: currentColor;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke; /* stroke-width is now in screen pixels */
+  stroke-width: 1 px; /* try 1px, 2px, 3px */
+}
 .subtitle {
   margin: 0;
   max-width: 280px;

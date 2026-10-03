@@ -1,4 +1,5 @@
 import react from '@vitejs/plugin-react';
+import svgr from 'vite-plugin-svgr';
 import { defineConfig } from 'vite';
 
 // WebContainer  needs the page to be cross-origin isolated. It's a
@@ -11,7 +12,7 @@ const isolationHeaders = {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), svgr()],
 
   // PGlite  loads its .wasm and data files relative to its own module. Pre-bundling
   // would move the module away from those files, so Vite serves the package as it is.

@@ -6,6 +6,7 @@ import {
 } from 'axios';
 import type {
   ApiErrorResponse,
+  CompleteDayResponse,
   SubmitTaskResponse,
   TaskCodeResponse,
   TaskFile,
@@ -124,8 +125,10 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   const taskMatch = /^\/tasks\/([^/]+)$/.exec(url);
   const submitMatch = /^\/tasks\/([^/]+)\/submit$/.exec(url);
   const activityMatch = /^\/activity\/([^/]+)\/events$/.exec(url);
+  const dayContentMatch = /^\/days\/([^/]+)$/.exec(url);
   const dayTasksMatch = /^\/days\/([^/]+)\/tasks$/.exec(url);
   const dayStatusMatch = /^\/days\/([^/]+)\/status$/.exec(url);
+  const dayCompleteMatch = /^\/days\/([^/]+)\/complete$/.exec(url);
   const dayJournalMatch = /^\/days\/([^/]+)\/journal$/.exec(url);
   const courseDaysMatch = /^\/courses\/([^/]+)\/days$/.exec(url);
 
@@ -199,6 +202,13 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
     return respond(config, 200, mockUser);
   }
 
+  if (method === 'get' && dayContentMatch) {
+    const day = mockDayContents[dayContentMatch[1]];
+    return day
+      ? respond(config, 200, day)
+      : errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
+  }
+
   if (method === 'get' && dayTasksMatch) {
     const dayId = dayTasksMatch[1];
 
@@ -228,8 +238,8 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
     return respond(config, 200, status);
   }
 
-  if (method === 'patch' && dayStatusMatch) {
-    const dayId = dayStatusMatch[1];
+  if (method === 'patch' && (dayStatusMatch || dayCompleteMatch)) {
+    const dayId = (dayCompleteMatch ?? dayStatusMatch)![1];
     const status = mockStatusByDay[dayId];
 
     if (!mockDayContents[dayId] || !status) {
@@ -253,6 +263,12 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
     }
 
     status.isCompleted = true;
+    if (dayCompleteMatch) {
+      const dayIds = Object.keys(mockDayContents);
+      const nextDayId = dayIds[dayIds.indexOf(dayId) + 1] ?? null;
+      const data: CompleteDayResponse = { status, nextDayId };
+      return respond(config, 200, data);
+    }
     return respond(config, 200, status);
   }
 

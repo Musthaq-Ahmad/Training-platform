@@ -4,7 +4,14 @@ import { MemoryRouter, Route, Routes } from 'react-router';
 import type { DayCurrentStatus, DayTask } from '@itp/types';
 import { ApiError } from '../../api/errors';
 import { mockDayContents } from '../../api/dayOverview';
-import { completeDay, getDayJournal, getDayStatus, getDayTasks, saveJournal } from '../../api/days';
+import {
+  completeDay,
+  getDayContent,
+  getDayJournal,
+  getDayStatus,
+  getDayTasks,
+  saveJournal,
+} from '../../api/days';
 import DayOverviewPage from './DayOverviewPage';
 
 vi.mock('../../api/days');
@@ -34,6 +41,7 @@ function renderPage() {
 
 beforeEach(() => {
   vi.resetAllMocks();
+  vi.mocked(getDayContent).mockResolvedValue(mockDayContents[dayId]);
   vi.mocked(getDayTasks).mockResolvedValue([completedTask]);
   vi.mocked(getDayStatus).mockResolvedValue(openStatus);
   vi.mocked(getDayJournal).mockResolvedValue({ responseText: null });
@@ -44,11 +52,12 @@ afterEach(() => {
 });
 
 describe('DayOverviewPage: loading', () => {
-  it('loads the tasks, status and journal for the day in the URL', async () => {
+  it('loads content, tasks, status and journal for the day in the URL', async () => {
     renderPage();
 
     await screen.findByRole('button', { name: /submit day/i });
 
+    expect(getDayContent).toHaveBeenCalledWith(dayId);
     expect(getDayTasks).toHaveBeenCalledWith(dayId);
     expect(getDayStatus).toHaveBeenCalledWith(dayId);
     expect(getDayJournal).toHaveBeenCalledWith(dayId);
