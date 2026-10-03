@@ -2,6 +2,7 @@ import googleLogo from './assets/google-logo.svg';
 import shieldCheckIcon from './assets/shield-check.svg';
 import LockIcon from './assets/icons/lockIcon';
 import styles from './LoginCard.module.css';
+import Logo from '../../assets/logo-mark-currentColor.svg?react';
 
 interface LoginCardProps {
   handleGoogleSignIn: () => void;
@@ -14,7 +15,7 @@ export default function LoginCard({ handleGoogleSignIn }: LoginCardProps) {
         <div className={styles.badgeWrap}>
           <div className={styles.badgeGlow} />
           <div className={styles.badge}>
-            <span className={styles.badgeText}>{'>_'}</span>
+            <Logo className={styles.logo} aria-hidden="true" />
           </div>
         </div>
 
