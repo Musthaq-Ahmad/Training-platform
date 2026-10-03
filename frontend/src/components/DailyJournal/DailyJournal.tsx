@@ -22,6 +22,7 @@ export default function DailyJournal({
   const [hasEditedSinceSave, setHasEditedSinceSave] = useState(false);
 
   const showSaved = isSaved && !hasEditedSinceSave;
+  const isSaveDisabled = isSaving || response.trim().length === 0;
 
   function handleChange(text: string) {
     setResponse(text);
@@ -67,7 +68,7 @@ export default function DailyJournal({
           type="button"
           className={styles.saveButton}
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaveDisabled}
         >
           {isSaving ? 'Saving...' : 'Save Journal'}
         </button>

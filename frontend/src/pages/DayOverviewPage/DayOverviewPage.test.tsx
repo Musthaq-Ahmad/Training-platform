@@ -4,14 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router';
 import type { DayCurrentStatus, DayTask } from '@itp/types';
 import { ApiError } from '../../api/errors';
 import { mockDayContents } from '../../api/dayOverview';
-import {
-  completeDay,
-  getDayContent,
-  getDayJournal,
-  getDayStatus,
-  getDayTasks,
-  saveJournal,
-} from '../../api/days';
+import { completeDay, getDayJournal, getDayStatus, getDayTasks, saveJournal } from '../../api/days';
 import DayOverviewPage from './DayOverviewPage';
 
 vi.mock('../../api/days');
@@ -39,9 +32,14 @@ function renderPage() {
   );
 }
 
+/** Waits for the page to load, then returns the journal's textarea. */
+async function findJournalTextarea() {
+  await screen.findByRole('button', { name: /save journal/i });
+  return screen.getByRole('textbox');
+}
+
 beforeEach(() => {
   vi.resetAllMocks();
-  vi.mocked(getDayContent).mockResolvedValue(mockDayContents[dayId]);
   vi.mocked(getDayTasks).mockResolvedValue([completedTask]);
   vi.mocked(getDayStatus).mockResolvedValue(openStatus);
   vi.mocked(getDayJournal).mockResolvedValue({ responseText: null });
@@ -52,12 +50,11 @@ afterEach(() => {
 });
 
 describe('DayOverviewPage: loading', () => {
-  it('loads content, tasks, status and journal for the day in the URL', async () => {
+  it('loads the tasks, status and journal for the day in the URL', async () => {
     renderPage();
 
     await screen.findByRole('button', { name: /submit day/i });
 
-    expect(getDayContent).toHaveBeenCalledWith(dayId);
     expect(getDayTasks).toHaveBeenCalledWith(dayId);
     expect(getDayStatus).toHaveBeenCalledWith(dayId);
     expect(getDayJournal).toHaveBeenCalledWith(dayId);
@@ -128,17 +125,13 @@ describe('DayOverviewPage: daily journal', () => {
     vi.mocked(getDayJournal).mockResolvedValue({ responseText: 'Saved earlier' });
     renderPage();
 
-    await screen.findByRole('button', { name: /save journal/i });
-
-    expect(screen.getByRole('textbox')).toHaveValue('Saved earlier');
+    expect(await findJournalTextarea()).toHaveValue('Saved earlier');
   });
 
   it('starts empty when nothing is saved yet', async () => {
     renderPage();
 
-    await screen.findByRole('button', { name: /save journal/i });
-
-    expect(screen.getByRole('textbox')).toHaveValue('');
+    expect(await findJournalTextarea()).toHaveValue('');
   });
 
   it('starts empty when loading the journal fails, without breaking the page', async () => {
@@ -147,18 +140,28 @@ describe('DayOverviewPage: daily journal', () => {
     );
     renderPage();
 
-    await screen.findByRole('button', { name: /save journal/i });
+    expect(await findJournalTextarea()).toHaveValue('');
+  });
 
-    expect(screen.getByRole('textbox')).toHaveValue('');
+  it('keeps Save Journal disabled until the trainee types something', async () => {
+    renderPage();
+
+    const textarea = await findJournalTextarea();
+    const saveButton = screen.getByRole('button', { name: /save journal/i });
+
+    expect(saveButton).toBeDisabled();
+
+    fireEvent.change(textarea, { target: { value: 'Some notes' } });
+
+    expect(saveButton).toBeEnabled();
   });
 
   it('saves the text for this day and shows "Saved successfully"', async () => {
     vi.mocked(saveJournal).mockResolvedValue(undefined);
     renderPage();
 
-    await screen.findByRole('button', { name: /save journal/i });
-
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Learned Prisma' } });
+    const textarea = await findJournalTextarea();
+    fireEvent.change(textarea, { target: { value: 'Learned Prisma' } });
     fireEvent.click(screen.getByRole('button', { name: /save journal/i }));
 
     expect(saveJournal).toHaveBeenCalledWith(dayId, 'Learned Prisma');
@@ -171,13 +174,24 @@ describe('DayOverviewPage: daily journal', () => {
     );
     renderPage();
 
-    await screen.findByRole('button', { name: /save journal/i });
-
+    // The button is disabled while the journal is empty, so type first.
+    const textarea = await findJournalTextarea();
+    fireEvent.change(textarea, { target: { value: 'Some notes' } });
     fireEvent.click(screen.getByRole('button', { name: /save journal/i }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Something went wrong. Please try again.'
     );
     expect(screen.queryByText('Saved successfully')).not.toBeInTheDocument();
+  });
+
+  it('does not call the API when the journal is only whitespace', async () => {
+    renderPage();
+
+    const textarea = await findJournalTextarea();
+    fireEvent.change(textarea, { target: { value: '    ' } });
+    fireEvent.click(screen.getByRole('button', { name: /save journal/i }));
+
+    expect(saveJournal).not.toHaveBeenCalled();
   });
 });
