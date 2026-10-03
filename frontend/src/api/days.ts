@@ -1,5 +1,17 @@
-import type { DayJournal, DayCurrentStatus, DayTask, SaveJournalRequest } from '@itp/types';
+import type {
+  CompleteDayResponse,
+  DayContent,
+  DayJournal,
+  DayCurrentStatus,
+  DayTask,
+  SaveJournalRequest,
+} from '@itp/types';
 import { apiClient } from './client';
+
+export async function getDayContent(dayId: string): Promise<DayContent> {
+  const { data } = await apiClient.get<DayContent>(`/days/${dayId}`);
+  return data;
+}
 
 export async function getDayTasks(dayId: string): Promise<DayTask[]> {
   const res = await apiClient.get<DayTask[]>(`/days/${dayId}/tasks`);
@@ -22,6 +34,6 @@ export async function saveJournal(dayId: string, responseText: string): Promise<
 
 /** Asks the server to complete the day. The server checks the rules; the client sends no body. */
 export async function completeDay(dayId: string): Promise<DayCurrentStatus> {
-  const { data } = await apiClient.patch<DayCurrentStatus>(`/days/${dayId}/status`);
-  return data;
+  const { data } = await apiClient.patch<CompleteDayResponse>(`/days/${dayId}/complete`);
+  return data.status;
 }

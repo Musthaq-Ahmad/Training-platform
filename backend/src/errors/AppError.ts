@@ -59,3 +59,12 @@ export class DayLockedError extends AppError {
     super(403, 'DAY_LOCKED', "This day isn't unlocked yet.");
   }
 }
+
+export class ChecklistIncompleteError extends AppError {
+  constructor(completedTasks: number, requiredTasks: number) {
+    super(403, 'CHECKLIST_INCOMPLETE', 'Complete all required tasks before submitting the day.', {
+      completedTasks,
+      requiredTasks,
+    });
+  }
+}

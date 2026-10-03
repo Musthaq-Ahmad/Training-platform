@@ -46,6 +46,11 @@ export interface DayCurrentStatus {
   isCompleted: boolean;
 }
 
+export interface CompleteDayResponse {
+  status: DayCurrentStatus;
+  nextDayId: string | null;
+}
+
 export interface DayJournal {
   responseText: string | null;
 }

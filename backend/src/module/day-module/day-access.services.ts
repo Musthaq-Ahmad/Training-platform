@@ -27,3 +27,21 @@ export async function assertDayIsAccessible(traineeId: string, dayId: string): P
   );
   if (!hasFinishedPreviousDay) throw new DayLockedError();
 }
+
+/** Returns lock/completion state without rejecting a locked day. */
+export async function getDayAccessStatus(traineeId: string, dayId: string) {
+  const day = await dayAccessRepository.findDayWithOrder(dayId);
+  if (!day) throw new NotFoundError('Day not found');
+
+  const completion = await dayAccessRepository.findCompletion(traineeId, dayId);
+  if (completion) return { isLocked: false, isCompleted: true };
+
+  const previousDay = await dayAccessRepository.findPreviousDay(
+    day.course.sort_order,
+    day.day_number
+  );
+  if (!previousDay) return { isLocked: false, isCompleted: false };
+
+  const previousCompletion = await dayAccessRepository.findCompletion(traineeId, previousDay.id);
+  return { isLocked: !previousCompletion, isCompleted: false };
+}
