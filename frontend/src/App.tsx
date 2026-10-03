@@ -14,18 +14,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import TypingTestPage from './pages/TypingTestPage/TypingTestPage';
 
 const TaskPage = lazy(() => import('./pages/TaskPage'));
-import ReferencePage from './pages/ReferencePage';
-import { useParams } from 'react-router';
-
-function ReferenceRoute() {
-  const { dayId } = useParams();
-
-  if (!dayId) {
-    return null;
-  }
-
-  return <ReferencePage dayId={dayId} />;
-}
+import ReferenceRoute from './pages/ReferencePage/ReferenceRoute';
 export default function App() {
   return (
     <AuthProvider>
