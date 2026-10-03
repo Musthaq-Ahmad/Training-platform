@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { SaveTypingResultRequest, TypingTodayResponse } from '@itp/types';
-import { getTypingToday, saveTypingResult } from '../../api/typingTest';
+import type { TypingResultRecord, TypingTestStats } from '@itp/types';
+import { getTypingResults, saveTypingResult } from '../../api/typingTest';
 import { ApiError } from '../../api/errors';
 import { TYPING_DURATIONS } from '../../constants/typingWords';
 import { formatTimer, type PassageOptions } from '../../lib/typingStats';
@@ -20,16 +20,16 @@ const OPTION_LABELS: { key: keyof PassageOptions; label: string }[] = [
 export default function TypingTestPage() {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [today, setToday] = useState<TypingTodayResponse | null>(null);
+  const [results, setResults] = useState<TypingResultRecord[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<ApiError | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<ApiError | null>(null);
-  const [lastResult, setLastResult] = useState<SaveTypingResultRequest | null>(null);
+  const [lastResult, setLastResult] = useState<TypingTestStats | null>(null);
 
   useEffect(() => {
-    getTypingToday()
-      .then(setToday)
+    getTypingResults()
+      .then(setResults)
       .catch((err: ApiError) => setLoadError(err))
       .finally(() => setIsLoading(false));
   }, []);
@@ -38,15 +38,15 @@ export default function TypingTestPage() {
     inputRef.current?.focus();
   }, []);
 
-  // Save the finished test, then reload today's history from the server
-  const handleFinish = useCallback((stats: SaveTypingResultRequest) => {
+  // Save the finished test, then reload the trainee's history from the server.
+  const handleFinish = useCallback((stats: TypingTestStats) => {
     setLastResult(stats);
     setSaveError(null);
     setIsSaving(true);
 
-    saveTypingResult(stats)
-      .then(() => getTypingToday())
-      .then(setToday)
+    saveTypingResult({ wpm: stats.wpm, accuracy: stats.accuracy })
+      .then(() => getTypingResults())
+      .then(setResults)
       .catch((err: ApiError) => setSaveError(err))
       .finally(() => setIsSaving(false));
   }, []);
@@ -160,6 +160,14 @@ export default function TypingTestPage() {
               />
             </div>
 
+            {status === 'running' && isPaused && (
+              <div className={styles.pauseOverlay} role="status">
+                <p className={styles.pauseTitle}>PAUSED</p>
+                <p className={styles.timeoutHint}>Test paused after 5 seconds of inactivity.</p>
+                <p className={styles.timeoutHint}>Press any key to continue</p>
+              </div>
+            )}
+
             {status === 'finished' && (
               <div className={styles.timeoutOverlay} role="status">
                 <p className={styles.timeoutTitle}>Time&apos;s up!</p>
@@ -210,12 +218,8 @@ export default function TypingTestPage() {
           <p className={styles.status}>Loading history...</p>
         ) : loadError ? (
           <p className={styles.status}>{loadError.message}</p>
-        ) : today ? (
-          <TestHistory
-            results={today.results}
-            averageWpm={today.averageWpm}
-            averageAccuracy={today.averageAccuracy}
-          />
+        ) : results ? (
+          <TestHistory results={results} />
         ) : null}
       </div>
     </>
