@@ -4,10 +4,10 @@ export type NextDay = DaySummary & {
   courseTotalDays: number; // number of curriculum_day rows in this day's course
 };
 
+/** Seconds from activity_log. activeSeconds is all platform time and includes codingSeconds. */
 export type TimeTotals = {
   activeSeconds: number;
   codingSeconds: number;
-  readingSeconds: number;
 };
 
 /** GET /api/dashboard */
@@ -15,9 +15,9 @@ export type DashboardResponse = {
   nextDay: NextDay | null; // computed by the backend; null = everything completed
   totalDaysCompleteOverall: number;
   totalDaysOverall: number;
-  today: TimeTotals; // activity_log rows where date = today
+  today: TimeTotals; // the activity_log row for today (Asia/Kolkata)
   total: TimeTotals; // sum of all activity_log rows
-  typing: TypingSummaryResponse; // from typing_test_result
+  typing: TypingSummaryResponse; // from typing_test_result; the trend covers the last 30 days
 };
 export type DayStatus = 'LOCKED' | 'UNLOCKED' | 'COMPLETED';
 
@@ -26,7 +26,7 @@ export type DaySummary = {
   courseId: string;
   dayNumber: number;
   title: string;
-  description: string; // curriculum_day.description, shown on the current-lesson card
+  description: string; // curriculum_day.subtitle, shown on the current-lesson card
   status: DayStatus;
 };
 
