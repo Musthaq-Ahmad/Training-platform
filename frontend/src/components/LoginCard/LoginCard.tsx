@@ -19,7 +19,9 @@ export default function LoginCard({ handleGoogleSignIn }: LoginCardProps) {
         </div>
 
         <div className={styles.headings}>
-          <h1 className={styles.title}>In-House Trainee Training Platform</h1>
+          <span role="heading" className={styles.appName}>
+            Vink<span className={styles.up}>Up</span>
+          </span>
           <p className={styles.subtitle}>
             Learn, practice, and track your technical training progress.
           </p>
