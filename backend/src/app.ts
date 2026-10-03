@@ -10,6 +10,7 @@ import { env } from './config/env';
 import profileRoutes from './module/profile-module/profile.routes';
 import { requireAuth } from './middleware/authMiddleware';
 import flagRoutes from './module/flag-module/flag.routes';
+import activityRoutes from './module/activity-module/activity.routes';
 
 const app: Express = express();
 
@@ -32,6 +33,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/activity', flagRoutes);
 
 app.use('/api/profile', requireAuth, profileRoutes);
+app.use('/api/activity', requireAuth, activityRoutes);
 
 app.use(notFoundHandler);
 

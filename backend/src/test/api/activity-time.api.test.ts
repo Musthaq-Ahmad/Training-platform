@@ -26,7 +26,7 @@ beforeEach(async () => {
   ({ a, b } = await freshTrainees());
 });
 
-const batch = { activeSeconds: 60, codingSeconds: 45 };
+const batch = { activeSeconds: 60, codingSeconds: 45, date: istDateString(0) };
 
 describe('POST /api/activity/time', () => {
   it("adds the seconds to today's row with 204", async () => {
@@ -110,6 +110,7 @@ describe('POST /api/activity/time', () => {
     const edge = {
       activeSeconds: 600,
       codingSeconds: 600,
+      date: '2025-10-10',
     };
 
     expect((await api.post('/api/activity/time', edge, a.cookie)).status).toBe(204);
