@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import type { DayTask, DayContent, DayCurrentStatus } from '@itp/types';
-import { getDayTasks, getDayStatus, getDayJournal, saveJournal, completeDay } from '../../api/days';
-import { mockDayContents } from '../../api/dayOverview';
+import {
+  getDayContent,
+  getDayTasks,
+  getDayStatus,
+  getDayJournal,
+  saveJournal,
+  completeDay,
+} from '../../api/days';
 import DaySummary from '../../components/DaySummary/DaySummary';
 import LessonSummary from '../../components/LessonSummary/LessonSummary';
 import LearningObjectives from '../../components/LearningObjectives/LearningObjectives';
@@ -18,7 +24,13 @@ import { ApiError } from '../../api/errors';
 import Loader from '../../components/Common/LoadingState';
 
 type LoadResult =
-  | { dayId: string; tasks: DayTask[]; status: DayCurrentStatus; journalResponse: string }
+  | {
+      dayId: string;
+      day: DayContent;
+      tasks: DayTask[];
+      status: DayCurrentStatus;
+      journalResponse: string;
+    }
   | { dayId: string; error: ApiError };
 
 function getErrorMessage(error: unknown, fallback: string): string {
@@ -47,9 +59,7 @@ function DayOverviewContent() {
   const { dayId } = useParams();
   const navigate = useNavigate();
 
-  // Static curriculum content. TODO: replace with an API call when a day endpoint exists.
-  const day: DayContent | undefined = dayId ? mockDayContents[dayId] : undefined;
-  const shouldLoad = Boolean(dayId && day);
+  const shouldLoad = Boolean(dayId);
 
   // Hooks must run before any early return.
   useEffect(() => {
@@ -57,14 +67,15 @@ function DayOverviewContent() {
     let isCancelled = false; // ignore late responses after navigating away
 
     Promise.all([
+      getDayContent(dayId),
       getDayTasks(dayId),
       getDayStatus(dayId),
       // A journal failure is not fatal: the page still renders with an empty journal.
       getDayJournal(dayId).catch(() => ({ responseText: null })),
     ])
-      .then(([tasks, status, journal]) => {
+      .then(([day, tasks, status, journal]) => {
         if (!isCancelled) {
-          setResult({ dayId, tasks, status, journalResponse: journal.responseText ?? '' });
+          setResult({ dayId, day, tasks, status, journalResponse: journal.responseText ?? '' });
         }
       })
       .catch((error: ApiError) => {
@@ -79,12 +90,13 @@ function DayOverviewContent() {
   // Only trust a result that belongs to the current dayId.
   const current = result && result.dayId === dayId ? result : null;
   const error = current && 'error' in current ? current.error : null;
+  const day = current && 'day' in current ? current.day : null;
   const tasks = current && 'tasks' in current ? current.tasks : [];
   const status = current && 'status' in current ? current.status : null;
   const journalResponse = current && 'journalResponse' in current ? current.journalResponse : '';
   const isLoading = shouldLoad && current === null;
 
-  if (!day || error?.code === 'NOT_FOUND') {
+  if (!dayId || error?.code === 'NOT_FOUND') {
     return (
       <>
         <Header />
@@ -122,7 +134,7 @@ function DayOverviewContent() {
     );
   }
 
-  if (error || !status) {
+  if (error || !day || !status) {
     return (
       <>
         <Header />
@@ -143,15 +155,15 @@ function DayOverviewContent() {
     (task) => task.status === 'completed' && !task.isStretchGoal
   ).length;
   const requiredTasks = tasks.filter((task) => !task.isStretchGoal).length;
+  const loadedDayId = day.dayId;
 
   async function handleSaveJournal(responseText: string) {
-    if (!day) return;
     setJournalError(null);
     setIsSavingJournal(true);
     setIsJournalSaved(false);
 
     try {
-      await saveJournal(day.dayId, responseText);
+      await saveJournal(loadedDayId, responseText);
       setIsJournalSaved(true);
     } catch (err) {
       setJournalError(getErrorMessage(err, 'Failed to save journal response.'));
@@ -161,13 +173,12 @@ function DayOverviewContent() {
   }
 
   async function handleCompleteDay() {
-    if (!day) return;
     setCompletionError(null);
     setIsCompletingDay(true);
 
     try {
       // The server decides whether the day can be completed (rule 2).
-      const updatedStatus = await completeDay(day.dayId);
+      const updatedStatus = await completeDay(loadedDayId);
 
       setResult((previous) => {
         if (!previous || 'error' in previous) return previous;

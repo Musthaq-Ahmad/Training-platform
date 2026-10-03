@@ -124,6 +124,7 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   const taskMatch = /^\/tasks\/([^/]+)$/.exec(url);
   const submitMatch = /^\/tasks\/([^/]+)\/submit$/.exec(url);
   const activityMatch = /^\/activity\/([^/]+)\/events$/.exec(url);
+  const dayContentMatch = /^\/days\/([^/]+)$/.exec(url);
   const dayTasksMatch = /^\/days\/([^/]+)\/tasks$/.exec(url);
   const dayStatusMatch = /^\/days\/([^/]+)\/status$/.exec(url);
   const dayJournalMatch = /^\/days\/([^/]+)\/journal$/.exec(url);
@@ -197,6 +198,13 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
 
   if (method === 'get' && url === '/auth/me') {
     return respond(config, 200, mockUser);
+  }
+
+  if (method === 'get' && dayContentMatch) {
+    const day = mockDayContents[dayContentMatch[1]];
+    return day
+      ? respond(config, 200, day)
+      : errorResponse(config, 404, 'NOT_FOUND', 'Day not found.');
   }
 
   if (method === 'get' && dayTasksMatch) {

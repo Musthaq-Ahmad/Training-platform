@@ -5,7 +5,14 @@ import { mockDayContents } from './dayOverview';
 import { mockStatusByDay } from '../test/fixtures/dayStatus';
 import { mockTasksByDay } from '../test/fixtures/dayTasks';
 import { ApiError } from './errors';
-import { completeDay, getDayJournal, getDayStatus, getDayTasks, saveJournal } from './days';
+import {
+  completeDay,
+  getDayContent,
+  getDayJournal,
+  getDayStatus,
+  getDayTasks,
+  saveJournal,
+} from './days';
 
 // Pick ids from the fixtures instead of hard-coding them, so the tests survive fixture edits.
 const dayIds = Object.keys(mockDayContents);
@@ -32,6 +39,20 @@ const anyDayId = dayIds[0];
 describe('days API (against the mock adapter)', () => {
   beforeAll(() => {
     installMockAdapter(apiClient);
+  });
+
+  describe('getDayContent', () => {
+    it('returns the static content for a known day', async () => {
+      const day = await getDayContent(anyDayId);
+      expect(day).toEqual(mockDayContents[anyDayId]);
+    });
+
+    it('throws NOT_FOUND for an unknown day', async () => {
+      await expect(getDayContent('does-not-exist')).rejects.toMatchObject({
+        status: 404,
+        code: 'NOT_FOUND',
+      });
+    });
   });
 
   describe('getDayStatus / getDayTasks', () => {

@@ -1,5 +1,16 @@
-import type { DayJournal, DayCurrentStatus, DayTask, SaveJournalRequest } from '@itp/types';
+import type {
+  DayContent,
+  DayJournal,
+  DayCurrentStatus,
+  DayTask,
+  SaveJournalRequest,
+} from '@itp/types';
 import { apiClient } from './client';
+
+export async function getDayContent(dayId: string): Promise<DayContent> {
+  const { data } = await apiClient.get<DayContent>(`/days/${dayId}`);
+  return data;
+}
 
 export async function getDayTasks(dayId: string): Promise<DayTask[]> {
   const res = await apiClient.get<DayTask[]>(`/days/${dayId}/tasks`);
