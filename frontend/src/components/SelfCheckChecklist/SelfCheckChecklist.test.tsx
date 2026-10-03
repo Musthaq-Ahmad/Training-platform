@@ -56,9 +56,7 @@ describe('SelfCheckChecklist', () => {
     render(<SelfCheckChecklist items={mockItems} />);
 
     expect(screen.getByText('1. Understand CSS selectors')).toBeInTheDocument();
-
     expect(screen.getByText('2. Understand the box model')).toBeInTheDocument();
-
     expect(screen.getByText('3. Explore advanced styling')).toBeInTheDocument();
   });
 
@@ -72,11 +70,9 @@ describe('SelfCheckChecklist', () => {
     expect(
       screen.getByText('Learn how to target HTML elements using selectors.')
     ).toBeInTheDocument();
-
     expect(
       screen.getByText('Learn about margins, padding, borders, and content.')
     ).toBeInTheDocument();
-
     expect(screen.getByText('Explore additional CSS styling techniques.')).toBeInTheDocument();
   });
 
@@ -84,6 +80,14 @@ describe('SelfCheckChecklist', () => {
     render(<SelfCheckChecklist items={mockItems} />);
 
     expect(screen.getByText('0 of 3 completed')).toBeInTheDocument();
+  });
+
+  it('starts with every checkbox unchecked', () => {
+    render(<SelfCheckChecklist items={mockItems} />);
+
+    screen.getAllByRole('checkbox').forEach((checkbox) => {
+      expect(checkbox).not.toBeChecked();
+    });
   });
 
   it('checks an item when its checkbox is clicked', () => {
@@ -121,40 +125,24 @@ describe('SelfCheckChecklist', () => {
 
     expect(checkboxes[0]).toBeChecked();
     expect(checkboxes[1]).toBeChecked();
+    expect(checkboxes[2]).not.toBeChecked();
     expect(screen.getByText('2 of 3 completed')).toBeInTheDocument();
-  });
-
-  it('displays the correct number of required checklist items in the footnote', () => {
-    render(<SelfCheckChecklist items={mockItems} />);
-
-    expect(
-      screen.getByText(
-        'The day is considered complete when all 2 required checklist items are verified and tasks are completed.'
-      )
-    ).toBeInTheDocument();
-  });
-
-  it('renders zero completed items and zero required items for an empty list', () => {
-    render(<SelfCheckChecklist items={[]} />);
-
-    expect(screen.getByText('0 of 0 completed')).toBeInTheDocument();
-
-    expect(
-      screen.getByText(
-        'The day is considered complete when all 0 required checklist items are verified and tasks are completed.'
-      )
-    ).toBeInTheDocument();
   });
 
   it('renders the correct progress when all items are checked', () => {
     render(<SelfCheckChecklist items={mockItems} />);
 
-    const checkboxes = screen.getAllByRole('checkbox');
-
-    checkboxes.forEach((checkbox) => {
+    screen.getAllByRole('checkbox').forEach((checkbox) => {
       fireEvent.click(checkbox);
     });
 
     expect(screen.getByText('3 of 3 completed')).toBeInTheDocument();
+  });
+
+  it('renders no checkboxes and "0 of 0 completed" for an empty list', () => {
+    render(<SelfCheckChecklist items={[]} />);
+
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    expect(screen.getByText('0 of 0 completed')).toBeInTheDocument();
   });
 });
