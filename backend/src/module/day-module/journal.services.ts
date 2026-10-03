@@ -1,5 +1,6 @@
 import type { DayJournal } from '@itp/types';
 import { journalRepository } from './journal.repository';
+import { dayAccessRepository } from './day-access.repository';
 import { NotFoundError, DayLockedError } from '../../errors/AppError';
 
 /**
@@ -11,19 +12,22 @@ import { NotFoundError, DayLockedError } from '../../errors/AppError';
  * exists, so every endpoint uses the same lock logic.
  */
 async function assertDayIsAccessible(traineeId: string, dayId: string): Promise<void> {
-  const day = await journalRepository.findDayWithOrder(dayId);
+  const day = await dayAccessRepository.findDayWithOrder(dayId);
   if (!day) throw new NotFoundError('Day not found');
 
-  const isCompleted = await journalRepository.findCompletion(traineeId, dayId);
+  const isCompleted = await dayAccessRepository.findCompletion(traineeId, dayId);
   if (isCompleted) return;
 
-  const previousDay = await journalRepository.findPreviousDay(
+  const previousDay = await dayAccessRepository.findPreviousDay(
     day.course.sort_order,
     day.day_number
   );
   if (!previousDay) return; // the first day of the curriculum is always open
 
-  const hasFinishedPreviousDay = await journalRepository.findCompletion(traineeId, previousDay.id);
+  const hasFinishedPreviousDay = await dayAccessRepository.findCompletion(
+    traineeId,
+    previousDay.id
+  );
   if (!hasFinishedPreviousDay) throw new DayLockedError();
 }
 

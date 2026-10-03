@@ -1,19 +1,28 @@
 import { Router } from 'express';
 import { validate } from '../../middleware/validate';
+import { dayTasksParamsSchema } from './day-tasks.schema';
+import { dayTasksController } from './day-tasks.controller';
 import { journalDayIdParamsSchema, saveJournalBodySchema } from './journal.schema';
 import { journalController } from './journal.controller';
 
-// Mounted at /api/days in routes/index.ts, so these become /api/days/:dayId/journal.
-export const journalRouter = Router();
+export const dayRouter = Router();
 
-journalRouter.get(
+dayRouter.get(
   '/:dayId/journal',
   validate({ params: journalDayIdParamsSchema }),
   journalController.getJournal
 );
 
-journalRouter.put(
+dayRouter.put(
   '/:dayId/journal',
   validate({ params: journalDayIdParamsSchema, body: saveJournalBodySchema }),
   journalController.saveJournal
 );
+
+dayRouter.get(
+  '/:dayId/tasks',
+  validate({ params: dayTasksParamsSchema }),
+  dayTasksController.getDayTasks
+);
+
+export default dayRouter;

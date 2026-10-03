@@ -1,5 +1,5 @@
 import type { DayTask } from '@itp/types';
-import { assertDayIsAccessible } from '../day-tasks-module/day-access.services';
+import { assertDayIsAccessible } from './day-access.services';
 import { dayTasksRepository } from './day-tasks.repository';
 
 type TaskRow = Awaited<ReturnType<typeof dayTasksRepository.findTasksByDay>>[number];
