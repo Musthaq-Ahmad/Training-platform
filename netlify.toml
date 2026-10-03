@@ -1,9 +1,9 @@
 # VITE_ variables are baked in at build time: a change needs a new deploy.
 [context.production.environment]
   VITE_USE_MOCKS = "false"   
-  VITE_API_URL = "https://vinkup-backend.onrender.com"
+  VITE_API_URL = "https://vinkup.netlify.app" 
 
-# PR previews and branch deploys always use mocks: Google login only works on the production address.
+# PR previews and branch deploys always use mocks
 [context.deploy-preview.environment]
   VITE_USE_MOCKS = "true"
   VITE_API_URL = ""
