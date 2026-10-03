@@ -1,0 +1,13 @@
+# VITE_ variables are baked in at build time: a change needs a new deploy.
+[context.production.environment]
+  VITE_USE_MOCKS = "true"   # set to "false" in Step 8, once the backend is live
+  VITE_API_URL = "https://<site>"
+
+# PR previews and branch deploys always use mocks: Google login only works on the production address.
+[context.deploy-preview.environment]
+  VITE_USE_MOCKS = "true"
+  VITE_API_URL = ""
+
+[context.branch-deploy.environment]
+  VITE_USE_MOCKS = "true"
+  VITE_API_URL = ""
