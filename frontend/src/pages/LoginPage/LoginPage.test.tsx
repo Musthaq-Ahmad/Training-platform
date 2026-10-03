@@ -28,9 +28,7 @@ describe('LoginPage', () => {
   describe('default state (no error param)', () => {
     it('renders LoginCard', () => {
       renderLoginPage('/login');
-      expect(
-        screen.getByRole('heading', { name: /in-house trainee training platform/i })
-      ).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /vinkup/i })).toBeInTheDocument();
     });
 
     it('does not render AccessRestrictedCard', () => {
@@ -68,9 +66,7 @@ describe('LoginPage', () => {
   describe('an unrecognized error value', () => {
     it('still falls back to LoginCard', () => {
       renderLoginPage('/login?error=DOMAIN_NOT_PERMITTE');
-      expect(
-        screen.getByRole('heading', { name: /in-house trainee training platform/i })
-      ).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /vinkup/i })).toBeInTheDocument();
     });
   });
 

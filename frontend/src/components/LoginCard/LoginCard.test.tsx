@@ -8,9 +8,7 @@ const mockLogin = vi.fn();
 describe('LoginCard', () => {
   it('renders the heading and subtitle', () => {
     render(<LoginCard handleGoogleSignIn={mockLogin} />);
-    expect(
-      screen.getByRole('heading', { name: /in-house trainee training platform/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /vinkup/i })).toBeInTheDocument();
     expect(
       screen.getByText(/learn, practice, and track your technical training progress/i)
     ).toBeInTheDocument();
