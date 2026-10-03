@@ -228,7 +228,7 @@
 .pauseTitle {
   font-size: 22px;
   font-weight: 800;
-  color: var(--color-text-bright);
+  color: var(--color-accent-purple);
 }
 .resultStats {
   display: flex;

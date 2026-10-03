@@ -17,25 +17,6 @@
   font-weight: 700;
 }
 
-.chips {
-  display: flex;
-  gap: 8px;
-}
-
-.chip {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--color-text-secondary);
-  background: var(--color-bg-panel);
-  border: 1px solid var(--color-border-card);
-  border-radius: 6px;
-  padding: 4px 10px;
-}
-
-.chip strong {
-  color: var(--color-text-green);
-}
-
 .tableWrap {
   overflow-x: auto;
   background: var(--color-bg-card);
@@ -74,15 +55,6 @@
 .accuracy {
   color: var(--color-text-green);
   font-weight: 600;
-}
-
-.badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-text-green);
-  background: var(--color-bg-green-fill);
-  border-radius: 4px;
-  padding: 2px 8px;
 }
 
 .empty {

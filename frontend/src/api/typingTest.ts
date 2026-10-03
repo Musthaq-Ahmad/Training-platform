@@ -1,12 +1,12 @@
-import type { SaveTypingResultRequest, TypingTestResult, TypingTodayResponse } from '@itp/types';
+import type { SaveTypingResultRequest, TypingResultRecord } from '@itp/types';
 import { apiClient } from './client';
 
-export async function getTypingToday(): Promise<TypingTodayResponse> {
-  const res = await apiClient.get<TypingTodayResponse>('/typing-test/today');
+export async function getTypingResults(): Promise<TypingResultRecord[]> {
+  const res = await apiClient.get<TypingResultRecord[]>('/typing-test/results');
   return res.data;
 }
 
-export async function saveTypingResult(body: SaveTypingResultRequest): Promise<TypingTestResult> {
-  const res = await apiClient.post<TypingTestResult>('/typing-test/results', body);
+export async function saveTypingResult(body: SaveTypingResultRequest): Promise<TypingResultRecord> {
+  const res = await apiClient.post<TypingResultRecord>('/typing-test/results', body);
   return res.data;
 }
