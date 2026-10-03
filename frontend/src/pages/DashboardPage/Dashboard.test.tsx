@@ -173,8 +173,8 @@ const mockDashboard: DashboardResponse = {
   nextDay: { ...JS_NEXT_DAY, courseTotalDays: 7 },
   totalDaysCompleteOverall: 17,
   totalDaysOverall: 60,
-  today: { activeSeconds: 5400, codingSeconds: 3600, readingSeconds: 1800 },
-  total: { activeSeconds: 153000, codingSeconds: 101700, readingSeconds: 51300 },
+  today: { activeSeconds: 5400, codingSeconds: 3600 },
+  total: { activeSeconds: 153000, codingSeconds: 101700 },
   typing: {
     latest: { wpm: 74, accuracy: 96, takenAt: '2026-09-26T09:00:00Z' },
     todayAverageWpm: 71,
@@ -288,6 +288,52 @@ describe('DashboardPage', () => {
     renderPage();
 
     expect(await screen.findByText('Failed to load days')).toBeInTheDocument();
+  });
+
+  it('offers Try again when the days fail to load, and loads them again', async () => {
+    const user = userEvent.setup();
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+    vi.mocked(getCourseDays).mockRejectedValueOnce(new Error('Failed to load days'));
+
+    renderPage();
+
+    expect(await screen.findByText('Failed to load days')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+
+    expect(await screen.findByText('JavaScript Module — Schedule')).toBeInTheDocument();
+    expect(screen.queryByText('Failed to load days')).not.toBeInTheDocument();
+    expect(getCourseDays).toHaveBeenCalledTimes(2);
+    expect(getCourseDays).toHaveBeenNthCalledWith(2, 'js');
+  });
+
+  it('loads a course again when its tab is reopened after a failed load', async () => {
+    const user = userEvent.setup();
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+    vi.mocked(getCourseDays).mockRejectedValueOnce(new Error('Failed to load days'));
+
+    renderPage();
+
+    expect(await screen.findByText('Failed to load days')).toBeInTheDocument();
+    await user.click(screen.getByRole('tab', { name: 'Node.js' }));
+    await screen.findByText('Node.js Module — Schedule');
+    await user.click(screen.getByRole('tab', { name: 'JavaScript' }));
+
+    expect(await screen.findByText('JavaScript Module — Schedule')).toBeInTheDocument();
+    expect(vi.mocked(getCourseDays).mock.calls.filter(([id]) => id === 'js')).toHaveLength(2);
+  });
+
+  it('loads a course again when its open tab is clicked after a failed load', async () => {
+    const user = userEvent.setup();
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+    vi.mocked(getCourseDays).mockRejectedValueOnce(new Error('Failed to load days'));
+
+    renderPage();
+
+    expect(await screen.findByText('Failed to load days')).toBeInTheDocument();
+    await user.click(screen.getByRole('tab', { name: 'JavaScript' }));
+
+    expect(await screen.findByText('JavaScript Module — Schedule')).toBeInTheDocument();
+    expect(getCourseDays).toHaveBeenCalledTimes(2);
   });
 
   it('loads the days of another course when its tab is selected', async () => {

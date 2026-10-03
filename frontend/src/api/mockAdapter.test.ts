@@ -460,7 +460,7 @@ describe('mockAdapter', () => {
       const res = await client.post('/activity/time', {
         activeSeconds: 60,
         codingSeconds: 0,
-        readingSeconds: 0,
+        date: '2026-10-01',
       });
 
       expect(res.status).toBe(204);

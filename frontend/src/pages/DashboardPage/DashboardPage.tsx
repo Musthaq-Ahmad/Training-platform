@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { DashboardResponse, DaySummary } from '@itp/types';
 import { getDashboard } from '../../api/dashboard';
@@ -14,6 +14,13 @@ import { ErrorState } from '../../components/Common/ErrorState';
 import styles from './DashboardPage.module.css';
 
 const DEFAULT_COURSE_ID = 'html';
+
+function withoutKey<T>(record: Record<string, T>, key: string): Record<string, T> {
+  if (!(key in record)) return record;
+  const copy = { ...record };
+  delete copy[key];
+  return copy;
+}
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -51,14 +58,42 @@ export default function DashboardPage() {
     };
   }, [attempt]);
 
+  // Loads one course's days. A failed load is forgotten, so opening the tab again or
+  // pressing "Try again" asks the server again.
+  const loadCourseDays = useCallback((courseId: string) => {
+    requestedCourses.current.add(courseId);
+
+    getCourseDays(courseId)
+      .then((days) => {
+        setDaysByCourse((prev) => ({ ...prev, [courseId]: days }));
+        setDaysErrors((prev) => withoutKey(prev, courseId));
+      })
+      .catch((err: unknown) => {
+        requestedCourses.current.delete(courseId);
+        setDaysErrors((prev) => ({
+          ...prev,
+          [courseId]: err instanceof Error ? err : new Error('Something went wrong'),
+        }));
+      });
+  }, []);
+
   useEffect(() => {
     if (!activeCourseId || requestedCourses.current.has(activeCourseId)) return;
-    requestedCourses.current.add(activeCourseId);
+    loadCourseDays(activeCourseId);
+  }, [activeCourseId, loadCourseDays]);
 
-    getCourseDays(activeCourseId)
-      .then((days) => setDaysByCourse((prev) => ({ ...prev, [activeCourseId]: days })))
-      .catch((err: Error) => setDaysErrors((prev) => ({ ...prev, [activeCourseId]: err })));
-  }, [activeCourseId]);
+  // Both run from a click, so setting state here is fine.
+  const handleRetryDays = (courseId: string) => {
+    setDaysErrors((prev) => withoutKey(prev, courseId));
+    loadCourseDays(courseId);
+  };
+
+  // A tab whose load failed is loaded again from here, not by the effect: clicking the tab
+  // that is already open doesn't change activeCourseId, so the effect wouldn't run.
+  const handleSelectCourse = (courseId: string) => {
+    setActiveCourseId(courseId);
+    if (daysErrors[courseId]) handleRetryDays(courseId);
+  };
 
   // Runs from a click, so setting state here is fine
   const handleRetry = () => {
@@ -125,22 +160,26 @@ export default function DashboardPage() {
           <TrackTabs
             tracks={CURRICULUM_COURSES}
             activeTrackId={activeTrack.id}
-            onSelect={setActiveCourseId}
+            onSelect={handleSelectCourse}
           />
         </section>
 
         <section className={styles.section}>
-          {daysError ? (
-            <p className={styles.status}>{daysError.message}</p>
-          ) : !activeDays ? (
-            <p className={styles.status}>Loading days...</p>
-          ) : (
+          {activeDays ? (
             <ScheduleGrid
               title={`${activeTrack.label} Module — Schedule`}
               days={activeDays}
               currentDayId={displayedDay?.id ?? null}
               onSelectDay={(dayId) => openDay(activeDays.find((d) => d.id === dayId))}
             />
+          ) : daysError ? (
+            <ErrorState
+              title={`Unable to load the ${activeTrack.label} schedule`}
+              message={daysError.message}
+              onRetry={() => handleRetryDays(activeTrack.id)}
+            />
+          ) : (
+            <p className={styles.status}>Loading days...</p>
           )}
         </section>
 

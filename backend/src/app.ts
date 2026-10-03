@@ -9,6 +9,8 @@ import authRoutes from './module/auth-module/auth.routes';
 import { env } from './config/env';
 import profileRoutes from './module/profile-module/profile.routes';
 import { requireAuth } from './middleware/authMiddleware';
+import { dashboardRoutes } from './module/dashboard-module/dashboard.routes';
+import { courseRoutes } from './module/dashboard-module/dashboard.routes';
 import flagRoutes from './module/flag-module/flag.routes';
 
 const app: Express = express();
@@ -32,6 +34,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/activity', flagRoutes);
 
 app.use('/api/profile', requireAuth, profileRoutes);
+app.use('/api/dashboard', requireAuth, dashboardRoutes);
+app.use('/api/courses', requireAuth, courseRoutes);
 
 app.use(notFoundHandler);
 

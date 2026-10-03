@@ -32,7 +32,7 @@
 .description {
   font-size: 1rem;
   line-height: 1.6;
-  color: var(--color-bg-text-secondary);
+  color: var(--color-text-secondary);
 }
 
 .continueButton {
