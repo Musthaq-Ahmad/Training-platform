@@ -14,6 +14,7 @@ authRoutes.get(
   '/google',
   passport.authenticate('google', {
     scope: ['profile', 'email'],
+    prompt: 'select_account',
     session: false,
   }) as RequestHandler
 );

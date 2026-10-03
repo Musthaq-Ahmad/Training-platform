@@ -179,7 +179,7 @@ export default function DashboardPage() {
               onRetry={() => handleRetryDays(activeTrack.id)}
             />
           ) : (
-            <p className={styles.status}>Loading days...</p>
+            <LoaderOverlay label="Loading days..." />
           )}
         </section>
 
