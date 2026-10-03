@@ -1,54 +1,42 @@
-import type { TypingTestResult } from '@itp/types';
-import { formatClockTime } from '../../lib/typingStats';
+import type { TypingResultRecord } from '@itp/types';
 import styles from './TestHistory.module.css';
 
 type TestHistoryProps = {
-  results: TypingTestResult[];
-  averageWpm: number | null;
-  averageAccuracy: number | null;
+  results: TypingResultRecord[];
 };
 
-export default function TestHistory({ results, averageWpm, averageAccuracy }: TestHistoryProps) {
+function formatCompletedAt(value: string): string {
+  return new Date(value).toLocaleString(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+}
+
+export default function TestHistory({ results }: TestHistoryProps) {
   return (
     <section className={styles.section}>
       <div className={styles.header}>
-        <h2 className={styles.heading}>Today&apos;s Test History</h2>
-        <div className={styles.chips}>
-          <span className={styles.chip}>
-            Today&apos;s avg: <strong>{averageWpm ?? '—'} WPM</strong>
-          </span>
-          <span className={styles.chip}>
-            Avg accuracy: <strong>{averageAccuracy === null ? '—' : `${averageAccuracy}%`}</strong>
-          </span>
-        </div>
+        <h2 className={styles.heading}>Typing Test History</h2>
       </div>
 
       {results.length === 0 ? (
-        <p className={styles.empty}>No tests yet today. Start typing to begin.</p>
+        <p className={styles.empty}>No typing tests yet. Complete a test to start your history.</p>
       ) : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Test #</th>
                 <th>WPM speed</th>
                 <th>Accuracy</th>
-                <th>Duration</th>
                 <th>Completed at</th>
-                <th>Status</th>
               </tr>
             </thead>
             <tbody>
               {results.map((result) => (
                 <tr key={result.id}>
-                  <td>Test {result.testNumber}</td>
                   <td>{result.wpm} WPM</td>
                   <td className={styles.accuracy}>{result.accuracy}%</td>
-                  <td>{result.durationSeconds} sec</td>
-                  <td>{formatClockTime(result.takenAt)}</td>
-                  <td>
-                    <span className={styles.badge}>Completed</span>
-                  </td>
+                  <td>{formatCompletedAt(result.takenAt)}</td>
                 </tr>
               ))}
             </tbody>

@@ -23,7 +23,8 @@ const endpoints: [method: 'get' | 'post' | 'put' | 'patch', path: string, body?:
   ['post', `/api/activity/${TASK.html1Main}/events`, { type: 'TAB_SWITCH' }],
   ['post', '/api/activity/time', { activeSeconds: 60, codingSeconds: 30 }],
   ['get', '/api/activity/time'],
-  ['post', '/api/typing/results', { wpm: 60, accuracy: 95 }],
+  ['get', '/api/typing-test/results'],
+  ['post', '/api/typing-test/results', { wpm: 60, accuracy: 95 }],
   ['get', '/api/profile'],
 ];
 

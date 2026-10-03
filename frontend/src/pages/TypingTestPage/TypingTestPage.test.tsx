@@ -1,14 +1,14 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { SaveTypingResultRequest, TypingTestResult, TypingTodayResponse } from '@itp/types';
+import type { TypingResultRecord, TypingTestStats } from '@itp/types';
 
 import TypingTestPage from './TypingTestPage';
-import { getTypingToday, saveTypingResult } from '../../api/typingTest';
+import { getTypingResults, saveTypingResult } from '../../api/typingTest';
 import { ApiError } from '../../api/errors';
 
 vi.mock('../../api/typingTest', () => ({
-  getTypingToday: vi.fn(),
+  getTypingResults: vi.fn(),
   saveTypingResult: vi.fn(),
 }));
 
@@ -26,23 +26,13 @@ vi.mock('../../components/PassageDisplay', () => ({
 }));
 
 vi.mock('../../components/TestHistory', () => ({
-  default: ({
-    results,
-    averageWpm,
-  }: {
-    results: TypingTestResult[];
-    averageWpm: number;
-    averageAccuracy: number;
-  }) => (
+  default: ({ results }: { results: TypingResultRecord[] }) => (
     <div>
       {results.map((result) => (
         <div key={result.id}>
-          Test {result.testNumber}
           <span>{result.wpm} WPM</span>
         </div>
       ))}
-
-      <span>{averageWpm} WPM</span>
     </div>
   ),
 }));
@@ -65,45 +55,25 @@ type MockTypingTestState = {
 
 type UseTypingTestMock = (
   initialDuration: number,
-  onFinish: (stats: SaveTypingResultRequest) => void
+  onFinish: (stats: TypingTestStats) => void
 ) => MockTypingTestState;
 
 const mockUseTypingTest = vi.fn<UseTypingTestMock>();
 
 vi.mock('../../hooks/useTypingTest', () => ({
-  useTypingTest: (initialDuration: number, onFinish: (stats: SaveTypingResultRequest) => void) =>
+  useTypingTest: (initialDuration: number, onFinish: (stats: TypingTestStats) => void) =>
     mockUseTypingTest(initialDuration, onFinish),
 }));
 
-const todayResponse: TypingTodayResponse = {
-  results: [
-    {
-      id: 'typing-2',
-      testNumber: 2,
-      wpm: 51,
-      accuracy: 98,
-      durationSeconds: 60,
-      takenAt: '2026-09-30T14:20:00.000Z',
-    },
-    {
-      id: 'typing-1',
-      testNumber: 1,
-      wpm: 42,
-      accuracy: 94,
-      durationSeconds: 60,
-      takenAt: '2026-09-30T09:00:00.000Z',
-    },
-  ],
-  averageWpm: 47,
-  averageAccuracy: 96,
-};
+const history: TypingResultRecord[] = [
+  { id: 'typing-2', wpm: 51, accuracy: 98, takenAt: '2026-09-30T14:20:00.000Z' },
+  { id: 'typing-1', wpm: 42, accuracy: 94, takenAt: '2026-09-30T09:00:00.000Z' },
+];
 
-const savedResult: TypingTestResult = {
+const savedResult: TypingResultRecord = {
   id: 'typing-3',
-  testNumber: 3,
   wpm: 24,
   accuracy: 100,
-  durationSeconds: 60,
   takenAt: '2026-09-30T15:00:00.000Z',
 };
 
@@ -140,7 +110,7 @@ describe('TypingTestPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    vi.mocked(getTypingToday).mockResolvedValue(todayResponse);
+    vi.mocked(getTypingResults).mockResolvedValue(history);
     vi.mocked(saveTypingResult).mockResolvedValue(savedResult);
 
     mockUseTypingTest.mockReturnValue({
@@ -164,27 +134,22 @@ describe('TypingTestPage', () => {
   });
 
   it('shows a loading message while history loads', () => {
-    vi.mocked(getTypingToday).mockReturnValue(new Promise(() => {}));
+    vi.mocked(getTypingResults).mockReturnValue(new Promise(() => {}));
 
     render(<TypingTestPage />);
 
     expect(screen.getByText('Loading history...')).toBeInTheDocument();
   });
 
-  it("shows today's history once it has loaded", async () => {
+  it('shows history once it has loaded', async () => {
     render(<TypingTestPage />);
 
-    expect(await screen.findByText('Test 2')).toBeInTheDocument();
-
-    expect(screen.getByText('51 WPM')).toBeInTheDocument();
-
-    expect(screen.getByText('Test 1')).toBeInTheDocument();
-
-    expect(screen.getByText('47 WPM')).toBeInTheDocument();
+    expect(await screen.findByText('51 WPM')).toBeInTheDocument();
+    expect(screen.getByText('42 WPM')).toBeInTheDocument();
   });
 
   it('shows the error when history fails to load', async () => {
-    vi.mocked(getTypingToday).mockRejectedValue(
+    vi.mocked(getTypingResults).mockRejectedValue(
       new ApiError(500, 'INTERNAL_ERROR', 'Failed to load history')
     );
 
@@ -214,7 +179,7 @@ describe('TypingTestPage', () => {
   });
 
   it('shows WPM and accuracy labels in the timeout overlay', () => {
-    let finishCallback: ((stats: SaveTypingResultRequest) => void) | undefined;
+    let finishCallback: ((stats: TypingTestStats) => void) | undefined;
 
     let testFinished = false;
 
@@ -254,7 +219,7 @@ describe('TypingTestPage', () => {
   });
 
   it('shows the saving state when the result is being saved', async () => {
-    let finishCallback: ((stats: SaveTypingResultRequest) => void) | undefined;
+    let finishCallback: ((stats: TypingTestStats) => void) | undefined;
 
     mockUseTypingTest.mockImplementation((_initialDuration, onFinish) => {
       finishCallback = onFinish;
@@ -296,7 +261,7 @@ describe('TypingTestPage', () => {
   });
 
   it('shows an error when the result cannot be saved', async () => {
-    let finishCallback: ((stats: SaveTypingResultRequest) => void) | undefined;
+    let finishCallback: ((stats: TypingTestStats) => void) | undefined;
 
     mockUseTypingTest.mockImplementation((_initialDuration, onFinish) => {
       finishCallback = onFinish;
@@ -398,15 +363,19 @@ describe('TypingTestPage', () => {
     expect(toggleOption).toHaveBeenCalledWith('numbers');
   });
 
-  it('does not render an inactivity overlay when the test is paused', () => {
+  it('shows the resume prompt when inactivity pauses the test', () => {
     mockUseTypingTest.mockReturnValue({
       ...defaultTypingTestState,
+      status: 'running',
+      secondsLeft: 42,
       isPaused: true,
     });
 
     render(<TypingTestPage />);
 
-    expect(screen.queryByText('Press any key to continue')).not.toBeInTheDocument();
+    expect(screen.getByText('PAUSED')).toBeInTheDocument();
+    expect(screen.getByText('Press any key to continue')).toBeInTheDocument();
+    expect(screen.getByRole('timer')).toHaveTextContent('00:42');
   });
 
   it('renders the correct timer value', () => {

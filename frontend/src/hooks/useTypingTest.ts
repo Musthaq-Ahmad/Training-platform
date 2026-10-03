@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { SaveTypingResultRequest } from '@itp/types';
+import type { TypingTestStats } from '@itp/types';
 import {
   buildPassage,
   calculateTypingStats,
@@ -13,10 +13,7 @@ const TICK_MS = 200;
 const EXTEND_THRESHOLD = 300; // characters of text to keep ahead of the cursor
 const INACTIVITY_MS = 5000;
 
-export function useTypingTest(
-  initialDuration: number,
-  onFinish: (stats: SaveTypingResultRequest) => void
-) {
+export function useTypingTest(initialDuration: number, onFinish: (stats: TypingTestStats) => void) {
   const [durationSeconds, setDurationSeconds] = useState(initialDuration);
   const [options, setOptions] = useState<PassageOptions>(DEFAULT_PASSAGE_OPTIONS);
   const [passage, setPassage] = useState(() =>
@@ -138,6 +135,7 @@ export function useTypingTest(
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== 'Enter' || event.repeat) return;
+      if (isPaused) return; // Enter resumes the test; it should not restart it too.
 
       // A focused button already restarts via its own click on Enter
       if (event.target instanceof HTMLButtonElement) return;
@@ -147,7 +145,7 @@ export function useTypingTest(
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [restart]);
+  }, [restart, isPaused]);
 
   return {
     passage,

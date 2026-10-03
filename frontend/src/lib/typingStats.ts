@@ -1,4 +1,4 @@
-import type { SaveTypingResultRequest } from '@itp/types';
+import type { TypingTestStats } from '@itp/types';
 import { TYPING_WORDS } from '../constants/typingWords';
 
 export type PassageOptions = {
@@ -66,7 +66,7 @@ export function calculateTypingStats(
   passage: string,
   typed: string,
   elapsedSeconds: number
-): SaveTypingResultRequest {
+): TypingTestStats {
   let correct = 0;
   for (let i = 0; i < typed.length; i++) {
     if (typed[i] === passage[i]) correct += 1;

@@ -2,24 +2,19 @@
 export type SaveTypingResultRequest = {
   wpm: number;
   accuracy: number; // 0–100
-  durationSeconds: number; // how long the test ran
 };
 
-/** One saved attempt, as shown in today's history */
-export type TypingTestResult = {
+/** Local test statistics; duration is shown by the client but is not persisted. */
+export type TypingTestStats = SaveTypingResultRequest & {
+  durationSeconds: number; // how long the client-side test ran
+};
+
+/** One persisted attempt returned by POST/GET /api/typing-test/results. */
+export type TypingResultRecord = {
   id: string;
-  testNumber: number; // 1 = first attempt today
   wpm: number;
   accuracy: number;
-  durationSeconds: number;
   takenAt: string; // ISO
-};
-
-/** GET /api/typing-test/today — newest first */
-export type TypingTodayResponse = {
-  results: TypingTestResult[];
-  averageWpm: number | null; // null = no tests today
-  averageAccuracy: number | null;
 };
 
 /** GET /api/typing-test/summary */
