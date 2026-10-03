@@ -9,6 +9,7 @@ import authRoutes from './module/auth-module/auth.routes';
 import { env } from './config/env';
 import profileRoutes from './module/profile-module/profile.routes';
 import { requireAuth } from './middleware/authMiddleware';
+import flagRoutes from './module/flag-module/flag.routes';
 
 const app: Express = express();
 
@@ -28,6 +29,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/activity', flagRoutes);
 
 app.use('/api/profile', requireAuth, profileRoutes);
 
