@@ -12,6 +12,89 @@ type HeaderProps = {
   status?: ReactNode;
 };
 
+function HomeIcon() {
+  return (
+    <svg
+      width="16"
+      height="18"
+      viewBox="0 0 16 18"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M1.5 7.2 8 1.5l6.5 5.7v8.3a1 1 0 0 1-1 1H10v-5H6v5H2.5a1 1 0 0 1-1-1V7.2Z" />
+    </svg>
+  );
+}
+
+function KeyboardIcon() {
+  return (
+    <svg
+      width="20"
+      height="14"
+      viewBox="0 0 20 14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="1" y="1" width="18" height="12" rx="2" />
+      <path d="M5 5h.01M8 5h.01M11 5h.01M14 5h.01M6 9h8" />
+    </svg>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="8" cy="5" r="3" />
+      <path d="M2 14.5c.4-2.6 2.8-4.2 6-4.2s5.6 1.6 6 4.2" />
+    </svg>
+  );
+}
+
+function PowerIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M15.3 5.53a7.5 7.5 0 1 1-10.61 0" />
+      <path d="M10 1.67V10" />
+    </svg>
+  );
+}
+function NavLabel({ text }: { text: string }) {
+  return (
+    <span className={styles.label} data-text={text}>
+      {text}
+    </span>
+  );
+}
+
 export default function Header({ leading, status }: HeaderProps) {
   const activity = useActivity();
   const { user, logout } = useAuth();
@@ -29,6 +112,7 @@ export default function Header({ leading, status }: HeaderProps) {
       setIsLoggingOut(false);
     }
   };
+  const profileLabel = user?.name ?? 'Profile';
 
   return (
     <header className={styles.header}>
@@ -47,28 +131,41 @@ export default function Header({ leading, status }: HeaderProps) {
               end
               className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
             >
-              Dashboard
+              <HomeIcon />
+              <NavLabel text="Dashboard" />
             </NavLink>
 
-            <span className={styles.divider}>/</span>
+            <NavLink
+              to="/typing-test"
+              end
+              className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+            >
+              <KeyboardIcon />
+              <NavLabel text="Typing Test" />
+            </NavLink>
 
             <NavLink
               to="/profile"
               className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
             >
-              {user?.name}
+              <UserIcon />
+              <NavLabel text={profileLabel} />
             </NavLink>
-            <span className={styles.divider}>/</span>
-            <button
-              className={styles.logoutButton}
-              disabled={isLoggingOut}
-              onClick={() => {
-                void handleLogout();
-              }}
-            >
-              {isLoggingOut ? 'Logging out…' : 'Log out'}
-            </button>
           </nav>
+          <span className={styles.divider} aria-hidden="true" />
+
+          <button
+            type="button"
+            className={styles.logoutButton}
+            disabled={isLoggingOut}
+            aria-label={isLoggingOut ? 'Logging out…' : 'Log out'}
+            title="Log out"
+            onClick={() => {
+              void handleLogout();
+            }}
+          >
+            <PowerIcon className={styles.logoutIcon} />
+          </button>
         </div>
       </div>
     </header>
