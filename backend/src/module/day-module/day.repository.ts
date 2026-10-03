@@ -35,36 +35,4 @@ export class DayRepository {
       },
     });
   }
-
-  findTasks(dayId: string, traineeId: string) {
-    return prisma.task.findMany({
-      where: { curriculum_day_id: dayId },
-      orderBy: { sequence_order: 'asc' },
-      select: {
-        id: true,
-        sequence_order: true,
-        title: true,
-        is_stretch_goal: true,
-        progress: {
-          where: { trainee_id: traineeId },
-          take: 1,
-        },
-      },
-    });
-  }
-
-  findJournal(dayId: string, traineeId: string) {
-    return prisma.journal_response.findUnique({
-      where: { trainee_id_curriculum_day_id: { trainee_id: traineeId, curriculum_day_id: dayId } },
-      select: { response_text: true },
-    });
-  }
-
-  saveJournal(dayId: string, traineeId: string, responseText: string) {
-    return prisma.journal_response.upsert({
-      where: { trainee_id_curriculum_day_id: { trainee_id: traineeId, curriculum_day_id: dayId } },
-      create: { trainee_id: traineeId, curriculum_day_id: dayId, response_text: responseText },
-      update: { response_text: responseText },
-    });
-  }
 }

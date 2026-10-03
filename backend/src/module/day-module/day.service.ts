@@ -1,4 +1,4 @@
-import type { DayContent, DayCurrentStatus, DayJournal, DayTask } from '@itp/types';
+import type { DayContent, DayCurrentStatus } from '@itp/types';
 import { NotFoundError } from '../../errors/AppError';
 import { ProgressService } from '../progress-module/progress.service';
 import { DayRepository } from './day.repository';
@@ -38,29 +38,5 @@ export class DayService {
       isLocked: status === 'LOCKED',
       isCompleted: status === 'COMPLETED',
     };
-  }
-
-  async getTasks(traineeId: string, dayId: string): Promise<DayTask[]> {
-    await progressService.assertDayUnlocked(traineeId, dayId);
-    const tasks = await dayRepository.findTasks(dayId, traineeId);
-    return tasks.map((task) => ({
-      id: task.id,
-      sequenceOrder: task.sequence_order,
-      title: task.title,
-      status: progressService.taskStatus(task.progress[0] ?? null),
-      isStretchGoal: task.is_stretch_goal,
-    }));
-  }
-
-  async getJournal(traineeId: string, dayId: string): Promise<DayJournal> {
-    await progressService.assertDayUnlocked(traineeId, dayId);
-    const journal = await dayRepository.findJournal(dayId, traineeId);
-    return { responseText: journal?.response_text ?? null };
-  }
-
-  async saveJournal(traineeId: string, dayId: string, responseText: string): Promise<DayJournal> {
-    await progressService.assertDayUnlocked(traineeId, dayId);
-    const journal = await dayRepository.saveJournal(dayId, traineeId, responseText.trim());
-    return { responseText: journal.response_text };
   }
 }

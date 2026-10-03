@@ -1,33 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DayLockedError, NotFoundError } from '../../errors/AppError';
+import { NotFoundError } from '../../errors/AppError';
 
 const repo = vi.hoisted(() => ({
   findContent: vi.fn(),
-  findTasks: vi.fn(),
-  findJournal: vi.fn(),
-  saveJournal: vi.fn(),
 }));
 
-const progress = vi.hoisted(() => ({
-  getDayStatus: vi.fn(),
-  assertDayUnlocked: vi.fn(),
-  taskStatus: vi.fn(),
-}));
+const { mockGetDayStatus } = vi.hoisted(() => ({ mockGetDayStatus: vi.fn() }));
 
 vi.mock('./day.repository', () => ({
   DayRepository: class {
     findContent = repo.findContent;
-    findTasks = repo.findTasks;
-    findJournal = repo.findJournal;
-    saveJournal = repo.saveJournal;
   },
 }));
 
 vi.mock('../progress-module/progress.service', () => ({
   ProgressService: class {
-    getDayStatus = progress.getDayStatus;
-    assertDayUnlocked = progress.assertDayUnlocked;
-    taskStatus = progress.taskStatus;
+    getDayStatus = mockGetDayStatus;
   },
 }));
 
@@ -62,9 +50,7 @@ describe('DayService', () => {
     vi.clearAllMocks();
     service = new DayService();
     repo.findContent.mockResolvedValue(day);
-    progress.getDayStatus.mockResolvedValue('UNLOCKED');
-    progress.assertDayUnlocked.mockResolvedValue(undefined);
-    progress.taskStatus.mockReturnValue('not_started');
+    mockGetDayStatus.mockResolvedValue('UNLOCKED');
   });
 
   describe('getContent', () => {
@@ -106,90 +92,10 @@ describe('DayService', () => {
       ['LOCKED', { isLocked: true, isCompleted: false }],
       ['COMPLETED', { isLocked: false, isCompleted: true }],
     ] as const)('maps %s progress to the current status response', async (status, expected) => {
-      progress.getDayStatus.mockResolvedValue(status);
+      mockGetDayStatus.mockResolvedValue(status);
 
       await expect(service.getCurrentStatus('trainee-1', day.id)).resolves.toEqual(expected);
-      expect(progress.getDayStatus).toHaveBeenCalledWith('trainee-1', day.id);
-    });
-  });
-
-  describe('getTasks', () => {
-    it('checks access and maps ordered task records with trainee progress', async () => {
-      repo.findTasks.mockResolvedValue([
-        {
-          id: 'html-task-1',
-          sequence_order: 1,
-          title: 'Profile page',
-          is_stretch_goal: false,
-          progress: [{ status: 'completed' }],
-        },
-        {
-          id: 'html-task-2',
-          sequence_order: 2,
-          title: 'Print styles',
-          is_stretch_goal: true,
-          progress: [],
-        },
-      ]);
-      progress.taskStatus.mockReturnValueOnce('completed').mockReturnValueOnce('not_started');
-
-      await expect(service.getTasks('trainee-1', day.id)).resolves.toEqual([
-        {
-          id: 'html-task-1',
-          sequenceOrder: 1,
-          title: 'Profile page',
-          status: 'completed',
-          isStretchGoal: false,
-        },
-        {
-          id: 'html-task-2',
-          sequenceOrder: 2,
-          title: 'Print styles',
-          status: 'not_started',
-          isStretchGoal: true,
-        },
-      ]);
-      expect(progress.assertDayUnlocked).toHaveBeenCalledWith('trainee-1', day.id);
-      expect(repo.findTasks).toHaveBeenCalledWith(day.id, 'trainee-1');
-      expect(progress.taskStatus).toHaveBeenNthCalledWith(1, { status: 'completed' });
-      expect(progress.taskStatus).toHaveBeenNthCalledWith(2, null);
-    });
-
-    it('propagates a locked day error without querying tasks', async () => {
-      progress.assertDayUnlocked.mockRejectedValue(new DayLockedError());
-
-      await expect(service.getTasks('trainee-1', day.id)).rejects.toBeInstanceOf(DayLockedError);
-      expect(repo.findTasks).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('journal', () => {
-    it('returns null when the trainee has not saved a response', async () => {
-      repo.findJournal.mockResolvedValue(null);
-
-      await expect(service.getJournal('trainee-1', day.id)).resolves.toEqual({
-        responseText: null,
-      });
-      expect(progress.assertDayUnlocked).toHaveBeenCalledWith('trainee-1', day.id);
-      expect(repo.findJournal).toHaveBeenCalledWith(day.id, 'trainee-1');
-    });
-
-    it('returns the trainee’s saved response', async () => {
-      repo.findJournal.mockResolvedValue({ response_text: 'Semantic tags matter.' });
-
-      await expect(service.getJournal('trainee-1', day.id)).resolves.toEqual({
-        responseText: 'Semantic tags matter.',
-      });
-    });
-
-    it('trims and saves the response for the authenticated trainee', async () => {
-      repo.saveJournal.mockResolvedValue({ response_text: 'My answer' });
-
-      await expect(service.saveJournal('trainee-1', day.id, '  My answer  ')).resolves.toEqual({
-        responseText: 'My answer',
-      });
-      expect(progress.assertDayUnlocked).toHaveBeenCalledWith('trainee-1', day.id);
-      expect(repo.saveJournal).toHaveBeenCalledWith(day.id, 'trainee-1', 'My answer');
+      expect(mockGetDayStatus).toHaveBeenCalledWith('trainee-1', day.id);
     });
   });
 });
