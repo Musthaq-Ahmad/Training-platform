@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { ArrowLeft } from 'lucide-react';
 import styles from './DayBreadcrumb.module.css';
 
 interface DayBreadcrumbProps {
@@ -12,7 +13,7 @@ export default function DayBreadcrumb({ dayNumber }: DayBreadcrumbProps) {
     <nav className={styles.dayBreadcrumb} aria-label="Breadcrumb">
       <Link to="/" className={styles.dayBreadcrumbBack}>
         <span className={styles.arrow} aria-hidden="true">
-          ←
+          <ArrowLeft size={16} strokeWidth={2} />
         </span>
         Dashboard
       </Link>

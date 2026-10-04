@@ -20,8 +20,12 @@
   transition: color 0.2s ease;
 }
 
-.dayBreadcrumbBack span {
-  font-size: 16px;
+.arrow {
+  display: inline-grid;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  place-items: center;
 }
 
 .dayBreadcrumbBack:hover {
