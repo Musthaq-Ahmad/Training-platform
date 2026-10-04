@@ -12,23 +12,7 @@ The main design decision: **all trainee code runs in the browser.** Web pages re
 
 **Code runs in the trainee's browser; the server only stores and checks.**
 
-```mermaid
-flowchart LR
-  subgraph Browser["Trainee's browser"]
-    direction TB
-    App["<b>Vinkup app (single-page app)</b><br/>React 19, Vite, React Router, Monaco editor<br/>JWT session in an httpOnly cookie"]
-    RT["<b>Code runtimes (no server needed)</b><br/>Web pages: preview iframe + esbuild-wasm<br/>Node.js: WebContainer + xterm terminal<br/>SQL: PGlite, tables kept in IndexedDB"]
-  end
-  Netlify["<b>Netlify</b><br/>vinkup.netlify.app: the built frontend<br/>Proxies /api/* to Render (same origin)"]
-  Render["<b>Render: Express 5 API</b><br/>vinkup-backend.onrender.com<br/>Auth, progress rules, code saves, tracking<br/>Free plan: sleeps after 15 min idle"]
-  Neon[("<b>Neon PostgreSQL</b><br/>Prisma 7 with the pg driver adapter<br/>12 tables: curriculum + trainee data")]
-  Google["<b>Google OAuth</b><br/>Company domain + enrolled trainees only"]
-
-  App -- HTTPS --> Netlify
-  Netlify -- "/api/*" --> Render
-  Render -- SQL via Prisma --> Neon
-  Render -- sign-in redirect --> Google
-```
+![System overview: the app and the code runtimes run in the trainee's browser; Netlify proxies /api to the Express API on Render, which uses Neon PostgreSQL and Google OAuth](images/system-overview.png)
 
 | Part            | Technology                                              | Where it runs                    |
 | --------------- | ------------------------------------------------------- | -------------------------------- |
@@ -143,17 +127,7 @@ A single-page React app built with Vite. Plain CSS modules. Monaco is the code e
 
 **A trainee loops between the day page and the task workspace until Submit Day.**
 
-```mermaid
-flowchart LR
-  Login["<b>Login</b><br/>/login"] -- Google sign-in --> Dash["<b>Dashboard</b><br/>/"]
-  Dash -- Continue or schedule --> Day["<b>Day overview</b><br/>/days/:dayId"]
-  Day -- Tasks picker --> Task["<b>Task workspace</b><br/>/tasks/:taskId"]
-  Task -- Back to tasks --> Day
-  Dash -- your name in the top bar --> Profile["<b>Profile</b><br/>/profile"]
-  Dash -- Typing test --> Typing["<b>Typing test</b><br/>/typing-test"]
-  Day -- References --> Refs["<b>References</b><br/>/days/:dayId/references"]
-  Day -- Submit Day --> Next["<b>Next day unlocked</b><br/>/days/:nextDayId"]
-```
+![Frontend page flow: Login, Dashboard, Day overview and Task workspace, with Profile, Typing test, References and the next day branching off](images/frontend-page-flow.png)
 
 | Route                     | Page            | Data it loads                                                                                                                 |
 | ------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------- |
@@ -227,36 +201,7 @@ Responses use the camelCase types from `@itp/types`; database column names never
 
 **Each request goes down the layers once; errors leave through one handler.** The example is a code save from the task page.
 
-```mermaid
-sequenceDiagram
-  autonumber
-  participant B as Browser (task page)
-  participant N as Netlify proxy
-  participant A as Express app
-  participant M as requireAuth + validate
-  participant C as task.controller
-  participant S as task.service
-  participant R as Repositories (Prisma)
-  participant D as Neon PostgreSQL
-
-  B->>N: PUT /api/tasks/:taskId/code (files, auth_token cookie)
-  N->>A: Forward to Render
-  A->>M: Parsed JSON (5 MB max) and cookies
-  M->>M: Verify JWT, set req.user. Zod-check taskId and files
-  M->>C: Valid request
-  C->>S: saveCode(traineeId, taskId, files)
-  S->>R: ProgressService.assertTaskUnlocked
-  R->>D: Task, days and day_completion rows
-  D-->>R: Rows
-  R-->>S: Day unlocked (else DAY_LOCKED)
-  S->>R: taskRepository.saveFiles
-  R->>D: Upsert task_progress (files, code_updated_at)
-  D-->>R: Saved row
-  R-->>S: Done
-  S-->>C: Done
-  C-->>B: 204 No Content
-  Note over A,S: Any layer can throw an AppError. It skips the layers above and goes to errorHandler,<br/>which sends { error: { code, message, details } }. Unexpected errors become 500 INTERNAL_ERROR.
-```
+![Backend request path: Express app, requireAuth, validate, controller, service, repository, Prisma and Neon, with errors going to errorHandler](images/backend-request-path.png)
 
 `requireAuth` turns the cookie into `req.user`, `validate` checks the `taskId` and the `files` array, and the controller calls `taskService.saveCode`. The service asks `ProgressService` whether the task's day is unlocked (a `DAY_LOCKED` error stops here), then the repository upserts the trainee's `task_progress` row with the files and `code_updated_at`. The controller answers 204 with no body. Read endpoints follow the same path, with the service mapping database rows to the `@itp/types` response before the controller sends it as JSON.
 
@@ -375,4 +320,4 @@ There is no CI pipeline yet; the hooks are the only automatic gate.
 | `NODE_ENV`                                 | `production` makes the cookie `Secure` and `SameSite=None`             | `production`                                          |
 | `PORT`                                     | Listening port                                                         | Render sets it                                        |
 
-The deployment guide covers the free-plan setup step by step.
+The deployment guide covers the setup step by step.
