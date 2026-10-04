@@ -132,7 +132,7 @@ export default function Header({ leading, status }: HeaderProps) {
               className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
             >
               <HomeIcon />
-              <NavLabel text="Dashboard" />
+              <NavLabel text="Home" />
             </NavLink>
 
             <NavLink
