@@ -5,14 +5,12 @@ type StatsRowProps = {
   totalActiveSeconds: number;
   totalCodingSeconds: number;
   latestWpm: number | null;
-  onTakeTypingTest: () => void;
 };
 
 export default function StatsRow({
   totalActiveSeconds,
   totalCodingSeconds,
   latestWpm,
-  onTakeTypingTest,
 }: StatsRowProps) {
   return (
     <div>
@@ -32,10 +30,6 @@ export default function StatsRow({
           <p className={styles.value}>{latestWpm !== null ? `${latestWpm} WPM` : '—'}</p>
         </div>
       </div>
-
-      <button className={styles.typingTestButton} onClick={onTakeTypingTest}>
-        Take a typing test
-      </button>
     </div>
   );
 }

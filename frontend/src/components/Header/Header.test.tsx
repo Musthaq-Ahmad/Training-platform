@@ -29,7 +29,7 @@ describe('Header', () => {
       </MemoryRouter>
     );
     expect(screen.getByText('Vink')).toHaveTextContent('VinkUp');
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Rahul Sharma')).toBeInTheDocument();
   });
 
@@ -40,7 +40,7 @@ describe('Header', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
     expect(screen.getByRole('link', { name: 'Rahul Sharma' })).toHaveAttribute('href', '/profile');
     expect(screen.getByRole('button', { name: 'Log out' })).toBeInTheDocument();
   });
