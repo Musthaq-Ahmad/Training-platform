@@ -4,7 +4,7 @@ _4 October 2026_
 
 ## 1. Overview
 
-This document explains how Vinkup is built: the parts of the system, how the frontend moves a trainee from sign-in to Submit Day, and how the backend is organised. It's written for the developers who will maintain the platform. For requirements see the TRD and PRD; for every endpoint see API.md; to run it locally see SETUP.md.
+This document explains how Vinkup is built: the parts of the system, how the frontend moves a trainee from sign-in to Submit Day, and how the backend is organised. It's written for the developers who will maintain the platform. For requirements see the TRD and PRD; for every endpoint see the [API reference](api-specifications.md); to run it locally see the [setup guide](setup-guide.md); for the tables see the [database documentation](database.md).
 
 Vinkup is Vonnue's in-house training platform for new engineering trainees. It carries 8 courses (HTML, CSS, JavaScript, TypeScript, Node.js, PostgreSQL, Prisma, React) with 54 days and 260 tasks. A trainee signs in with their company Google account, opens the day that's unlocked, reads the lesson, solves the tasks in a code editor in the browser, submits them, and submits the day to unlock the next. While they work, the platform records active time, coding time and focus events (leaving fullscreen, switching tabs) for mentors.
 
@@ -93,7 +93,7 @@ Training-platform/
 │     └─ test/api/           API contract tests
 ├─ packages/types/           @itp/types: request and response types shared by both sides
 ├─ scripts/export-curriculum.ts
-├─ docs/conventions.md       coding conventions
+├─ docs/                     project documentation (conventions, setup, API, architecture, database)
 └─ netlify.toml              build settings and per-context VITE_ variables
 ```
 
@@ -219,7 +219,7 @@ Responses use the camelCase types from `@itp/types`; database column names never
 | profile     | `GET /profile`                                                                               | Current position, totals, latest typing result, last 7 days                                                     |
 | progress    | (no routes)                                                                                  | `ProgressService`: day statuses and unlock checks used by dashboard, task, flag and profile                     |
 
-All paths are under `/api`. API.md has every request and response.
+All paths are under `/api`. The [API reference](api-specifications.md) has every request and response.
 
 ### Progress and unlock rules
 
@@ -283,7 +283,7 @@ Curriculum tables change only through the seed; trainee tables are written by th
 | `npm run db:seed -w backend`                        | Upsert trainees and curriculum (`SEED_DEMO=true` adds demo progress, local only) |
 | `npx tsx scripts/export-curriculum.ts`              | Rebuild `curriculum.json` from the frontend curriculum data                      |
 
-The Prisma CLI needs the config file: `npx prisma migrate deploy --config prisma7.config.ts` (from `backend/`). SETUP.md has the full local setup.
+The Prisma CLI needs the config file: `npx prisma migrate deploy --config prisma7.config.ts` (from `backend/`). The [setup guide](setup-guide.md) has the full local setup.
 
 ### Checks on every commit
 
@@ -319,5 +319,3 @@ There is no CI pipeline yet; the hooks are the only automatic gate.
 | `SESSION_SECRET`                           | Required by `env.ts` (at least 32 characters) but not used by any code | Any long random value                                 |
 | `NODE_ENV`                                 | `production` makes the cookie `Secure` and `SameSite=None`             | `production`                                          |
 | `PORT`                                     | Listening port                                                         | Render sets it                                        |
-
-The deployment guide covers the setup step by step.

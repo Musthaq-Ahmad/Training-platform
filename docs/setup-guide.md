@@ -179,11 +179,16 @@ Vite only reads env files at startup: restart `npm run dev:frontend` after chang
 
 ### 5.6 Run both
 
-In two terminals from the repo root:
+In two terminals from the repo root. The first starts the API on http://localhost:3000:
 
 ```bash
-npm run dev:backend    # API on http://localhost:3000
-npm run dev:frontend   # app on http://localhost:5173
+npm run dev:backend
+```
+
+The second starts the app on http://localhost:5173:
+
+```bash
+npm run dev:frontend
 ```
 
 Check the API: <http://localhost:3000/api/health> shows `{"status":"ok"}`.
@@ -246,7 +251,7 @@ safe.
 5. Pull `main` into your branch at least once a day.
 
 Coding rules — module layout, errors, validation, shared types, naming — are in
-[`docs/conventions.md`](docs/conventions.md). Read "The 10 rules" at the top before your first PR.
+[`docs/conventions.md`](conventions.md). Read "The 10 rules" at the top before your first PR.
 
 ## 8. Useful commands
 

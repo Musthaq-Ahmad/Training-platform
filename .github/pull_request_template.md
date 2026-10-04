@@ -12,6 +12,6 @@ Explain why this change was needed.
 
 ## Related issue
 
-Closes #99
+Closes #
 
 ## Screenshots (if any)

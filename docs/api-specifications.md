@@ -426,9 +426,9 @@ or `{ "responseText": "Because padding and border stay inside the declared width
 - **Auth:** required.
 - **Request body** (`SaveJournalRequest`):
 
-| Field          | Type   | Rules                                                                                                                                                                                 |
-| -------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `responseText` | string | Trimmed first, then 1–5,000 chars (`MAX_JOURNAL_LENGTH = 5_000`). Whitespace-only is rejected. Stored trimmed. Note: the frontend text box allows 10,000 (see Notes for maintainers). |
+| Field          | Type   | Rules                                                                                                                                                                                                             |
+| -------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `responseText` | string | Trimmed first, then 1–5,000 chars (`MAX_JOURNAL_LENGTH = 5_000`). Whitespace-only is rejected. Stored trimmed. Note: the frontend text box allows 10,000, so an entry over 5,000 characters is rejected with 400. |
 
 ```json
 { "responseText": "Because padding and border stay inside the declared width…" }
