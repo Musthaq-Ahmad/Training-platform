@@ -16,7 +16,10 @@ function setup(overrides: Overrides = {}) {
       {...overrides}
     />
   );
-  return { onComplete, button: screen.getByRole('button') };
+  return {
+    onComplete,
+    button: screen.getByRole<HTMLButtonElement>('button'),
+  };
 }
 
 describe('DayCompletion', () => {
