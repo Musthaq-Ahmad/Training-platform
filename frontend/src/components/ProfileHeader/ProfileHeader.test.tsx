@@ -17,10 +17,10 @@ describe('ProfileHeader', () => {
     totalDays: 12,
   };
 
-  it('renders the trainee name', () => {
+  it('renders the trainee name as the page heading', () => {
     render(<ProfileHeader trainee={trainee} />);
 
-    expect(screen.getByText('Rahul Sharma')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Rahul Sharma' })).toBeInTheDocument();
   });
 
   it('renders the trainee email', () => {
@@ -29,10 +29,26 @@ describe('ProfileHeader', () => {
     expect(screen.getByText('rahul.sharma@vonnue.com')).toBeInTheDocument();
   });
 
-  it('renders the trainee track and progress', () => {
+  it('renders the initials avatar', () => {
     render(<ProfileHeader trainee={trainee} />);
 
-    expect(screen.getByText('JavaScript, Day 6 of 12')).toBeInTheDocument();
+    expect(screen.getByText('RS')).toBeInTheDocument();
+  });
+
+  it('renders the current course and day', () => {
+    render(<ProfileHeader trainee={trainee} />);
+
+    expect(screen.getByText('JavaScript')).toBeInTheDocument();
+    expect(screen.getByText('Day 6 of 12')).toBeInTheDocument();
+  });
+
+  it('shows the position in the course as a progress bar', () => {
+    render(<ProfileHeader trainee={trainee} />);
+
+    const bar = screen.getByRole('progressbar', { name: 'JavaScript progress' });
+    expect(bar).toHaveAttribute('aria-valuenow', '6');
+    expect(bar).toHaveAttribute('aria-valuemax', '12');
+    expect(bar.firstElementChild).toHaveStyle({ width: '50%' });
   });
 
   it('renders different trainee data correctly', () => {
@@ -48,6 +64,7 @@ describe('ProfileHeader', () => {
 
     expect(screen.getByText('Jane Doe')).toBeInTheDocument();
     expect(screen.getByText('jane.doe@vonnue.com')).toBeInTheDocument();
-    expect(screen.getByText('React, Day 10 of 12')).toBeInTheDocument();
+    expect(screen.getByText('React')).toBeInTheDocument();
+    expect(screen.getByText('Day 10 of 12')).toBeInTheDocument();
   });
 });

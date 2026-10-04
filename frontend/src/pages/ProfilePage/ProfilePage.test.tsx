@@ -88,8 +88,14 @@ describe('ProfilePage', () => {
 
     const main = screen.getByRole('main');
 
-    expect(within(main).getByText('Rahul Sharma')).toBeInTheDocument();
-    expect(within(main).getByText('JavaScript, Day 6 of 12')).toBeInTheDocument();
+    expect(within(main).getByRole('heading', { name: 'Rahul Sharma' })).toBeInTheDocument();
+    expect(within(main).getByText('RS')).toBeInTheDocument();
+    expect(within(main).getByText('JavaScript')).toBeInTheDocument();
+    expect(within(main).getByText('Day 6 of 12')).toBeInTheDocument();
+    expect(within(main).getByRole('progressbar', { name: 'JavaScript progress' })).toHaveAttribute(
+      'aria-valuenow',
+      '6'
+    );
   });
 
   it('renders the stats from the profile data', async () => {
