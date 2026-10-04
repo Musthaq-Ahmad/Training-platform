@@ -6,7 +6,6 @@ type Overrides = Partial<React.ComponentProps<typeof DayCompletion>>;
 
 function setup(overrides: Overrides = {}) {
   const onComplete = vi.fn();
-
   render(
     <DayCompletion
       completedTasks={3}
@@ -17,10 +16,10 @@ function setup(overrides: Overrides = {}) {
       {...overrides}
     />
   );
-
-  const button: HTMLButtonElement = screen.getByRole('button');
-
-  return { onComplete, button };
+  return {
+    onComplete,
+    button: screen.getByRole<HTMLButtonElement>('button'),
+  };
 }
 
 describe('DayCompletion', () => {

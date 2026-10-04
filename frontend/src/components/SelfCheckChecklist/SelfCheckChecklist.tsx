@@ -20,7 +20,6 @@ export default function SelfCheckChecklist({
   };
 
   const completedCount = checkedItems.length;
-  const requiredCount = items.filter((item) => item.isRequired).length;
 
   return (
     <section className={styles.selfCheck}>
@@ -66,11 +65,6 @@ export default function SelfCheckChecklist({
           );
         })}
       </div>
-
-      <p className={styles.selfCheckFootnote}>
-        The day is considered complete when all {requiredCount} required checklist items are
-        verified and tasks are completed.
-      </p>
     </section>
   );
 }
