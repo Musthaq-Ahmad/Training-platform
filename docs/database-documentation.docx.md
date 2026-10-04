@@ -2,7 +2,7 @@
 
 Every table in the database and how they relate. A crow's foot marks the many side of a one-to-many link. PK \= primary key, FK \= foreign key, UK \= unique key.
 
-![Entity relationship diagram of the training platform database](./images/er-diagram.png)
+![Entity relationship diagram of the training platform database](./images/er-diagram.svg)
 
 _Figure 1: Entity relationship diagram of the training platform database._
 
