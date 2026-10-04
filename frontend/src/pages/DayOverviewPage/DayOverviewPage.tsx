@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ArrowRight } from 'lucide-react';
 import type { DayTask, DayContent, DayCurrentStatus } from '@itp/types';
@@ -15,6 +15,7 @@ import styles from './DayOverviewPage.module.css';
 import StateMessage from '../../components/StateMessage';
 import { ApiError } from '../../api/errors';
 import Loader from '../../components/Common/LoadingState';
+import DayCelebration from '../../components/DayCelebration/DayCelebration';
 
 type LoadResult =
   | { dayId: string; tasks: DayTask[]; status: DayCurrentStatus; journalResponse: string }
@@ -114,9 +115,11 @@ function DayOverviewContent() {
   const [isJournalSaved, setIsJournalSaved] = useState(false);
   const [isSavingJournal, setIsSavingJournal] = useState(false);
   const [isCompletingDay, setIsCompletingDay] = useState(false);
+  const [showDayCelebration, setShowDayCelebration] = useState(false);
   const [result, setResult] = useState<LoadResult | null>(null);
   const [journalError, setJournalError] = useState<string | null>(null);
   const [completionError, setCompletionError] = useState<string | null>(null);
+  const completionAttempted = useRef(false);
 
   // dayId is an opaque string. Never parse or build it here.
   const { dayId } = useParams();
@@ -236,7 +239,9 @@ function DayOverviewContent() {
   }
 
   async function handleCompleteDay() {
-    if (!day) return;
+    if (!day || completionAttempted.current || status?.isCompleted) return;
+    // State updates are asynchronous; the ref closes the rapid double-click window.
+    completionAttempted.current = true;
     setCompletionError(null);
     setIsCompletingDay(true);
 
@@ -248,7 +253,13 @@ function DayOverviewContent() {
         if (!previous || 'error' in previous) return previous;
         return { ...previous, status: updatedStatus };
       });
+      if (updatedStatus.isCompleted) {
+        setShowDayCelebration(true);
+      } else {
+        completionAttempted.current = false;
+      }
     } catch (err) {
+      completionAttempted.current = false;
       setCompletionError(getErrorMessage(err, 'Failed to complete the day.'));
     } finally {
       setIsCompletingDay(false);
@@ -260,6 +271,7 @@ function DayOverviewContent() {
       <Header />
 
       <main className={styles.dayOverview}>
+        {showDayCelebration && <DayCelebration onDismiss={() => setShowDayCelebration(false)} />}
         <DayBreadcrumb dayNumber={day.dayNumber} />
 
         <DaySummary

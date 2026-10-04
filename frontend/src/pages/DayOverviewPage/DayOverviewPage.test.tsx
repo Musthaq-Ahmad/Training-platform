@@ -95,6 +95,21 @@ describe('DayOverviewPage: completing the day', () => {
 
     expect(completeDay).toHaveBeenCalledWith(dayId);
     expect(await screen.findByText('Day completed')).toBeInTheDocument();
+    const successHeading = await screen.findByRole('heading', { name: 'Day submitted!' });
+    expect(successHeading.closest('[role="status"]')).toHaveAttribute('aria-live', 'polite');
+  });
+
+  it('does not celebrate while the request is pending and ignores repeat clicks', async () => {
+    vi.mocked(completeDay).mockImplementation(() => new Promise(() => {}));
+    renderPage();
+
+    const submitButton = await screen.findByRole('button', { name: /submit day/i });
+    fireEvent.click(submitButton);
+    fireEvent.click(submitButton);
+
+    expect(completeDay).toHaveBeenCalledTimes(1);
+    expect(await screen.findByRole('button', { name: /submitting/i })).toBeDisabled();
+    expect(screen.queryByRole('heading', { name: 'Day submitted!' })).not.toBeInTheDocument();
   });
 
   it('shows the server message when completion fails', async () => {
@@ -108,6 +123,24 @@ describe('DayOverviewPage: completing the day', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Check all required items before submitting.'
     );
+    expect(screen.queryByRole('heading', { name: 'Day submitted!' })).not.toBeInTheDocument();
+  });
+
+  it('allows a failed submission to be retried and celebrates only the successful attempt', async () => {
+    vi.mocked(completeDay)
+      .mockRejectedValueOnce(new Error('Please try again.'))
+      .mockResolvedValueOnce({ ...openStatus, isCompleted: true });
+    renderPage();
+
+    fireEvent.click(await screen.findByRole('button', { name: /submit day/i }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Please try again.');
+    expect(screen.queryByRole('heading', { name: 'Day submitted!' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /submit day/i }));
+
+    const successHeading = await screen.findByRole('heading', { name: 'Day submitted!' });
+    expect(successHeading.closest('[role="status"]')).toHaveAttribute('aria-live', 'polite');
+    expect(completeDay).toHaveBeenCalledTimes(2);
   });
 
   it('disables the button when a required task is not completed', async () => {
