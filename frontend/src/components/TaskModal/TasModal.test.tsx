@@ -1,160 +1,261 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
-import SelfCheckChecklist from '../SelfCheckChecklist';
-import type { SelfCheckItem } from '@itp/types';
+import type { DayTask } from '@itp/types';
+import TaskModal from './TaskModal';
 
 afterEach(() => {
   cleanup();
+  document.body.style.overflow = '';
 });
 
-describe('SelfCheckChecklist', () => {
-  const mockItems: SelfCheckItem[] = [
-    {
-      id: '1',
-      label: 'Understand CSS selectors',
-      code: 'CSS-01',
-      description: 'Learn how to target HTML elements using selectors.',
-      isRequired: true,
-    },
-    {
-      id: '2',
-      label: 'Understand the box model',
-      code: 'CSS-02',
-      description: 'Learn about margins, padding, borders, and content.',
-      isRequired: true,
-    },
-    {
-      id: '3',
-      label: 'Explore advanced styling',
-      code: 'CSS-03',
-      description: 'Explore additional CSS styling techniques.',
-      isRequired: false,
-    },
-  ];
+// Only the fields the modal reads. Cast because DayTask may carry more fields.
+function makeTask(overrides: Partial<DayTask> = {}): DayTask {
+  return {
+    id: 'task-1',
+    title: 'Personal Profile Page',
+    sequenceOrder: 1,
+    status: 'not_started',
+    isStretchGoal: false,
+    ...overrides,
+  };
+}
 
-  it('renders the checklist heading', () => {
-    render(<SelfCheckChecklist items={mockItems} />);
+const requiredTask = makeTask({
+  id: 'task-1',
+  title: 'Personal Profile Page',
+  sequenceOrder: 1,
+  status: 'completed',
+});
+const inProgressTask = makeTask({
+  id: 'task-2',
+  title: 'Recipe Card',
+  sequenceOrder: 2,
+  status: 'in_progress',
+});
+const stretchTask = makeTask({
+  id: 'task-3',
+  title: 'Accessible Navigation',
+  sequenceOrder: 3,
+  status: 'not_started',
+  isStretchGoal: true,
+});
 
-    expect(screen.getByText('END OF THE DAY CHECKLIST')).toBeInTheDocument();
+function renderModal(overrides: Partial<React.ComponentProps<typeof TaskModal>> = {}) {
+  const onClose = vi.fn();
+  const onSelectTask = vi.fn();
+
+  const props = {
+    courseTitle: 'HTML',
+    isOpen: true,
+    dayNumber: 3,
+    tasks: [requiredTask, inProgressTask, stretchTask],
+    onClose,
+    onSelectTask,
+    ...overrides,
+  };
+
+  const view = render(<TaskModal {...props} />);
+  return { ...view, props, onClose, onSelectTask };
+}
+
+describe('TaskModal: visibility', () => {
+  it('renders nothing when it is closed', () => {
+    renderModal({ isOpen: false });
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('renders the default description', () => {
-    render(<SelfCheckChecklist items={mockItems} />);
+  it('renders an accessible dialog when it is open', () => {
+    renderModal();
 
-    expect(
-      screen.getByText('Self-check verification criteria separate from the practical coding tasks.')
-    ).toBeInTheDocument();
+    const dialog = screen.getByRole('dialog', { name: 'Day Tasks' });
+
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
   });
 
-  it('renders a custom description when provided', () => {
-    render(<SelfCheckChecklist items={mockItems} description="Complete your daily checklist." />);
+  it('shows the course and zero-padded day number', () => {
+    renderModal({ courseTitle: 'CSS', dayNumber: 3 });
 
-    expect(screen.getByText('Complete your daily checklist.')).toBeInTheDocument();
+    expect(screen.getByText('CSS-DAY 03')).toBeInTheDocument();
   });
 
-  it('renders all checklist items', () => {
-    render(<SelfCheckChecklist items={mockItems} />);
+  it('shows the instruction text', () => {
+    renderModal();
 
-    expect(screen.getByText('1. Understand CSS selectors')).toBeInTheDocument();
+    expect(screen.getByText('Select a task to open its workspace.')).toBeInTheDocument();
+  });
+});
 
-    expect(screen.getByText('2. Understand the box model')).toBeInTheDocument();
+describe('TaskModal: task list', () => {
+  it('lists every task with its zero-padded number and title', () => {
+    renderModal();
 
-    expect(screen.getByText('3. Explore advanced styling')).toBeInTheDocument();
+    expect(screen.getByText('01')).toBeInTheDocument();
+    expect(screen.getByText('Personal Profile Page')).toBeInTheDocument();
+    expect(screen.getByText('02')).toBeInTheDocument();
+    expect(screen.getByText('Recipe Card')).toBeInTheDocument();
+    expect(screen.getByText('03')).toBeInTheDocument();
+    expect(screen.getByText('Accessible Navigation')).toBeInTheDocument();
   });
 
-  it("renders each item's code and description", () => {
-    render(<SelfCheckChecklist items={mockItems} />);
+  it('shows the right status label for each status', () => {
+    renderModal();
 
-    expect(screen.getByText('CSS-01')).toBeInTheDocument();
-    expect(screen.getByText('CSS-02')).toBeInTheDocument();
-    expect(screen.getByText('CSS-03')).toBeInTheDocument();
-
-    expect(
-      screen.getByText('Learn how to target HTML elements using selectors.')
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText('Learn about margins, padding, borders, and content.')
-    ).toBeInTheDocument();
-
-    expect(screen.getByText('Explore additional CSS styling techniques.')).toBeInTheDocument();
+    expect(screen.getByText('Completed')).toBeInTheDocument();
+    expect(screen.getByText('In progress')).toBeInTheDocument();
+    expect(screen.getByText('Not started')).toBeInTheDocument();
   });
 
-  it('shows zero completed items initially', () => {
-    render(<SelfCheckChecklist items={mockItems} />);
+  it('shows the stretch badge only on stretch goals', () => {
+    renderModal();
 
-    expect(screen.getByText('0 of 3 completed')).toBeInTheDocument();
+    expect(screen.getAllByText('Stretch goal')).toHaveLength(1);
+
+    const stretchButton = screen.getByRole('button', { name: /Accessible Navigation/ });
+    expect(stretchButton).toHaveTextContent('Stretch goal');
+
+    const requiredButton = screen.getByRole('button', { name: /Personal Profile Page/ });
+    expect(requiredButton).not.toHaveTextContent('Stretch goal');
   });
 
-  it('checks an item when its checkbox is clicked', () => {
-    render(<SelfCheckChecklist items={mockItems} />);
+  it('keeps the tasks in the order they are given', () => {
+    renderModal();
 
-    const checkboxes = screen.getAllByRole('checkbox');
+    const titles = screen
+      .getAllByRole('button', { name: /Personal Profile Page|Recipe Card|Accessible Navigation/ })
+      .map((button) => button.textContent ?? '');
 
-    fireEvent.click(checkboxes[0]);
-
-    expect(checkboxes[0]).toBeChecked();
-    expect(screen.getByText('1 of 3 completed')).toBeInTheDocument();
+    expect(titles[0]).toContain('Personal Profile Page');
+    expect(titles[1]).toContain('Recipe Card');
+    expect(titles[2]).toContain('Accessible Navigation');
   });
 
-  it('unchecks an item when its checkbox is clicked again', () => {
-    render(<SelfCheckChecklist items={mockItems} />);
+  it('shows an empty message and a zero count when there are no tasks', () => {
+    renderModal({ tasks: [] });
 
-    const checkbox = screen.getAllByRole('checkbox')[0];
-
-    fireEvent.click(checkbox);
-    expect(checkbox).toBeChecked();
-
-    fireEvent.click(checkbox);
-    expect(checkbox).not.toBeChecked();
-
-    expect(screen.getByText('0 of 3 completed')).toBeInTheDocument();
+    expect(screen.getByText('No tasks are available for this day.')).toBeInTheDocument();
+    expect(screen.getByText('0 tasks')).toBeInTheDocument();
   });
 
-  it('allows multiple items to be checked', () => {
-    render(<SelfCheckChecklist items={mockItems} />);
+  it('uses the singular "task" for exactly one task', () => {
+    renderModal({ tasks: [requiredTask] });
 
-    const checkboxes = screen.getAllByRole('checkbox');
-
-    fireEvent.click(checkboxes[0]);
-    fireEvent.click(checkboxes[1]);
-
-    expect(checkboxes[0]).toBeChecked();
-    expect(checkboxes[1]).toBeChecked();
-    expect(screen.getByText('2 of 3 completed')).toBeInTheDocument();
+    expect(screen.getByText('1 task')).toBeInTheDocument();
   });
 
-  it('displays the correct number of required checklist items in the footnote', () => {
-    render(<SelfCheckChecklist items={mockItems} />);
+  it('uses the plural "tasks" for several tasks', () => {
+    renderModal();
 
-    expect(
-      screen.getByText(
-        'The day is considered complete when all 2 required checklist items are verified and tasks are completed.'
-      )
-    ).toBeInTheDocument();
+    expect(screen.getByText('3 tasks')).toBeInTheDocument();
+  });
+});
+
+describe('TaskModal: selecting a task', () => {
+  it('calls onSelectTask with the task that was clicked', () => {
+    const { onSelectTask } = renderModal();
+
+    fireEvent.click(screen.getByRole('button', { name: /Recipe Card/ }));
+
+    expect(onSelectTask).toHaveBeenCalledTimes(1);
+    expect(onSelectTask).toHaveBeenCalledWith(inProgressTask);
   });
 
-  it('renders zero completed items and zero required items for an empty list', () => {
-    render(<SelfCheckChecklist items={[]} />);
+  it('does not close the modal by itself when a task is selected', () => {
+    const { onClose } = renderModal();
 
-    expect(screen.getByText('0 of 0 completed')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Recipe Card/ }));
 
-    expect(
-      screen.getByText(
-        'The day is considered complete when all 0 required checklist items are verified and tasks are completed.'
-      )
-    ).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+});
+
+describe('TaskModal: closing', () => {
+  it('calls onClose when the close button is clicked', () => {
+    const { onClose } = renderModal();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close tasks modal' }));
+
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the correct progress when all items are checked', () => {
-    render(<SelfCheckChecklist items={mockItems} />);
+  it('calls onClose when Escape is pressed', () => {
+    const { onClose } = renderModal();
 
-    const checkboxes = screen.getAllByRole('checkbox');
+    fireEvent.keyDown(window, { key: 'Escape' });
 
-    checkboxes.forEach((checkbox) => {
-      fireEvent.click(checkbox);
-    });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 
-    expect(screen.getByText('3 of 3 completed')).toBeInTheDocument();
+  it('ignores other keys', () => {
+    const { onClose } = renderModal();
+
+    fireEvent.keyDown(window, { key: 'Enter' });
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('does not listen for Escape while it is closed', () => {
+    const { onClose } = renderModal({ isOpen: false });
+
+    fireEvent.keyDown(window, { key: 'Escape' });
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('stops listening for Escape after it is unmounted', () => {
+    const { onClose, unmount } = renderModal();
+
+    unmount();
+    fireEvent.keyDown(window, { key: 'Escape' });
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('calls onClose when the backdrop is pressed', () => {
+    const { onClose } = renderModal();
+
+    const backdrop = screen.getByRole('dialog').parentElement as HTMLElement;
+    fireEvent.mouseDown(backdrop);
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not close when the press happens inside the dialog', () => {
+    const { onClose } = renderModal();
+
+    fireEvent.mouseDown(screen.getByRole('dialog'));
+    fireEvent.mouseDown(screen.getByText('Day Tasks'));
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+});
+
+describe('TaskModal: page scroll lock', () => {
+  it('locks page scrolling while open', () => {
+    renderModal();
+
+    expect(document.body.style.overflow).toBe('hidden');
+  });
+
+  it('does not lock page scrolling while closed', () => {
+    renderModal({ isOpen: false });
+
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  it('unlocks page scrolling when it closes', () => {
+    const { rerender, props } = renderModal();
+
+    rerender(<TaskModal {...props} isOpen={false} />);
+
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  it('unlocks page scrolling when it is unmounted while open', () => {
+    const { unmount } = renderModal();
+
+    unmount();
+
+    expect(document.body.style.overflow).toBe('');
   });
 });
