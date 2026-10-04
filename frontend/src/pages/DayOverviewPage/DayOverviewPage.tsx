@@ -48,7 +48,7 @@ function DayTasks({
               {courseTitle.toUpperCase()}-DAY {String(dayNumber).padStart(2, '0')}
             </span>
             <span>
-              {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
+              {requiredTasks} {requiredTasks === 1 ? 'task' : 'tasks'}
             </span>
           </div>
           <h2 id="day-tasks-title" className={styles.tasksTitle}>
@@ -72,9 +72,11 @@ function DayTasks({
               className={`${styles.taskItem} ${task.isStretchGoal ? styles.stretchTaskItem : ''}`}
               onClick={() => onSelectTask(task)}
             >
-              <span className={styles.taskNumber}>
-                {String(task.sequenceOrder).padStart(2, '0')}
-              </span>
+              {!task.isStretchGoal && (
+                <span className={styles.taskNumber}>
+                  {String(task.sequenceOrder).padStart(2, '0')}
+                </span>
+              )}
               <span className={styles.taskInfo}>
                 <span className={styles.taskTitle}>{task.title}</span>
                 <span className={styles.taskMeta}>
