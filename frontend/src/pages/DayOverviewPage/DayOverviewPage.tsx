@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { ArrowRight } from 'lucide-react';
 import type { DayTask, DayContent, DayCurrentStatus } from '@itp/types';
 import { getDayTasks, getDayStatus, getDayJournal, saveJournal, completeDay } from '../../api/days';
 import { mockDayContents } from '../../api/dayOverview';
 import DaySummary from '../../components/DaySummary/DaySummary';
-import LessonSummary from '../../components/LessonSummary/LessonSummary';
 import LearningObjectives from '../../components/LearningObjectives/LearningObjectives';
 import SelfCheckChecklist from '../../components/SelfCheckChecklist';
 import DailyJournal from '../../components/DailyJournal';
 import DayCompletion from '../../components/DayCompletion/DayCompletion';
 import Header from '../../components/Header';
 import DayBreadcrumb from '../../components/DayBreadcrumb/DayBreadcrumb';
-import TaskModal from '../../components/TaskModal';
 import styles from './DayOverviewPage.module.css';
 import StateMessage from '../../components/StateMessage';
 import { ApiError } from '../../api/errors';
@@ -25,6 +24,83 @@ function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
+function DayTasks({
+  courseTitle,
+  dayNumber,
+  tasks,
+  completedTasks,
+  requiredTasks,
+  onSelectTask,
+}: {
+  courseTitle: string;
+  dayNumber: number;
+  tasks: DayTask[];
+  completedTasks: number;
+  requiredTasks: number;
+  onSelectTask: (task: DayTask) => void;
+}) {
+  return (
+    <section className={styles.tasks} aria-labelledby="day-tasks-title">
+      <header className={styles.tasksHeader}>
+        <div>
+          <div className={styles.tasksEyebrow}>
+            <span className={styles.tasksCourse}>
+              {courseTitle.toUpperCase()}-DAY {String(dayNumber).padStart(2, '0')}
+            </span>
+            <span>
+              {requiredTasks} {requiredTasks === 1 ? 'task' : 'tasks'}
+            </span>
+          </div>
+          <h2 id="day-tasks-title" className={styles.tasksTitle}>
+            Day Tasks
+          </h2>
+          <p className={styles.tasksDescription}>Select a task to open its workspace.</p>
+        </div>
+        <p className={styles.tasksProgress}>
+          {completedTasks} of {requiredTasks} completed
+        </p>
+      </header>
+
+      {tasks.length === 0 ? (
+        <p className={styles.emptyTasks}>No tasks are available for this day.</p>
+      ) : (
+        <div className={styles.taskList}>
+          {tasks.map((task) => (
+            <button
+              key={task.id}
+              type="button"
+              className={`${styles.taskItem} ${task.isStretchGoal ? styles.stretchTaskItem : ''}`}
+              onClick={() => onSelectTask(task)}
+            >
+              {!task.isStretchGoal && (
+                <span className={styles.taskNumber}>
+                  {String(task.sequenceOrder).padStart(2, '0')}
+                </span>
+              )}
+              <span className={styles.taskInfo}>
+                <span className={styles.taskTitle}>{task.title}</span>
+                <span className={styles.taskMeta}>
+                  <span className={`${styles.taskStatus} ${styles[task.status]}`}>
+                    {task.status === 'in_progress'
+                      ? 'In progress'
+                      : task.status === 'completed'
+                        ? 'Completed'
+                        : 'Not started'}
+                  </span>
+                  {task.isStretchGoal && <span className={styles.stretchBadge}>Stretch goal</span>}
+                </span>
+              </span>
+              <span className={styles.taskArrow} aria-hidden="true">
+                <ArrowRight size={20} strokeWidth={2} />
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 /**
  * `key={dayId}` remounts the content when the day changes, so saved/error/submitting
  * state from one day can never leak into another.
@@ -35,7 +111,6 @@ export default function DayOverviewPage() {
 }
 
 function DayOverviewContent() {
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isJournalSaved, setIsJournalSaved] = useState(false);
   const [isSavingJournal, setIsSavingJournal] = useState(false);
   const [isCompletingDay, setIsCompletingDay] = useState(false);
@@ -193,15 +268,20 @@ function DayOverviewContent() {
           totalDays={day.totalDays}
           title={day.title}
           description={day.subtitle}
-          completedTasks={completedTasks}
-          totalTasks={requiredTasks}
+          summary={day.lessonSummary}
           onReferences={() => void navigate(`/days/${day.dayId}/references`)}
-          onTasks={() => setIsTaskModalOpen(true)}
         />
 
         <div className={styles.grid}>
           <div className={styles.left}>
-            <LessonSummary summary={day.lessonSummary} />
+            <DayTasks
+              courseTitle={day.courseTitle}
+              dayNumber={day.dayNumber}
+              tasks={tasks}
+              completedTasks={completedTasks}
+              requiredTasks={requiredTasks}
+              onSelectTask={(task) => void navigate(`/tasks/${task.id}`)}
+            />
             <LearningObjectives objectives={day.learningObjectives} />
           </div>
 
@@ -236,18 +316,6 @@ function DayOverviewContent() {
           </p>
         )}
       </main>
-
-      <TaskModal
-        courseTitle={day.courseTitle}
-        isOpen={isTaskModalOpen}
-        dayNumber={day.dayNumber}
-        tasks={tasks}
-        onClose={() => setIsTaskModalOpen(false)}
-        onSelectTask={(task) => {
-          setIsTaskModalOpen(false);
-          void navigate(`/tasks/${task.id}`);
-        }}
-      />
     </>
   );
 }

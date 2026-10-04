@@ -7,10 +7,8 @@ interface DaySummaryProps {
   totalDays: number;
   title: string;
   description: string;
-  completedTasks: number;
-  totalTasks: number;
+  summary?: string;
   onReferences: () => void;
-  onTasks: () => void;
 }
 
 export default function DaySummary({
@@ -19,10 +17,8 @@ export default function DaySummary({
   totalDays,
   title,
   description,
-  completedTasks,
-  totalTasks,
+  summary = '',
   onReferences,
-  onTasks,
 }: DaySummaryProps) {
   return (
     <section className={styles.daySummary}>
@@ -36,27 +32,23 @@ export default function DaySummary({
         <h1 className={styles.daySummaryTitle}>{title}</h1>
 
         <p className={styles.daySummaryDescription}>{description}</p>
+
+        <div className={styles.daySummaryActions}>
+          <button
+            type="button"
+            className={`${styles.daySummaryButton} ${styles.daySummaryButtonSecondary}`}
+            onClick={onReferences}
+          >
+            <HiOutlineBookOpen />
+            <div>References</div>
+          </button>
+        </div>
       </div>
 
-      {/* 2. Right container for actions (placed parallel to text) */}
-      <div className={styles.daySummaryActions}>
-        <button
-          type="button"
-          className={`${styles.daySummaryButton} ${styles.daySummaryButtonSecondary}`}
-          onClick={onReferences}
-        >
-          <HiOutlineBookOpen />
-          <div>References</div>
-        </button>
-
-        <button
-          type="button"
-          className={`${styles.daySummaryButton} ${styles.daySummaryButtonPrimary}`}
-          onClick={onTasks}
-        >
-          Tasks ({completedTasks}/{totalTasks}) →
-        </button>
-      </div>
+      <aside className={styles.dayGoal}>
+        <span className={styles.dayGoalLabel}>BY THE END OF THE DAY</span>
+        <p className={styles.dayGoalText}>{summary}</p>
+      </aside>
     </section>
   );
 }

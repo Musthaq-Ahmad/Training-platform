@@ -13,10 +13,8 @@ describe('DaySummary', () => {
     totalDays: 10,
     title: 'Introduction to CSS',
     description: 'Learn the fundamentals of CSS styling.',
-    completedTasks: 2,
-    totalTasks: 4,
+    summary: 'Build a reusable CSS design system.',
     onReferences: vi.fn(),
-    onTasks: vi.fn(),
   };
 
   it('renders the uppercased course title with a two-digit day number', () => {
@@ -44,16 +42,17 @@ describe('DaySummary', () => {
     expect(screen.getByRole('button', { name: /references/i })).toBeInTheDocument();
   });
 
-  it('renders the Tasks button with completed and total task counts', () => {
+  it('renders the day goal alongside the summary', () => {
     render(<DaySummary {...defaultProps} />);
 
-    expect(screen.getByRole('button', { name: /tasks \(2\/4\)/i })).toBeInTheDocument();
+    expect(screen.getByText('BY THE END OF THE DAY')).toBeInTheDocument();
+    expect(screen.getByText('Build a reusable CSS design system.')).toBeInTheDocument();
   });
 
-  it('renders zero progress when no tasks are completed', () => {
-    render(<DaySummary {...defaultProps} completedTasks={0} totalTasks={3} />);
+  it('does not show the obsolete Tasks modal button', () => {
+    render(<DaySummary {...defaultProps} />);
 
-    expect(screen.getByRole('button', { name: /tasks \(0\/3\)/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /tasks/i })).not.toBeInTheDocument();
   });
 
   it('calls onReferences when the References button is clicked', () => {
@@ -64,26 +63,6 @@ describe('DaySummary', () => {
     fireEvent.click(screen.getByRole('button', { name: /references/i }));
 
     expect(onReferences).toHaveBeenCalledTimes(1);
-  });
-
-  it('calls onTasks when the Tasks button is clicked', () => {
-    const onTasks = vi.fn();
-
-    render(<DaySummary {...defaultProps} onTasks={onTasks} />);
-
-    fireEvent.click(screen.getByRole('button', { name: /tasks/i }));
-
-    expect(onTasks).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not call onReferences when the Tasks button is clicked', () => {
-    const onReferences = vi.fn();
-
-    render(<DaySummary {...defaultProps} onReferences={onReferences} />);
-
-    fireEvent.click(screen.getByRole('button', { name: /tasks/i }));
-
-    expect(onReferences).not.toHaveBeenCalled();
   });
 
   it('formats a single-digit day number with a leading zero', () => {
