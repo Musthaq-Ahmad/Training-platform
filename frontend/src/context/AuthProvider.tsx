@@ -3,6 +3,7 @@ import type { MeResponse } from '@itp/types';
 import { getMe, logout as logoutRequest, startGoogleLogin } from '../api/auth';
 import { setUnauthorizedHandler } from '../api/client';
 import { ApiError } from '../api/errors';
+import { GREETING_SESSION_KEY } from '../constants/greeting';
 import { AuthContext, type AuthContextValue, type AuthStatus } from './AuthContext';
 
 async function fetchSession(): Promise<MeResponse | null> {
@@ -62,6 +63,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     try {
       await logoutRequest();
+      try {
+        window.sessionStorage.removeItem(GREETING_SESSION_KEY);
+      } catch {
+        // Storage may be unavailable; the server logout still completed successfully.
+      }
     } finally {
       // Clear local state even if the request failed, so the UI never shows a stale user
       clearSession();
