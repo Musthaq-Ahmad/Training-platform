@@ -10,7 +10,7 @@ import PassageDisplay from '../../components/PassageDisplay';
 import TestHistory from '../../components/TestHistory';
 import styles from './TypingTestPage.module.css';
 
-const DEFAULT_DURATION = 60;
+const DEFAULT_DURATION = 30;
 
 const OPTION_LABELS: { key: keyof PassageOptions; label: string }[] = [
   { key: 'punctuation', label: 'punctuation' },
