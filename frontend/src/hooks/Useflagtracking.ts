@@ -47,7 +47,7 @@ export function useFlagTracking({ taskId, onWarning }: Options): void {
 
       const endedAt = Date.now();
 
-      const durationSeconds = Math.max(0, Math.round((endedAt - activeFlag.startedAt) / 1000));
+      const durationMs = Math.max(0, Math.round(endedAt - activeFlag.startedAt));
 
       const flag = activeFlag;
 
@@ -55,7 +55,7 @@ export function useFlagTracking({ taskId, onWarning }: Options): void {
 
       void logFlagEvent(taskId, {
         type: flag.type,
-        durationMs: durationSeconds,
+        durationMs: durationMs,
       }).catch(() => {});
     }
 
