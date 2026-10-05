@@ -1,344 +1,163 @@
-# Team Conventions — In-House Trainee Training Platform
+# Team Conventions — Vinkup
 
-This is how we write code on this project. It is meant to be read once, top to bottom, and then used as a reference.
+How we write code on this project. Read it once, top to bottom, then use it as a reference.
 
-- The code in this document is the **starting code** for the shared pieces (API client, error classes, validation middleware, error handler). One person adds them on day 1. Everyone else imports them — don't write your own versions.
-- If the TRD and the code disagree, fix the TRD first, then the code.
-- Deployment, CI pipelines and production hardening are **out of scope for now**. They will be added later.
+- These conventions describe the codebase **as it is built**, and the examples come from real files.
+  When you're unsure, copy the pattern of the task module (`backend/src/module/task-module/`) and
+  the task page (`frontend/src/pages/TaskPage/`).
+- A few older files don't follow every rule yet. They're listed in §14; don't copy them, and fix
+  them when you're already changing that code.
+- Requirements live in the TRD and PRD; this file is about _how_ we build.
 
 ---
 
 ## The 10 rules (read these if you read nothing else)
 
-1. Every change goes through a **pull request** and is **reviewed by one other person** before merging. No direct pushes to `main`.
-2. The **backend decides**, the frontend only displays. Day locking, completion and time tracking are always checked on the server.
-3. A trainee's id always comes from the **session** (`req.user.id`), never from the request body or URL.
-4. Frontend: only files in `src/api/` talk to the backend, using the shared **axios client**. No `fetch` or `axios` in components.
-5. Backend layers: **route → controller → service → repository**. Each layer has one job (§5.2).
-6. Controllers wrap everything in **`try/catch` and call `next(error)`**. Services **throw our custom errors**. Only the error handler sends error responses.
-7. Every route that takes input has a **Zod schema**, checked by the `validate` middleware before the controller runs.
-8. Every request/response shape is a type in **`packages/types`** and is used by both frontend and backend.
-9. TypeScript **strict mode** is on. No `any`.
-10. **Conventional commit** messages (`feat: ...`, `fix: ...`).
+1. Every change goes through a **pull request** reviewed and approved by **one other person**. No
+   direct pushes to `main`.
+2. The **backend decides**, the frontend only displays. Day locks, task and day completion, and
+   time tracking are always checked on the server.
+3. A trainee's id always comes from the **signed-in session** (`req.user.id`, from the JWT cookie),
+   never from the request body, query or URL.
+4. Frontend: only files in `src/api/` talk to the backend, through the shared **Axios client**. No
+   `fetch` or `axios` in components, pages or hooks.
+5. Backend layers: **route → validate → controller → service → repository**. Each layer has one job
+   (§5.2).
+6. Controllers wrap their work in **`try/catch` and call `next(error)`**. Services **throw our error
+   classes**. Only the error handler sends error responses.
+7. Every route that takes params or a body has a **Zod schema**, checked by `validate()` before the
+   controller runs.
+8. Every request and response shape is a type in **`packages/types`**, used by both sides.
+9. TypeScript **strict mode**, no `any`.
+10. **Conventional Commits** (`feat(days): ...`, `fix(tasks): ...`), checked by commitlint.
 
 ---
 
-## 1. Repo structure
+## 1. Repository structure
 
 ```
 /
-├── frontend/            # React (Vite) + TypeScript
-├── backend/             # Node.js + Express + Prisma
+├── frontend/              React + Vite + TypeScript (workspace "frontend")
+├── backend/               Express + Prisma + TypeScript (workspace "backend")
 ├── packages/
-│   └── types/           # Shared types (@itp/types), used by frontend and backend
-├── docs/
-│   └── conventions.md   # this file
-├── eslint.config.js     # one lint config for everything
-├── .prettierrc.json     # one format config for everything
-├── tsconfig.base.json   # shared TypeScript settings
-├── package.json         # root: npm workspaces
-└── package-lock.json    # ONE lockfile, at the root
+│   └── types/             @itp/types: shared request/response types
+├── scripts/
+│   └── export-curriculum.ts
+├── docs/                  this file and the other project docs
+├── .github/               pull request template
+├── .husky/                pre-commit and commit-msg hooks
+├── eslint.config.js       one lint config for every workspace
+├── .prettierrc            one format config for everything
+├── commitlint.config.js
+├── netlify.toml           frontend build settings per environment
+├── package.json           root: npm workspaces and shared scripts
+└── package-lock.json      ONE lockfile, at the root
 ```
 
-`frontend`, `backend` and `packages/types` are npm workspaces. Each has its own `package.json`.
-
-**Installing packages** — always from the repo root, with `-w`:
+**Installing packages:** always from the repository root, with `-w`:
 
 ```bash
-npm install zod -w backend          # add to backend
-npm install axios -w frontend       # add to frontend
-npm install -D prettier             # dev tool for everyone (root)
+npm install zod -w backend
+npm install axios -w frontend
+npm install -D prettier
 ```
 
-Never run `npm install` inside `frontend/` or `backend/` — it creates a second lockfile.
+The last line installs a dev tool for everyone, at the root. Never run `npm install` inside
+`frontend/` or `backend/`: it creates a second lockfile.
 
-`npm run dev` from the root starts the backend and the frontend . Open **http://localhost:5173** — Vite forwards `/api` requests to the backend (§10.2).
+**Running locally:** `npm run dev:backend` (API on port 3000) and `npm run dev:frontend` (app on
+http://localhost:5173) in two terminals. Vite forwards `/api` to the backend (§10.2). The setup
+guide has the full steps.
 
 ---
 
 ## 2. TypeScript
 
-Strict mode is on from the first commit. Every workspace's `tsconfig.json` extends this root file:
+Strict mode is on in every workspace. The frontend also has `noUnusedLocals` and
+`noUnusedParameters`.
 
-Rules:
-
-| Rule                               | Instead                                                                          |
-| ---------------------------------- | -------------------------------------------------------------------------------- |
-| No `any`                           | Use a real type, or `unknown` and check it                                       |
-| No `// @ts-ignore`                 | Fix the type error, or ask in the PR                                             |
-| Don't use TypeScript `enum`        | Use a union of strings: `type DayStatus = "LOCKED" \| "UNLOCKED" \| "COMPLETED"` |
-| Dates in shared types are `string` | They arrive over JSON as ISO strings, e.g. `"2026-09-25T06:50:00.000Z"`          |
+| Rule                                  | Instead                                                                                               |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| No `any`                              | Use a real type, or `unknown` and narrow it                                                           |
+| No `// @ts-ignore`                    | Fix the type error, or ask in the PR                                                                  |
+| No TypeScript `enum`                  | A union of strings: `type DayStatus = 'LOCKED' \| 'UNLOCKED' \| 'COMPLETED'`                          |
+| Dates in shared types are `string`    | They cross JSON as ISO strings: `"2026-09-25T06:50:00.000Z"`, or `"2026-09-25"` for IST calendar days |
+| Prefix intentionally unused names `_` | `_req`, `_next` (ESLint allows `^_`)                                                                  |
 
 ---
 
 ## 3. Naming
 
-| Thing                                  | Style                               | Example                                                                                          |
-| -------------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------ |
-| React components (folder + file)       | PascalCase                          | `components/TaskCard/TaskCard.tsx`                                                               |
-| Pages                                  | PascalCase + `Page`                 | `pages/DashboardPage/DashboardPage.tsx`                                                          |
-| Hooks                                  | `use` + camelCase                   | `hooks/useAutosave.ts`                                                                           |
-| Other frontend files                   | camelCase                           | `api/days.ts`, `lib/formatTime.ts`                                                               |
-| Backend module folders                 | `modules/<resource>/`               | `modules/days/`, `modules/journal/`                                                              |
-| Backend files (inside a module folder) | `<resource>.<layer>.ts`             | `days.route.ts`, `days.controller.ts`, `days.service.ts`, `days.repository.ts`, `days.schema.ts` |
-| Variables, functions                   | camelCase                           | `getDay`, `completedAt`                                                                          |
-| Booleans                               | start with `is` / `has` / `can`     | `isCompleted`, `hasAccess`                                                                       |
-| Constants                              | UPPER_SNAKE_CASE                    | `AUTOSAVE_DELAY_MS`                                                                              |
-| Types                                  | PascalCase                          | `DayResponse`, `SaveCodeRequest`                                                                 |
-| Error classes                          | PascalCase + `Error`                | `DayLockedError`                                                                                 |
-| API URLs                               | lowercase, plural, kebab-case       | `/api/typing-test/results`                                                                       |
-| JSON fields                            | camelCase                           | `curriculumDayId`                                                                                |
-| Database tables / columns              | snake_case (from the TRD)           | `day_unlock`, `curriculum_day_id`                                                                |
-| Prisma models / fields                 | PascalCase models, camelCase fields | `model DayUnlock { curriculumDayId ... }`                                                        |
-| Branches                               | `type/short-description`            | `feat/day-unlock`, `fix/paste-block`                                                             |
+| Thing                                   | Style                                                  | Example                                                                                           |
+| --------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| React component folder + file           | PascalCase                                             | `components/DayTaskList/DayTaskList.tsx`                                                          |
+| Pages                                   | PascalCase + `Page`                                    | `pages/DayOverviewPage/DayOverviewPage.tsx`                                                       |
+| Hooks                                   | `use` + camelCase, file named the same                 | `hooks/useIsFullscreen.ts`, `TaskPage/hooks/useAutosave.ts`                                       |
+| Other frontend files                    | camelCase                                              | `api/days.ts`, `lib/saveRules.ts`                                                                 |
+| CSS Modules                             | `<Component>.module.css`, camelCase classes            | `DayTaskList.module.css`, `.taskItem`                                                             |
+| Backend module folders                  | `<resource>-module`                                    | `module/task-module/`, `module/day-module/`                                                       |
+| Backend files                           | `<resource>.<layer>.ts`                                | `task.routes.ts`, `task.controller.ts`, `task.service.ts`, `task.repository.ts`, `task.schema.ts` |
+| Classes                                 | PascalCase                                             | `TaskService`, `TaskRepository`                                                                   |
+| Variables, functions                    | camelCase                                              | `getDayTasks`, `completedAt`                                                                      |
+| Booleans                                | `is` / `has` / `can` / `should`                        | `isCompleted`, `hasIncompleteTasks`                                                               |
+| Constants                               | UPPER_SNAKE_CASE                                       | `MAX_FILE_CHARS`, `AUTH_COOKIE_NAME`                                                              |
+| Types                                   | PascalCase; requests `…Request`, responses `…Response` | `SaveCodeRequest`, `TaskCodeResponse`                                                             |
+| Component props type                    | `<Component>Props`                                     | `DayTaskListProps`                                                                                |
+| Error classes                           | PascalCase + `Error`                                   | `DayLockedError`                                                                                  |
+| API URLs                                | lowercase, plural, kebab-case                          | `/api/typing-test/results`                                                                        |
+| JSON fields                             | camelCase                                              | `sequenceOrder`, `isStretchGoal`                                                                  |
+| Database tables, columns, Prisma models | snake_case, same name in Prisma and PostgreSQL         | `task_progress.code_updated_at`                                                                   |
+| Curriculum ids                          | lowercase slugs                                        | course `css`, day `css-day-03`, task `css-day-03-t-2`                                             |
+| Branches                                | `type/short-description`                               | `feat/day-task-list`, `fix/journal-limit`                                                         |
 
 ---
 
-## 4. Shared types — `packages/types`
+## 4. Shared types: `packages/types`
 
 ### 4.1 What it is
 
-One package that holds the **shape of every request and response** between the frontend and the backend. Both sides import from it, so if the backend changes a response, the frontend shows a type error straight away instead of breaking at runtime.
+One package with the **shape of every request and response** between the frontend and the backend.
+Both import it, so when a response changes, the other side gets a type error at once instead of
+breaking at runtime. There's no build step: both apps read the `.ts` files directly.
 
 ```ts
-import type { DayResponse } from '@itp/types';
+import type { TaskCodeResponse } from '@itp/types';
 ```
 
-### 4.2 What goes in, what doesn't
-
-| ✅ Put in `packages/types`                                  | ❌ Don't put here                                                  |
-| ----------------------------------------------------------- | ------------------------------------------------------------------ |
-| Request body types (`SaveCodeRequest`)                      | Prisma models / database types                                     |
-| Response types (`DayResponse`, `DashboardResponse`)         | Zod schemas (they live in the backend)                             |
-| Small shapes used inside them (`TaskFile`, `ChecklistItem`) | React props or UI state                                            |
-| Status / type unions (`DayStatus`, `FlagEventType`)         | Functions or business logic                                        |
-| The error response shape (`ApiErrorResponse`)               | Anything the trainee must never see (flag events, review priority) |
-
-### 4.3 Setup
-
-No build step — both apps read the `.ts` files directly.
+### 4.2 Files
 
 ```
-packages/types/
-├── package.json
-└── src/
-    ├── index.ts        # re-exports everything
-    ├── common.ts       # error response shape, error codes
-    ├── auth.ts
-    ├── dashboard.ts
-    ├── days.ts
-    ├── tasks.ts
-    ├── sql.ts
-    ├── typingTest.ts
-    ├── journal.ts
-    └── activity.ts
+packages/types/src/
+├── index.ts         re-exports everything
+├── common.ts        ErrorCode, ApiErrorResponse, MeResponse
+├── dashboard.ts     DashboardResponse, DaySummary, DayStatus, CourseDaysResponse
+├── dayOverview.ts   DayContent, DayTask, DayCurrentStatus, DayJournal, CompleteDayResponse
+├── tasks.ts         TaskResponse, TaskCodeResponse, SaveCodeRequest, SubmitTaskResponse, TaskFile
+├── activity.ts      LogFlagEventRequest, ActivityTimeRequest, FlagEventType
+├── typingTest.ts    SaveTypingResultRequest, TypingResultRecord
+└── profile.ts       ProfileData
 ```
 
-One file per API resource (matches the backend route files).
+Add new types to the file of their API resource, or create one for a new resource and export it
+from `index.ts`.
 
-### 4.4 The types for this project
+### 4.3 What goes in, what doesn't
 
-```ts
-// packages/types/src/common.ts
+| ✅ Put in `packages/types`                           | ❌ Keep out                                                                   |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Request bodies (`SaveCodeRequest`)                   | Prisma models and database rows                                               |
+| Responses (`TaskResponse`, `DashboardResponse`)      | Zod schemas (they live in the backend)                                        |
+| Small shapes inside them (`TaskFile`, `DaySummary`)  | React props and UI state                                                      |
+| Status unions (`DayStatus`, `TaskRuntime`)           | Functions and business logic                                                  |
+| The error shape (`ApiErrorResponse`) and `ErrorCode` | Anything a trainee must never receive (review priority, other trainees' data) |
 
-/** Codes the backend can send in an error response. The frontend checks these, never the message text. */
-export type ErrorCode =
-  | 'VALIDATION_FAILED'
-  | 'UNAUTHENTICATED'
-  | 'FORBIDDEN'
-  | 'NOT_FOUND'
-  | 'INTERNAL_ERROR'
-  | 'DAY_LOCKED'
-  | 'CHECKLIST_INCOMPLETE';
+### 4.4 Rules
 
-/** Every error response from the API looks exactly like this. */
-export type ApiErrorResponse = {
-  error: {
-    code: ErrorCode;
-    message: string; // safe to show to the trainee
-    details?: unknown; // e.g. which fields failed validation
-  };
-};
-```
-
-```ts
-// packages/types/src/auth.ts
-
-/** GET /api/auth/me */
-export type MeResponse = {
-  id: string;
-  email: string;
-  name: string;
-};
-```
-
-```ts
-// packages/types/src/days.ts
-
-export type DayStatus = 'LOCKED' | 'UNLOCKED' | 'COMPLETED';
-
-export type DaySummary = {
-  id: string;
-  dayNumber: number;
-  title: string;
-  status: DayStatus;
-};
-
-export type TaskSummary = {
-  id: string;
-  title: string;
-  sequenceOrder: number;
-  isStretchGoal: boolean;
-};
-
-export type ChecklistItem = {
-  id: string;
-  label: string;
-  isChecked: boolean;
-  isStretch: boolean; // stretch items never block completion (FR-3)
-};
-
-/** GET /api/days/:dayId */
-export type DayResponse = DaySummary & {
-  lessonMarkdown: string;
-  tasks: TaskSummary[];
-  checklist: ChecklistItem[];
-};
-
-/** PATCH /api/days/:dayId/complete */
-export type CompleteDayResponse = {
-  nextDay: DaySummary | null; // null if this was the last day
-};
-```
-
-```ts
-// packages/types/src/tasks.ts
-
-export type TaskFile = {
-  path: string; // e.g. "src/App.tsx"
-  content: string;
-};
-
-/** GET /api/tasks/:taskId */
-export type TaskResponse = {
-  id: string;
-  title: string;
-  instructionsMarkdown: string;
-  isStretchGoal: boolean;
-};
-
-/** GET /api/tasks/:taskId/code */
-export type TaskCodeResponse = {
-  files: TaskFile[];
-  updatedAt: string | null; // null = never saved
-};
-
-/** PUT /api/tasks/:taskId/code */
-export type SaveCodeRequest = {
-  files: TaskFile[];
-};
-```
-
-```ts
-// packages/types/src/sql.ts
-
-/** POST /api/sql/execute */
-export type SqlExecuteRequest = {
-  query: string;
-};
-
-/** A broken query is a normal result (ok: false), not an API error. */
-export type SqlExecuteResponse =
-  | { ok: true; columns: string[]; rows: Record<string, unknown>[] }
-  | { ok: false; errorMessage: string };
-```
-
-```ts
-// packages/types/src/typingTest.ts
-
-/** POST /api/typing-test/results — the server sets the time */
-export type SaveTypingResultRequest = {
-  wpm: number;
-  accuracy: number; // 0–100
-};
-
-/** GET /api/typing-test/summary */
-export type TypingSummaryResponse = {
-  latest: { wpm: number; accuracy: number; takenAt: string } | null;
-  todayAverageWpm: number | null;
-  trend: { date: string; averageWpm: number }[];
-};
-```
-
-```ts
-// packages/types/src/journal.ts
-
-/** GET /api/journal/:dayId */
-export type JournalResponse = {
-  prompts: string[];
-  responseText: string;
-  isEditable: boolean; // only today's entry can be edited
-};
-
-/** PUT /api/journal/:dayId */
-export type SaveJournalRequest = {
-  responseText: string;
-};
-```
-
-```ts
-// packages/types/src/activity.ts
-
-export type FlagEventType = 'FULLSCREEN_EXIT' | 'TAB_SWITCH' | 'PASTE_BLOCKED';
-
-/** POST /api/activity/:taskId/events — the server sets the timestamp */
-export type LogFlagEventRequest = {
-  type: FlagEventType;
-  durationMs?: number; // how long the trainee was away, if known
-};
-
-/** POST /api/activity/time — sent every ~60 seconds */
-export type ActivityTimeRequest = {
-  activeSeconds: number;
-  codingSeconds: number;
-  readingSeconds: number;
-};
-```
-
-There is deliberately **no** type for returning flag events — trainees never see them (FR-18).
-
-```ts
-// packages/types/src/dashboard.ts
-import type { DaySummary } from './days';
-import type { TypingSummaryResponse } from './typingTest';
-
-/** GET /api/dashboard */
-export type DashboardResponse = {
-  currentDay: DaySummary | null;
-  days: DaySummary[];
-  today: { activeSeconds: number; codingSeconds: number; readingSeconds: number };
-  total: { activeSeconds: number; codingSeconds: number; readingSeconds: number };
-  typing: TypingSummaryResponse;
-};
-```
-
-```ts
-// packages/types/src/index.ts
-export * from './common';
-export * from './auth';
-export * from './dashboard';
-export * from './days';
-export * from './tasks';
-export * from './sql';
-export * from './typingTest';
-export * from './journal';
-export * from './activity';
-```
-
-### 4.5 Rules
-
-- If your PR changes what an endpoint sends or receives, update the type **in the same PR**.
-- Put a one-line comment above each request/response type saying which endpoint uses it.
+- If your PR changes what an endpoint sends or receives, update the type **in the same PR**, plus
+  the Zod schema (§7) and the mock adapter (§10.4).
+- Put a one-line comment above each request/response type naming its endpoint:
+  `/** GET /api/tasks/:taskId/code */`.
+- Never declare a type for an endpoint that doesn't exist.
 
 ---
 
@@ -346,449 +165,230 @@ export * from './activity';
 
 ### 5.1 Folder structure
 
-Backend code is organized **by module (resource), not by layer**. Everything about `days` — its route, controller, service, repository and Zod schema — lives together in `modules/days/`, instead of being spread across four top-level `routes/`, `controllers/`, `services/`, `repositories/` folders. To find everything about a resource, open one folder. To add a resource, add one folder.
+Code is organised **by feature, not by layer**: everything about tasks lives in
+`module/task-module/`.
 
 ```
 backend/
-├── package.json
-├── tsconfig.json
-├── .env.example
 ├── prisma/
 │   ├── schema.prisma
-│   ├── migrations/          # generated by Prisma, committed
-│   └── seed.ts              # test data for local development
+│   ├── migrations/              generated by Prisma, committed
+│   └── seed-data/curriculum.json
+├── prisma7.config.ts            Prisma CLI config (pass --config)
+├── vitest.config.ts             unit tests
+├── vitest.api.config.ts         API contract tests
 └── src/
-    ├── server.ts            # starts the server (app.listen)
-    ├── app.ts               # creates the Express app, adds middleware and routes
-    ├── config/
-    │   └── env.ts           # reads and checks environment variables
-    ├── modules/              # one folder per API resource — see §5.1a
-    │   ├── auth/
-    │   │   ├── auth.route.ts
-    │   │   ├── auth.controller.ts
-    │   │   ├── passport.ts          # Google login/strategy setup — auth-specific, lives here
-    │   │   └── trainees.repository.ts
-    │   ├── dashboard/
-    │   │   ├── dashboard.route.ts
-    │   │   ├── dashboard.controller.ts
-    │   │   ├── dashboard.service.ts
-    │   │   └── dashboard.repository.ts
-    │   ├── days/
-    │   │   ├── days.route.ts
-    │   │   ├── days.controller.ts
-    │   │   ├── days.service.ts
-    │   │   ├── days.repository.ts
-    │   │   └── days.schema.ts
-    │   ├── tasks/
-    │   │   └── ...                  # same five-file pattern
-    │   ├── sql/
-    │   ├── typingTest/
-    │   ├── journal/
-    │   └── activity/
-    ├── routes/
-    │   └── index.ts         # composition root only — imports each module's router and mounts it under /api
-    ├── middleware/
-    │   ├── requireAuth.ts
-    │   ├── validate.ts
-    │   └── errorHandler.ts
-    ├── errors/
-    │   └── AppError.ts      # our custom error classes
-    └── lib/
-        └── prisma.ts        # the one Prisma client
+    ├── server.ts                starts the server (app.listen)
+    ├── app.ts                   Express app: middleware, routers, error handler
+    ├── config/env.ts            environment variables, checked with Zod at startup
+    ├── module/
+    │   ├── auth-module/         routes, controller, service, repository, passport.ts, constants
+    │   ├── task-module/         task.routes / .controller / .service / .repository / .schema
+    │   ├── day-module/          day content, status, tasks, journal, Submit Day
+    │   ├── dashboard-module/    dashboard and course days
+    │   ├── profile-module/
+    │   ├── typing-test-module/
+    │   ├── activity-module/     time tracking
+    │   ├── flag-module/         focus events
+    │   └── progress-module/     ProgressService: day statuses and unlock checks (no routes)
+    ├── middleware/              authMiddleware (requireAuth), validate, notFoundHandler, errorHandler
+    ├── errors/AppError.ts       our error classes
+    ├── lib/                     prisma.ts (the one client), seed.ts
+    ├── types/                   auth.types.ts (AuthenticatedRequest), express.d.ts
+    ├── utils/                   jwt.ts, istDate.ts
+    └── test/api/                API contract tests and their helpers
+```
+
+Routers are mounted in `app.ts`. Protected routers get `requireAuth` **at the mount**, so no route
+in them can forget it:
+
+```ts
+// backend/src/app.ts
+app.use('/api/auth', authRoutes);
+app.use('/api/tasks', requireAuth, taskRoutes);
+app.use('/api/days', requireAuth, dayRouter);
 ```
 
 ### 5.2 What each layer does
 
-A request travels down the layers and the answer travels back up:
-
 ```
-Request → route → validate (Zod) → controller → service → repository → database
-                                        ↑
-                    any error → next(error) → errorHandler → error JSON
+Request → route → validate (Zod) → controller → service → repository → Prisma → PostgreSQL
+                                                   ↑
+                         any thrown AppError → next(error) → errorHandler → { error: { … } }
 ```
 
-| Layer          | Its job                                                                                                                                      | It must NOT                                                       |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| **Route**      | Connect a URL + method to middleware and a controller                                                                                        | Contain any logic                                                 |
-| **Controller** | `try { ... } catch (error) { next(error) }`. Get the trainee id and input from `req`, call the service, send the response with a status code | Contain business rules or database queries                        |
-| **Service**    | Business rules (is the day unlocked? are all required items checked?). **Throws** a custom error when a rule fails. Returns plain data       | Use `req` / `res`. Call Prisma directly                           |
-| **Repository** | Prisma queries. Returns the data, or `null` if not found                                                                                     | Throw custom errors or make decisions — it just fetches and saves |
+| Layer          | Its job                                                                                                                              | It must NOT                                |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| **Route**      | Connect a method + path to `validate(...)` and a controller method                                                                   | Contain logic                              |
+| **Controller** | `try` → read `req.user.id` and the validated input → call the service → `res.status(...).json(...)` → `catch` → `next(error)`        | Contain business rules or Prisma calls     |
+| **Service**    | Business rules (is the day unlocked? are the required tasks done?), mapping rows to the shared response types. **Throws** our errors | Touch `req`/`res`, or call Prisma directly |
+| **Repository** | Prisma queries. Returns rows, or `null` when nothing is found                                                                        | Throw our errors or make decisions         |
 
-**Where do errors come from?**
+Where errors come from: the repository returns `null`, the service throws
+`NotFoundError` / `DayLockedError`, the controller passes it to `next`, and `errorHandler` sends it.
 
-- Repository finds nothing → returns `null`.
-- Service sees `null` or a broken rule → `throw new NotFoundError(...)` / `throw new DayLockedError()`.
-- Controller catches it → `next(error)`.
-- `errorHandler` turns it into the JSON response.
+Services and repositories are **classes**; controllers are a class exported as one instance. The
+day lock rules live in `ProgressService`; use it instead of writing new lock checks.
 
-### 5.3 A full example — the `days` resource
-
-Copy this pattern for every resource.
+### 5.3 A full example: the task module
 
 **Route**
 
 ```ts
-// src/modules/days/days.route.ts
-import { Router } from 'express';
-import { validate } from '../../middleware/validate';
-import { dayIdParamsSchema } from './days.schema';
-import { daysController } from './days.controller';
+// backend/src/module/task-module/task.routes.ts
+const taskRoutes = Router();
 
-export const daysRouter = Router();
-
-daysRouter.get('/:dayId', validate({ params: dayIdParamsSchema }), daysController.getDay);
-daysRouter.patch(
-  '/:dayId/complete',
-  validate({ params: dayIdParamsSchema }),
-  daysController.completeDay
+taskRoutes.get('/:taskId', validate({ params: taskIdParamsSchema }), taskController.getTask);
+taskRoutes.put(
+  '/:taskId/code',
+  validate({ params: taskIdParamsSchema, body: saveCodeBodySchema }),
+  taskController.saveCode
 );
+
+export default taskRoutes;
 ```
-
-`routes/index.ts` is the only file that reaches _into_ the module folders — it's the composition root, not a module itself, so it's kept separate rather than living inside any one module:
-
-```ts
-// src/routes/index.ts
-import { Router } from 'express';
-import { requireAuth } from '../middleware/requireAuth';
-import { authRouter } from '../modules/auth/auth.route';
-import { daysRouter } from '../modules/days/days.route';
-import { tasksRouter } from '../modules/tasks/tasks.route';
-// ...other module routers
-
-export const apiRouter = Router();
-
-apiRouter.use('/auth', authRouter); // login routes are public
-
-// everything below needs a logged-in trainee
-apiRouter.use('/days', requireAuth, daysRouter);
-apiRouter.use('/tasks', requireAuth, tasksRouter);
-// ...
-```
-
-Adding `requireAuth` when the router is mounted means every route in that file is protected automatically — you can't forget it.
 
 **Controller**
 
 ```ts
-// src/modules/days/days.controller.ts
-import type { Request, Response, NextFunction } from 'express';
-import type { DayResponse, CompleteDayResponse } from '@itp/types';
-import { daysService } from './days.service';
+// backend/src/module/task-module/task.controller.ts
+const taskService = new TaskService();
 
-export const daysController = {
-  async getDay(req: Request, res: Response<DayResponse>, next: NextFunction) {
+class TaskController {
+  getTask = async (req: Request, res: Response<TaskResponse>, next: NextFunction) => {
     try {
-      const traineeId = req.user!.id; // requireAuth guarantees req.user exists
-      const { dayId } = req.params;
-
-      const day = await daysService.getDay(traineeId, dayId);
-
-      res.status(200).json(day);
+      const traineeId = (req as AuthenticatedRequest).user.id;
+      const { taskId } = req.params as TaskIdParams;
+      const task = await taskService.getTask(traineeId, taskId);
+      res.status(200).json(task);
     } catch (error) {
       next(error);
     }
-  },
+  };
 
-  async completeDay(req: Request, res: Response<CompleteDayResponse>, next: NextFunction) {
+  saveCode = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const traineeId = req.user!.id;
-      const { dayId } = req.params;
-
-      const result = await daysService.completeDay(traineeId, dayId);
-
-      res.status(200).json(result);
+      const traineeId = (req as AuthenticatedRequest).user.id;
+      const { taskId } = req.params as TaskIdParams;
+      const { files } = req.body as SaveCodeRequest;
+      await taskService.saveCode(traineeId, taskId, files);
+      res.status(204).end();
     } catch (error) {
       next(error);
     }
-  },
-};
+  };
+}
+
+export const taskController = new TaskController();
 ```
 
-Every controller function has this same shape: `try` → get input → call service → `res.status().json()` → `catch` → `next(error)`.
+The casts are safe because `requireAuth` and `validate()` have already run.
 
 **Service**
 
 ```ts
-// src/modules/days/days.service.ts
-import type { DayResponse, CompleteDayResponse } from '@itp/types';
-import { daysRepository } from './days.repository';
-import { NotFoundError, DayLockedError, ChecklistIncompleteError } from '../../errors/AppError';
-
-export const daysService = {
-  async getDay(traineeId: string, dayId: string): Promise<DayResponse> {
-    const day = await daysRepository.findDayWithTasks(dayId);
-    if (!day) throw new NotFoundError('Day not found');
-
-    const unlock = await daysRepository.findUnlock(traineeId, dayId);
-    if (!unlock || !unlock.unlocked) throw new DayLockedError(); // FR-1
-
-    const checklist = await daysRepository.findChecklist(traineeId, dayId);
-
-    return {
-      id: day.id,
-      dayNumber: day.dayNumber,
-      title: day.title,
-      status: unlock.isCompleted ? 'COMPLETED' : 'UNLOCKED',
-      lessonMarkdown: day.lessonMarkdown,
-      tasks: day.tasks,
-      checklist,
-    };
-  },
-
-  async completeDay(traineeId: string, dayId: string): Promise<CompleteDayResponse> {
-    const unlock = await daysRepository.findUnlock(traineeId, dayId);
-    if (!unlock || !unlock.unlocked) throw new DayLockedError();
-
-    // FR-2 / FR-3: all required items checked; stretch items don't count
-    const checklist = await daysRepository.findChecklist(traineeId, dayId);
-    const hasUncheckedRequired = checklist.some((item) => !item.isStretch && !item.isChecked);
-    if (hasUncheckedRequired) throw new ChecklistIncompleteError();
-
-    await daysRepository.markCompleted(traineeId, dayId);
-
-    const nextDay = await daysRepository.findNextDay(dayId);
-    if (nextDay) await daysRepository.unlockDay(traineeId, nextDay.id);
-
-    return {
-      nextDay: nextDay
-        ? { id: nextDay.id, dayNumber: nextDay.dayNumber, title: nextDay.title, status: 'UNLOCKED' }
-        : null,
-    };
-  },
-};
+// backend/src/module/task-module/task.service.ts
+export class TaskService {
+  async saveCode(traineeId: string, taskId: string, files: TaskFile[]): Promise<void> {
+    await progressService.assertTaskUnlocked(traineeId, taskId); // 404 or 403 DAY_LOCKED
+    await taskRepository.saveFiles(traineeId, taskId, files, new Date());
+  }
+}
 ```
 
 **Repository**
 
 ```ts
-// src/modules/days/days.repository.ts
-import { prisma } from '../../lib/prisma';
-
-export const daysRepository = {
-  findDayWithTasks(dayId: string) {
-    return prisma.curriculumDay.findUnique({
-      where: { id: dayId },
-      include: {
-        tasks: {
-          orderBy: { sequenceOrder: 'asc' },
-          select: { id: true, title: true, sequenceOrder: true, isStretchGoal: true },
-        },
-      },
-    });
-  },
-
-  findUnlock(traineeId: string, dayId: string) {
-    return prisma.dayUnlock.findUnique({
-      where: { traineeId_curriculumDayId: { traineeId, curriculumDayId: dayId } },
-    });
-  },
-
-  markCompleted(traineeId: string, dayId: string) {
-    return prisma.dayUnlock.update({
-      where: { traineeId_curriculumDayId: { traineeId, curriculumDayId: dayId } },
-      data: { isCompleted: true },
-    });
-  },
-
-  // findChecklist, findNextDay, unlockDay ... same style
-};
-```
-
-Notice every query about a trainee's own data includes **`traineeId`** in the `where`. That is what stops one trainee from seeing another's data (FR-6).
-
-### 5.4 Response status codes
-
-| Situation                                      | Status                              |
-| ---------------------------------------------- | ----------------------------------- |
-| Got data                                       | `200` + the data                    |
-| Created something (e.g. saved a typing result) | `201`                               |
-| Saved / updated, nothing to send back          | `204` (use `res.status(204).end()`) |
-| Error                                          | sent by `errorHandler` only (§6)    |
-
-Send the data directly (`res.json(day)`), not wrapped in `{ data: day }`.
-
-### 5.5 `app.ts` and `server.ts`
-
-```ts
-// src/app.ts
-import express from 'express';
-import session from 'express-session';
-import passport from 'passport';
-import { env } from './config/env';
-import { configurePassport } from './auth/passport';
-import { apiRouter } from './routes';
-import { errorHandler } from './middleware/errorHandler';
-
-export function createApp() {
-  const app = express();
-
-  app.use(express.json());
-
-  app.use(
-    session({
-      secret: env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: false,
-      cookie: { httpOnly: true, maxAge: 12 * 60 * 60 * 1000 }, // 12 hours
-    })
-  );
-
-  configurePassport();
-  app.use(passport.initialize());
-  app.use(passport.session());
-
-  app.use('/api', apiRouter);
-
-  app.use(errorHandler); // must be the LAST app.use
-
-  return app;
+// backend/src/module/task-module/task.repository.ts
+export class TaskRepository {
+  findStarterFiles = (taskId: string) => {
+    return prisma.task.findUnique({ where: { id: taskId }, select: { starter_files: true } });
+  };
 }
 ```
 
-```ts
-// src/server.ts
-import { createApp } from './app';
-import { env } from './config/env';
+Every query on a trainee's own data has **`trainee_id` in the `where`**. That is what keeps one
+trainee from reading or changing another's data.
 
-createApp().listen(env.PORT, () => {
-  console.log(`API running on http://localhost:${env.PORT}`);
-});
-```
+### 5.4 Response status codes
 
-`app.ts` doesn't call `listen()` so tests can use the app without starting a server.
+| Situation                                           | Status                             |
+| --------------------------------------------------- | ---------------------------------- |
+| Returned data                                       | `200` + the data                   |
+| Created something (a typing result)                 | `201` + the created record         |
+| Saved, nothing to return (code save, activity time) | `204` with `res.status(204).end()` |
+| Any error                                           | sent by `errorHandler` only (§6)   |
 
-> Sessions are kept in memory for now, so everyone is logged out when the backend restarts. That's fine for development; we'll pick a proper session store when we look at deployment.
+Send the data directly (`res.json(task)`), never wrapped in `{ data: ... }`.
 
-### 5.6 Environment config
+### 5.5 Environment variables
 
-```ts
-// src/config/env.ts
-import 'dotenv/config';
-import { z } from 'zod';
+`backend/src/config/env.ts` parses `process.env` with Zod when the server starts, and stops with a
+clear message if something is missing. Read configuration from `env`, never from `process.env` in
+other files.
 
-const envSchema = z.object({
-  PORT: z.coerce.number().default(4000),
-  DATABASE_URL: z.string().min(1),
-  SESSION_SECRET: z.string().min(32),
-  GOOGLE_CLIENT_ID: z.string().min(1),
-  GOOGLE_CLIENT_SECRET: z.string().min(1),
-  GOOGLE_CALLBACK_URL: z.string().min(1),
-  ALLOWED_EMAIL_DOMAIN: z.string().min(1),
-  FRONTEND_URL: z.string().default('http://localhost:5173'),
-});
+| Variable                                                          | Notes                                                                  |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `PORT`                                                            | Default 3000. Leave it out rather than empty: an empty value becomes 0 |
+| `DATABASE_URL`                                                    | PostgreSQL connection string                                           |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL` | Google OAuth client                                                    |
+| `ALLOWED_EMAIL_DOMAIN`                                            | Company domain without `@`                                             |
+| `FRONTEND_URL`                                                    | CORS origin and redirect target after sign-in                          |
+| `JWT_SECRET`, `JWT_EXPIRES_IN`                                    | Use `7d` to match the cookie's 7-day lifetime                          |
+| `SESSION_SECRET`                                                  | Required by `env.ts` but unused (see §14)                              |
+| `NODE_ENV`                                                        | `production` makes the cookie `Secure`                                 |
 
-// Crashes on startup with a clear message if a variable is missing
-export const env = envSchema.parse(process.env);
-```
-
-Use `env.SESSION_SECRET` everywhere — don't read `process.env` in other files.
+When you add a variable, add it to `env.ts`, `backend/.env.example` and the setup guide in the same
+PR.
 
 ---
 
 ## 6. Errors
 
-### 6.1 Custom error classes
+### 6.1 Error classes
 
-Instead of `throw new Error("something")`, services throw one of these. Each one knows its **status code** and **error code**, so the error handler knows what to send.
+Services throw one of these instead of `new Error(...)`. Each knows its status and code.
 
-```ts
-// src/errors/AppError.ts
-import type { ErrorCode } from '@itp/types';
+| Class                      | Status | Code                   | Use when                                                               |
+| -------------------------- | ------ | ---------------------- | ---------------------------------------------------------------------- |
+| `ValidationError`          | 400    | `VALIDATION_FAILED`    | Thrown by `validate()`; `details` lists Zod issues                     |
+| `UnauthorizedError`        | 401    | `UNAUTHENTICATED`      | No cookie, or invalid or expired JWT                                   |
+| `ForbiddenError`           | 403    | `FORBIDDEN`            | The trainee may not do this (not used yet)                             |
+| `NotFoundError`            | 404    | `NOT_FOUND`            | Unknown day, task, course or record                                    |
+| `DayLockedError`           | 403    | `DAY_LOCKED`           | The day, or the task's day, is locked                                  |
+| `ChecklistIncompleteError` | 403    | `CHECKLIST_INCOMPLETE` | Submit Day with required tasks not submitted; `details` has the counts |
+| `DomainNotPermittedError`  | 403    | `DOMAIN_NOT_PERMITTED` | Sign-in with an email outside the allowed domain                       |
+| `NotProvisionedError`      | 403    | `NOT_PROVISIONED`      | Sign-in with an email not in the trainee table                         |
 
-export class AppError extends Error {
-  statusCode: number;
-  code: ErrorCode;
-  details?: unknown;
+The two sign-in errors are never sent as JSON: the OAuth callback turns them into a redirect to
+`/login?error=<code>`.
 
-  constructor(statusCode: number, code: ErrorCode, message: string, details?: unknown) {
-    super(message);
-    this.statusCode = statusCode;
-    this.code = code;
-    this.details = details;
-  }
-}
-
-// General errors
-export class ValidationError extends AppError {
-  constructor(details: unknown) {
-    super(400, 'VALIDATION_FAILED', 'Some fields are invalid.', details);
-  }
-}
-
-export class UnauthorizedError extends AppError {
-  constructor(message = 'Please log in.') {
-    super(401, 'UNAUTHENTICATED', message);
-  }
-}
-
-export class ForbiddenError extends AppError {
-  constructor(message = "You don't have access to this.") {
-    super(403, 'FORBIDDEN', message);
-  }
-}
-
-export class NotFoundError extends AppError {
-  constructor(message = 'Not found.') {
-    super(404, 'NOT_FOUND', message);
-  }
-}
-
-// Project-specific errors
-export class DayLockedError extends AppError {
-  constructor() {
-    super(403, 'DAY_LOCKED', "This day isn't unlocked yet.");
-  }
-}
-
-export class ChecklistIncompleteError extends AppError {
-  constructor() {
-    super(400, 'CHECKLIST_INCOMPLETE', 'Check all required items before submitting.');
-  }
-}
-```
-
-**Adding a new error:** add a class here and add its code to `ErrorCode` in `packages/types/src/common.ts`. Only make a new class if the frontend needs to react to it differently — otherwise reuse `NotFoundError` / `ForbiddenError` with a different message.
+**Adding an error:** add a class to `errors/AppError.ts` and its code to `ErrorCode` in
+`packages/types/src/common.ts`. Only add a class when the frontend must react to it differently;
+otherwise reuse `NotFoundError` or `ForbiddenError` with another message.
 
 ### 6.2 The error handler
 
-This is the **only** place that sends error responses.
+`middleware/errorHandler.ts` is the **only** place that sends error responses:
 
-```ts
-// src/middleware/errorHandler.ts
-import type { Request, Response, NextFunction } from 'express';
-import type { ApiErrorResponse } from '@itp/types';
-import { AppError } from '../errors/AppError';
+- an `AppError` → its status and `{ "error": { "code", "message", "details" } }`;
+- a body-parser failure (body over 5 MB, broken JSON) → 400 `VALIDATION_FAILED`;
+- anything else → logged, and answered 500 `INTERNAL_ERROR` with a generic message. Internal
+  details never reach the trainee.
 
-export function errorHandler(
-  error: unknown,
-  _req: Request,
-  res: Response<ApiErrorResponse>,
-  _next: NextFunction
-) {
-  // One of our errors → send its status and code
-  if (error instanceof AppError) {
-    res.status(error.statusCode).json({
-      error: { code: error.code, message: error.message, details: error.details },
-    });
-    return;
-  }
-
-  // Anything else is a bug → log it, but never send internal details to the trainee (TRD §10.2)
-  console.error(error);
-  res.status(500).json({
-    error: { code: 'INTERNAL_ERROR', message: 'Something went wrong. Please try again.' },
-  });
-}
-```
+`notFoundHandler` answers unknown paths with 404 `NOT_FOUND`.
 
 ### 6.3 Rules
 
-| Where         | Do                                                                           |
-| ------------- | ---------------------------------------------------------------------------- |
-| Repository    | Don't catch errors. Return `null` when not found                             |
-| Service       | `throw new SomeError()` when a rule fails. Never `throw new Error("...")`    |
-| Controller    | `try { ... } catch (error) { next(error); }` — nothing else in the `catch`   |
-| Anywhere else | Never `res.status(4xx).json(...)` by hand — throw, and let the handler do it |
+| Where         | Do                                                                            |
+| ------------- | ----------------------------------------------------------------------------- |
+| Repository    | Don't catch errors. Return `null` when not found                              |
+| Service       | `throw new SomeError()` when a rule fails; never `throw new Error('...')`     |
+| Controller    | `try { ... } catch (error) { next(error); }` and nothing else in the `catch`  |
+| Anywhere else | Never `res.status(4xx).json(...)` by hand: throw, and let the handler send it |
+
+Messages must be safe to show to a trainee. The frontend branches on `code`, never on the message
+text.
 
 ---
 
@@ -796,268 +396,92 @@ export function errorHandler(
 
 ### 7.1 How it works
 
-1. You write a Zod schema describing what the request should contain.
-2. You put `validate(...)` in the route, before the controller.
-3. If the input is wrong, `validate` sends a `400 VALIDATION_FAILED` error and the controller **never runs**.
-4. If it's right, the controller can use `req.body` / `req.params` safely.
+1. Write a Zod schema in the module's `*.schema.ts`.
+2. Put `validate({ params, body })` in the route, before the controller.
+3. Wrong input → `400 VALIDATION_FAILED` and the controller never runs.
+4. Right input → `req.body` is replaced by the parsed data (unknown fields dropped), so the
+   controller can trust it.
 
-### 7.2 The middleware
+`validate()` (`middleware/validate.ts`) checks `params` and `body` only. For a query string, parse
+it with a schema in the controller.
 
-```ts
-// src/middleware/validate.ts
-import type { Request, Response, NextFunction } from 'express';
-import type { ZodType } from 'zod';
-import { ValidationError } from '../errors/AppError';
-
-type Schemas = {
-  body?: ZodType;
-  params?: ZodType;
-};
-
-export function validate(schemas: Schemas) {
-  return (req: Request, _res: Response, next: NextFunction) => {
-    if (schemas.params) {
-      const result = schemas.params.safeParse(req.params);
-      if (!result.success) return next(new ValidationError(result.error.issues));
-    }
-
-    if (schemas.body) {
-      const result = schemas.body.safeParse(req.body);
-      if (!result.success) return next(new ValidationError(result.error.issues));
-      req.body = result.data; // cleaned data (unknown fields removed)
-    }
-
-    next();
-  };
-}
-```
-
-### 7.3 Writing schemas
-
-Schemas live inside their resource's module folder now, alongside the route/controller/service/repository — not in a separate top-level `schemas/` folder.
+### 7.2 Writing schemas
 
 ```ts
-// src/modules/days/days.schema.ts
-import { z } from 'zod';
-
-export const dayIdParamsSchema = z.object({
-  dayId: z.string().uuid(),
-});
-```
-
-```ts
-// src/modules/tasks/tasks.schema.ts
-import { z } from 'zod';
-
+// backend/src/module/task-module/task.schema.ts
+/** Task ids are slugs built from the day id: "css-day-03-t-2". */
 export const taskIdParamsSchema = z.object({
-  taskId: z.string().uuid(),
+  taskId: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9-]+$/),
 });
 
-export const saveCodeBodySchema = z.object({
-  files: z
-    .array(
-      z.object({
-        path: z.string().min(1).max(200),
-        content: z.string().max(200_000),
-      })
-    )
-    .min(1),
-});
+export type TaskIdParams = z.infer<typeof taskIdParamsSchema>;
 ```
 
-```ts
-// src/modules/activity/activity.schema.ts
-import { z } from 'zod';
+### 7.3 Rules
 
-export const logFlagEventBodySchema = z.object({
-  type: z.enum(['FULLSCREEN_EXIT', 'TAB_SWITCH', 'PASTE_BLOCKED']),
-  durationMs: z.number().int().min(0).optional(),
-});
-```
+- Every route with params or a body gets a schema.
+- Curriculum ids (course, day, task) are **slugs**: `z.string().min(1).max(100).regex(/^[a-z0-9-]+$/)`.
+  Ids of trainee records are UUIDs: `z.string().uuid()`.
+- Every string and array gets a `.max(...)`, so nobody can send huge data. Text stored in `jsonb` or
+  `text` also rejects NUL characters and broken emoji (see `isStorable` in `task.schema.ts`).
+- Share limits with the frontend (for example `MAX_FILE_CHARS` and `lib/saveRules.ts`) and keep
+  them equal, so the frontend never sends something the backend rejects.
+- Zod checks **shape** only ("is this a slug?"). Rules that need the database ("is this day
+  unlocked?") belong in the service.
+- Never accept a `traineeId` from the client.
 
-### 7.4 Using it — route and controller
+### 7.4 Zod schema vs shared type
 
-```ts
-// src/modules/tasks/tasks.route.ts
-tasksRouter.put(
-  '/:taskId/code',
-  validate({ params: taskIdParamsSchema, body: saveCodeBodySchema }),
-  tasksController.saveCode
-);
-```
+|               | Shared type (`packages/types`) | Zod schema (`backend/src/module/...`) |
+| ------------- | ------------------------------ | ------------------------------------- |
+| What it is    | A TypeScript type              | A runtime check                       |
+| When it works | While you write code           | On every request                      |
+| Used by       | Frontend and backend           | Backend only                          |
+| Example       | `SaveCodeRequest`              | `saveCodeBodySchema`                  |
 
-```ts
-// src/modules/tasks/tasks.controller.ts
-import type { SaveCodeRequest } from "@itp/types";
-
-async saveCode(req: Request, res: Response, next: NextFunction) {
-    try {
-        const traineeId = req.user!.id;
-        const { taskId } = req.params;
-        const body = req.body as SaveCodeRequest; // safe: validate() already checked it
-
-        await tasksService.saveCode(traineeId, taskId, body.files);
-
-        res.status(204).end();
-    } catch (error) {
-        next(error);
-    }
-},
-```
-
-### 7.5 Zod vs. shared types — how they relate
-
-They are two separate things with two separate jobs:
-
-|               | Shared type (`packages/types`)           | Zod schema (`backend/src/modules/<resource>/`) |
-| ------------- | ---------------------------------------- | ---------------------------------------------- |
-| What it is    | A TypeScript type                        | A runtime check                                |
-| When it works | While you write code (editor + compiler) | While the server runs, on every request        |
-| Used by       | Frontend and backend                     | Backend only                                   |
-| Example       | `SaveCodeRequest`                        | `saveCodeBodySchema`                           |
-
-When you change one, change the other in the same PR so they describe the same shape.
-
-### 7.6 Rules
-
-- Every route that takes a body or URL params gets a schema.
-- IDs are checked with `z.string().uuid()`.
-- Strings and arrays get a `.max(...)` so nobody can send huge data.
-- Zod only checks **shape** ("is this a UUID?"). Rules that need the database ("is this day unlocked?") go in the **service**.
-- Never accept `traineeId` in a body — it always comes from `req.user.id`.
+Change both in the same PR so they describe the same shape.
 
 ---
 
-## 8. Login and authorization
+## 8. Sign-in and authorization
 
-### 8.1 Login flow (TRD §4)
+### 8.1 Sign-in flow
 
-1. Frontend login button goes to `/api/auth/google`.
-2. Google login → Google calls back `/api/auth/google/callback`.
-3. Backend checks the email is on the company domain (FR-20).
-4. Backend checks the trainee exists in our `trainee` table (no self-registration).
-5. Session created → redirect to the dashboard. If a check fails → redirect to `/login?error=...`.
+1. **Continue with Google** goes to `/api/auth/google`; Passport redirects to Google.
+2. Google returns to `/api/auth/google/callback`. `AuthService` checks the email's domain against
+   `ALLOWED_EMAIL_DOMAIN` and that the email is in the `trainee` table. There is no
+   self-registration.
+3. On success the backend signs a JWT (`id`, `name`, `email`), sets it as the httpOnly `auth_token`
+   cookie for 7 days and redirects to the dashboard. On failure it redirects to
+   `/login?error=DOMAIN_NOT_PERMITTED` or `NOT_PROVISIONED`.
+4. The frontend calls `GET /api/auth/me` on every page load. `POST /api/auth/logout` clears the
+   cookie.
 
-### 8.2 Passport setup
+There are no server sessions: the JWT is the session.
 
-Passport's Google strategy setup and the trainee-lookup repository it needs both live inside `modules/auth/` too — they're auth-specific, not generic infrastructure, so they belong with the rest of the auth module rather than in a shared top-level folder:
+### 8.2 `requireAuth`
 
-```ts
-// src/modules/auth/passport.ts
-import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { env } from '../../config/env';
-import { traineesRepository } from './trainees.repository';
-
-export function configurePassport() {
-  passport.use(
-    new GoogleStrategy(
-      {
-        clientID: env.GOOGLE_CLIENT_ID,
-        clientSecret: env.GOOGLE_CLIENT_SECRET,
-        callbackURL: env.GOOGLE_CALLBACK_URL,
-      },
-      async (_accessToken, _refreshToken, profile, done) => {
-        try {
-          const email = profile.emails?.[0]?.value.toLowerCase();
-
-          // FR-20: company domain only
-          if (!email || !email.endsWith(`@${env.ALLOWED_EMAIL_DOMAIN}`)) {
-            return done(null, false, { message: 'DOMAIN_NOT_ALLOWED' });
-          }
-
-          // TRD §4 step 4: must already exist in our database
-          const trainee = await traineesRepository.findByEmail(email);
-          if (!trainee) {
-            return done(null, false, { message: 'NOT_REGISTERED' });
-          }
-
-          return done(null, { id: trainee.id, email: trainee.email, name: trainee.name });
-        } catch (error) {
-          return done(error);
-        }
-      }
-    )
-  );
-
-  // Store only the id in the session
-  passport.serializeUser((user, done) => done(null, user.id));
-
-  passport.deserializeUser(async (id: string, done) => {
-    try {
-      const trainee = await traineesRepository.findById(id);
-      done(null, trainee ? { id: trainee.id, email: trainee.email, name: trainee.name } : false);
-    } catch (error) {
-      done(error);
-    }
-  });
-}
-```
+`middleware/authMiddleware.ts` reads the `auth_token` cookie, verifies the JWT and sets `req.user`
+to `{ id, name, email }`. A missing or invalid token is `401 UNAUTHENTICATED`. In controllers, read
+it through `AuthenticatedRequest`:
 
 ```ts
-// src/types/express.d.ts — tells TypeScript what req.user contains
-import type { MeResponse } from '@itp/types';
-
-declare global {
-  namespace Express {
-    interface User extends MeResponse {}
-  }
-}
-
-export {};
+const traineeId = (req as AuthenticatedRequest).user.id;
 ```
 
-```ts
-// src/modules/auth/auth.route.ts
-import { Router } from 'express';
-import passport from 'passport';
-import { env } from '../../config/env';
-import { requireAuth } from '../../middleware/requireAuth';
-import { authController } from './auth.controller';
-
-export const authRouter = Router();
-
-authRouter.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-authRouter.get('/google/callback', (req, res, next) => {
-  passport.authenticate(
-    'google',
-    (error: unknown, user: Express.User | false, info?: { message?: string }) => {
-      if (error) return next(error);
-      if (!user)
-        return res.redirect(`${env.FRONTEND_URL}/login?error=${info?.message ?? 'LOGIN_FAILED'}`);
-
-      req.logIn(user, (loginError) => {
-        if (loginError) return next(loginError);
-        res.redirect(`${env.FRONTEND_URL}/dashboard`);
-      });
-    }
-  )(req, res, next);
-});
-
-authRouter.get('/me', requireAuth, authController.me);
-authRouter.post('/logout', requireAuth, authController.logout);
-```
-
-### 8.3 `requireAuth`
-
-```ts
-// src/middleware/requireAuth.ts
-import type { Request, Response, NextFunction } from 'express';
-import { UnauthorizedError } from '../errors/AppError';
-
-export function requireAuth(req: Request, _res: Response, next: NextFunction) {
-  if (!req.isAuthenticated()) return next(new UnauthorizedError());
-  next();
-}
-```
-
-### 8.4 Authorization rules (FR-6)
+### 8.3 Authorization rules
 
 - The trainee id **only** comes from `req.user.id`.
-- Every repository function for trainee data takes `traineeId` and uses it in the `where`.
-- Locked days, completed days (read-only) and past journal entries (read-only) are checked in the **service**, not just hidden in the UI.
-- The frontend route guard is for user experience only; the backend is what actually protects data.
+- Every repository function on trainee data takes the trainee id and uses it in the `where`.
+- Locked days, and tasks on locked days, are refused in the **service** (`ProgressService`), not
+  just hidden in the UI.
+- Frontend route guards (`ProtectedRoute`) are for user experience only; the backend is what
+  protects the data.
+- Flag events are write-only for trainees: no endpoint returns them.
 
 ---
 
@@ -1065,89 +489,52 @@ export function requireAuth(req: Request, _res: Response, next: NextFunction) {
 
 ### 9.1 Setup
 
-The Prisma client is created once, in one file:
+We're on Prisma 7 with the `@prisma/adapter-pg` driver adapter.
 
-```ts
-// src/lib/prisma.ts
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../generated/prisma/client';
-import { env } from '../config/env';
-
-const adapter = new PrismaPg({ connectionString: env.DATABASE_URL });
-
-export const prisma = new PrismaClient({ adapter });
-```
-
-Only **repositories** import `prisma`.
-
-```prisma
-// prisma/schema.prisma (top of file)
-generator client {
-    provider = "prisma-client"
-    output   = "../src/generated/prisma"
-}
-
-datasource db {
-    provider = "postgresql"
-}
-```
-
-```ts
-// prisma.config.ts (backend root)
-import 'dotenv/config';
-import { defineConfig, env } from 'prisma/config';
-
-export default defineConfig({
-  schema: 'prisma/schema.prisma',
-  migrations: { path: 'prisma/migrations', seed: 'tsx prisma/seed.ts' },
-  datasource: { url: env('DATABASE_URL') },
-});
-```
-
-> We're on Prisma 7: the database URL lives in `prisma.config.ts`, not in `schema.prisma`, and the client needs the `@prisma/adapter-pg` package. Add `src/generated/` to `.gitignore`.
+- Schema: `backend/prisma/schema.prisma`. The client is generated into `backend/src/generated/prisma`
+  (git-ignored) by `npm install` (postinstall).
+- CLI config: `backend/prisma7.config.ts`. Because of the file name, every Prisma command needs
+  `--config prisma7.config.ts`, run inside `backend/`.
+- One client for the whole app, in `src/lib/prisma.ts`. Only **repositories** (and the seed) import
+  it.
 
 ### 9.2 Writing models
 
-Model and field names follow the **TRD tables** (§8 of the TRD). Use camelCase in Prisma and map to the snake_case column names:
-
-```prisma
-model DayUnlock {
-    id              String   @id @default(uuid()) @db.Uuid
-    traineeId       String   @map("trainee_id") @db.Uuid
-    curriculumDayId String   @map("curriculum_day_id") @db.Uuid
-    unlocked        Boolean  @default(false)
-    isCompleted     Boolean  @default(false) @map("is_completed")
-    createdAt       DateTime @default(now()) @map("created_at")
-    updatedAt       DateTime @updatedAt @map("updated_at")
-
-    trainee       Trainee       @relation(fields: [traineeId], references: [id])
-    curriculumDay CurriculumDay @relation(fields: [curriculumDayId], references: [id])
-
-    @@unique([traineeId, curriculumDayId]) // one row per trainee per day
-    @@map("day_unlock")
-}
-```
-
-- Every table has `id` (UUID) and `createdAt`. Tables that change also get `updatedAt`.
-- `@@map("table_name")` on every model, `@map("column_name")` on multi-word fields.
-- If a rule says "one per trainee per X", add a `@@unique` for it.
+- Model and column names are **snake_case** and identical in Prisma and PostgreSQL (`model
+task_progress`, `code_updated_at`), so no `@map` is needed.
+- Curriculum tables (`course`, `curriculum_day`, `task`, …) use readable string ids
+  (`css-day-03`). Trainee data tables use `@id @default(uuid()) @db.Uuid`.
+- Timestamps are `@db.Timestamptz`. A calendar day in India time is `@db.Date` (see
+  `activity_log.date` and `utils/istDate.ts`).
+- "One per trainee per X" rules get a `@@unique` (`@@unique([trainee_id, task_id])`). Handle the
+  race with an `upsert`, or by treating Prisma's `P2002` error as "already exists".
+- Trainee data cascades when a trainee is deleted (`onDelete: Cascade`).
+- Enums in the database are fine (`task_status`); in TypeScript code use string unions (§2).
 
 ### 9.3 Migrations
 
 ```bash
-# after changing schema.prisma
-npx prisma migrate dev --name add_checklist_items   # run inside backend/, or use -w backend scripts
+cd backend
+npx prisma migrate dev --config prisma7.config.ts --name add_checklist_items
 ```
 
 - Commit the generated `prisma/migrations/` folder in the same PR as the schema change.
-- Name migrations in snake_case describing the change: `add_checklist_items`.
-- **Never edit a migration that's already merged** — make a new one.
-- If two PRs both add migrations, the second one to merge pulls `main` and re-runs `migrate dev`.
-- Each developer uses their **own Neon branch** for local development, so one person's migration can't break anyone else's database.
+- Name migrations in snake_case after the change: `add_checklist_items`.
+- **Never edit a migration that's already merged**; add a new one.
+- If two PRs both add migrations, the second to merge pulls `main` and re-runs `migrate dev`.
+- Develop against your **own Neon branch**, so one person's migration can't break anyone else's
+  database. Production runs `npx prisma migrate deploy --config prisma7.config.ts`.
 
-### 9.4 Seed data
+### 9.4 Seed data and the curriculum
 
-`prisma/seed.ts` creates a course, a few days with tasks and checklist items, and two test trainees on the company domain. Run it with `npx prisma db seed`. It should be safe to run more than once (use `upsert`).
+- `npm run db:seed -w backend` runs `src/lib/seed.ts`: it upserts the trainee list and the whole
+  curriculum, and never deletes trainee data, so it's safe to run again. `SEED_DEMO=true` adds demo
+  progress (local only).
+- The curriculum is **edited in the frontend** (`frontend/src/api/dayOverview/` for day content,
+  `frontend/src/api/mockTasks/` for tasks and starter files). After changing it, run
+  `npx tsx scripts/export-curriculum.ts` from the root to rebuild
+  `backend/prisma/seed-data/curriculum.json`, commit both, and reseed.
+- Trainees are enrolled by adding them to the list in `seed.ts` and reseeding.
 
 ---
 
@@ -1157,154 +544,54 @@ npx prisma migrate dev --name add_checklist_items   # run inside backend/, or us
 
 ```
 frontend/src/
-├── main.tsx              # app entry
-├── App.tsx               # providers + router
-├── router.tsx            # all routes
-├── index.css
-├── App.css
-├── api/                  # the ONLY place that calls the backend
-│   ├── client.ts         # the shared axios instance
-│   ├── errors.ts         # ApiError + getErrorMessage
-│   ├── auth.ts
-│   ├── dashboard.ts
-│   ├── days.ts
-│   ├── tasks.ts
-│   └── ...
-├── pages/                # one folder per route
-│   ├── LoginPage/
-│   ├── DashboardPage/
-│   ├── DayPage/
-│   └── TaskPage/
-├── components/           # reusable components (used by 2+ pages)
-├── context/
-│   └── AuthContext.tsx   # who is logged in
-├── hooks/                # useAutosave, useFlagTracking, ...
-├── lib/                  # small helpers (formatTime, ...)
+├── main.tsx             entry: installs the mock adapter in mock mode, renders <App />
+├── App.tsx              AuthProvider → FullscreenGate → ActivityProvider → routes
+├── index.css            design tokens (colours, fonts) for light and dark mode
+├── api/                 the ONLY code that calls the backend
+│   ├── client.ts        the shared Axios instance
+│   ├── errors.ts        ApiError and toApiError
+│   ├── days.ts, tasks.ts, dashboard.ts, ...   one file per resource
+│   ├── mockAdapter.ts   answers every endpoint in mock mode
+│   ├── dayOverview/     day content (source of the curriculum)
+│   └── mockTasks/       task catalog and starter files (source of the curriculum)
+├── pages/               one folder per route; page-only hooks and state live inside
+├── components/          reusable components, one folder each
+├── routes/              ProtectedRoute, PublicOnlyRoute
+├── context/             AuthProvider + useAuth, ActivityProvider + useActivity
+├── hooks/               shared hooks (flag tracking, fullscreen, typing test, ...)
+├── runtimes/            browser, node and sql runtimes + RuntimeHost
+├── lib/                 small pure helpers (saveRules, formatTime, ...), each with tests
+├── content/             reference pages for every day
+├── constants/           course list, typing test words
+└── test/                setup.ts and fixtures used by tests and the mock adapter
 ```
 
-### 10.2 Vite proxy
+### 10.2 Talking to the backend
 
-In development, Vite forwards every `/api` request to the backend, so the frontend and backend look like one site (cookies just work).
-
-```ts
-// frontend/vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 5173,
-    proxy: {
-      '/api': 'http://localhost:4000',
-    },
-  },
-});
-```
-
-### 10.3 Why axios, and the shared client
-
-**Yes — use axios, through one shared client.** With plain `fetch`, every call would need to repeat the same things: add `credentials`, check `res.ok`, parse JSON, handle errors. With one axios client, that's written **once**:
-
-|                                 | `fetch`                          | shared axios client |
-| ------------------------------- | -------------------------------- | ------------------- |
-| Throws on 4xx/5xx               | You check `res.ok` every time    | Automatic           |
-| JSON                            | You call `res.json()` every time | Automatic           |
-| Cookies / base URL              | Repeated in every call           | Set once            |
-| Error handling                  | Repeated in every call           | Once, in the client |
-| "Session expired → go to login" | Repeated                         | Once, in the client |
-
-Install: `npm install axios -w frontend`
+All calls use **relative** `/api` paths through the shared client:
 
 ```ts
-// src/api/errors.ts
-import type { ApiErrorResponse, ErrorCode } from '@itp/types';
-
-/** Every failed API call throws this. */
-export class ApiError extends Error {
-  status: number;
-  code: ErrorCode | 'NETWORK_ERROR';
-
-  constructor(status: number, code: ErrorCode | 'NETWORK_ERROR', message: string) {
-    super(message);
-    this.status = status;
-    this.code = code;
-  }
-}
-
-/** Turns whatever axios threw into an ApiError. */
-export function toApiError(error: unknown): ApiError {
-  const axiosError = error as { response?: { status: number; data?: ApiErrorResponse } };
-
-  // The server couldn't be reached at all
-  if (!axiosError.response) {
-    return new ApiError(0, 'NETWORK_ERROR', "Can't reach the server. Check your connection.");
-  }
-
-  const { status, data } = axiosError.response;
-  const code = data?.error?.code ?? 'INTERNAL_ERROR';
-  const message = data?.error?.message ?? 'Something went wrong. Please try again.';
-  return new ApiError(status, code, message);
-}
-```
-
-```ts
-// src/api/client.ts
-import axios from 'axios';
-import { toApiError } from './errors';
-
+// frontend/src/api/client.ts
 export const apiClient = axios.create({
   baseURL: '/api',
-  withCredentials: true, // send the login cookie
+  withCredentials: true, // send the auth cookie
   timeout: 15000,
 });
-
-// Runs on every failed request
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const apiError = toApiError(error);
-
-    // Session expired → back to the login page
-    if (apiError.status === 401 && window.location.pathname !== '/login') {
-      window.location.href = '/login';
-    }
-
-    return Promise.reject(apiError);
-  }
-);
 ```
 
-### 10.4 API files — one per resource
+- Locally, Vite proxies `/api` to `http://localhost:3000`; in production, Netlify's `_redirects`
+  proxies it to the Render API. Never hard-code a backend URL. The only exception is the Google
+  sign-in link, which uses `VITE_API_URL`.
+- Every failure becomes an `ApiError` with `status`, `code` and a message that's safe to show. A
+  401 signs the trainee out, unless the call sets `skipUnauthorizedHandler: true` (used by
+  `GET /auth/me`).
 
-Each backend resource gets one file with one function per endpoint. Every function returns the **data** with its shared type.
+### 10.3 API files: one per resource
 
-```ts
-// src/api/days.ts
-import type { DayResponse, CompleteDayResponse } from '@itp/types';
-import { apiClient } from './client';
-
-export async function getDay(dayId: string): Promise<DayResponse> {
-  const res = await apiClient.get<DayResponse>(`/days/${dayId}`);
-  return res.data;
-}
-
-export async function completeDay(dayId: string): Promise<CompleteDayResponse> {
-  const res = await apiClient.patch<CompleteDayResponse>(`/days/${dayId}/complete`);
-  return res.data;
-}
-```
+One typed function per endpoint, returning the data with its shared type:
 
 ```ts
-// src/api/tasks.ts
-import type { TaskResponse, TaskCodeResponse, SaveCodeRequest } from '@itp/types';
-import { apiClient } from './client';
-
-export async function getTask(taskId: string): Promise<TaskResponse> {
-  const res = await apiClient.get<TaskResponse>(`/tasks/${taskId}`);
-  return res.data;
-}
-
+// frontend/src/api/tasks.ts
 export async function getTaskCode(taskId: string): Promise<TaskCodeResponse> {
   const res = await apiClient.get<TaskCodeResponse>(`/tasks/${taskId}/code`);
   return res.data;
@@ -1315,181 +602,94 @@ export async function saveTaskCode(taskId: string, body: SaveCodeRequest): Promi
 }
 ```
 
-```ts
-// src/api/auth.ts
-import type { MeResponse } from '@itp/types';
-import { apiClient } from './client';
+Components, pages and hooks import these functions; they never import `axios` or call `fetch`.
+The one exception is `postActivityTimeOnExit`, which needs `fetch` with `keepalive`. It still
+lives in `api/activity.ts`.
 
-export async function getMe(): Promise<MeResponse> {
-  const res = await apiClient.get<MeResponse>('/auth/me');
-  return res.data;
-}
+### 10.4 Mock mode
 
-export async function logout(): Promise<void> {
-  await apiClient.post('/auth/logout');
-}
-```
+With `VITE_USE_MOCKS=true`, `mockAdapter.ts` answers every request from data in the browser.
+Pull request previews and the frontend tests run this way.
 
-**Rule:** components and hooks import these functions. They never import `axios` or call `fetch` themselves.
+- **A new or changed endpoint must be added to the mock adapter in the same PR**, with the same
+  rules as the real API (locks, limits, status codes), so previews and tests keep working.
+- Mock data lives in `src/test/fixtures/`. Keep the fixtures consistent with each other: the same
+  trainee name in `/auth/me` and `/profile`, and the same progress on every page.
+- Mock mode must never be on in production; `netlify.toml` sets it to `false` for the production
+  context.
 
-### 10.5 Using API functions in a page
+### 10.5 Loading data in a page
 
-Same `useEffect` + `useState` you already know — you just call an `api/` function:
-
-```tsx
-// src/pages/DayPage/DayPage.tsx
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
-import type { DayResponse } from '@itp/types';
-import { getDay } from '../../api/days';
-import { ApiError } from '../../api/errors';
-
-export default function DayPage() {
-  const { dayId } = useParams();
-  const [day, setDay] = useState<DayResponse | null>(null);
-  const [error, setError] = useState<ApiError | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (!dayId) return;
-    setIsLoading(true);
-
-    getDay(dayId)
-      .then(setDay)
-      .catch((err: ApiError) => setError(err))
-      .finally(() => setIsLoading(false));
-  }, [dayId]);
-
-  if (isLoading) return <p>Loading...</p>;
-  if (error?.code === 'DAY_LOCKED')
-    return <p>This day is locked. Finish the previous day first.</p>;
-  if (error) return <p>{error.message}</p>;
-  if (!day) return null;
-
-  return <h1>{day.title}</h1>;
-}
-```
-
-Every page that loads data shows three states: **loading**, **error**, **data**. Check `error.code`, not the message text.
-
-**Saving data** (buttons): call the api function in the click handler, and disable the button while it's saving so it can't be clicked twice.
+Pages load data; components only display what they're given. Every page that loads data shows
+three states (loading, error, data) using the shared `Loader`, `ErrorState` and `StateMessage`
+components. Branch on `error.code`, not the message, and ignore responses that arrive after the
+user has left:
 
 ```tsx
-const [isSaving, setIsSaving] = useState(false);
+useEffect(() => {
+  if (!dayId) return;
+  let isCancelled = false;
 
-async function handleComplete() {
-  setIsSaving(true);
-  try {
-    const result = await completeDay(dayId);
-    // navigate to next day, show message, etc.
-  } catch (err) {
-    setError(err as ApiError);
-  } finally {
-    setIsSaving(false);
-  }
-}
+  Promise.all([getDayContent(dayId), getDayTasks(dayId), getDayStatus(dayId)])
+    .then(([day, tasks, status]) => {
+      if (!isCancelled) setResult({ dayId, day, tasks, status });
+    })
+    .catch((error: ApiError) => {
+      if (!isCancelled) setResult({ dayId, error });
+    });
 
-<button onClick={handleComplete} disabled={isSaving}>
-  Complete day
-</button>;
+  return () => {
+    isCancelled = true;
+  };
+}, [dayId]);
 ```
 
-### 10.6 Logged-in user
+**Buttons that save:** call the API function in the handler, and disable the button while it's
+saving so it can't be clicked twice.
 
-```tsx
-// src/context/AuthContext.tsx
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { MeResponse } from '@itp/types';
-import { getMe } from '../api/auth';
+### 10.6 Signed-in user
 
-type AuthState = { user: MeResponse | null; isLoading: boolean };
+`AuthProvider` (`context/AuthProvider.tsx`) loads `GET /auth/me` once and exposes `useAuth()`:
+`status` (`loading` / `authenticated` / `unauthenticated`), `user`, `login()` and `logout()`.
+`ProtectedRoute` waits for `loading` to finish, so a refresh doesn't flash the login page.
 
-const AuthContext = createContext<AuthState>({ user: null, isLoading: true });
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>({ user: null, isLoading: true });
-
-  useEffect(() => {
-    getMe()
-      .then((user) => setState({ user, isLoading: false }))
-      .catch(() => setState({ user: null, isLoading: false }));
-  }, []);
-
-  return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  return useContext(AuthContext);
-}
-```
-
-```tsx
-// src/components/ProtectedRoute/ProtectedRoute.tsx
-import { Navigate, Outlet } from 'react-router';
-import { useAuth } from '../../context/AuthContext';
-
-export default function ProtectedRoute() {
-  const { user, isLoading } = useAuth();
-  if (isLoading) return <p>Loading...</p>;
-  if (!user) return <Navigate to="/login" replace />;
-  return <Outlet />;
-}
-```
-
-The login button is a plain link, because Google login needs a full page redirect:
-
-```tsx
-<a href="/api/auth/google">Sign in with Google</a>
-```
-
-### 10.7 Components
+### 10.7 Components and styling
 
 Every component gets its own folder:
 
 ```
-components/TaskCard/
-├── TaskCard.tsx
-├── TaskCard.module.css
-└── index.ts            // export { default } from "./TaskCard";
+components/DayTaskList/
+├── DayTaskList.tsx
+├── DayTaskList.module.css
+├── DayTaskList.test.tsx
+└── index.ts            export { default } from './DayTaskList';
 ```
 
-```tsx
-// components/TaskCard/TaskCard.tsx
-import type { TaskSummary } from '@itp/types';
-import styles from './TaskCard.module.css';
+- Import from the folder: `import DayTaskList from '../../components/DayTaskList';`
+- One default-exported component per file. Put helper functions in `lib/`, not next to the
+  component (React Refresh warns about mixed exports).
+- A component used by one page only can live in that page's folder. Move it to `components/` when
+  a second page needs it.
+- **Styles:** CSS Modules only. Use the colour and font **tokens** from `index.css`
+  (`var(--color-text-primary)`, `var(--font-mono)`), never hard-coded colours, so light and dark
+  mode both work. Check new UI in both modes.
+- Prefer real elements for actions (`<button>`, `<a>`), give icon-only buttons an `aria-label`, and
+  use headings in order.
+- Split a component that grows past about 200 lines.
 
-type TaskCardProps = {
-  task: TaskSummary;
-  onOpen: (taskId: string) => void;
-};
+### 10.8 Workspace behaviour
 
-export default function TaskCard({ task, onOpen }: TaskCardProps) {
-  return (
-    <button className={styles.card} onClick={() => onOpen(task.id)}>
-      {task.title}
-      {task.isStretchGoal && <span className={styles.badge}>Stretch</span>}
-    </button>
-  );
-}
-```
+These live in hooks so every part of the workspace behaves the same:
 
-- Import from the folder: `import TaskCard from "../../components/TaskCard";`
-- Props type is named `<Component>Props`.
-- **Pages load data; components just display it** (they get data through props).
-- A component used by only one page can live in `pages/ThatPage/components/`. Move it to `components/` when a second page needs it.
-- Styles go in `ComponentName.module.css` (CSS Modules). Class names in camelCase.
-- If a component gets longer than ~200 lines, split it.
+| Hook / provider            | What it does                                                                               |
+| -------------------------- | ------------------------------------------------------------------------------------------ |
+| `useAutosave` (TaskPage)   | Saves 2 s after typing stops, at least every 8 s while typing; retries; waits when offline |
+| `usePasteBlock` (TaskPage) | Blocks paste and drop in the editor; `blockPasteEvents` does the same for the terminal     |
+| `useFlagTracking`          | Records fullscreen exit, tab switch and window blur with their duration; shows the warning |
+| `ActivityProvider`         | Counts active and coding seconds and sends them every 60 s and when the page is hidden     |
+| `FullscreenGate`           | Blocks the app until the browser is in fullscreen                                          |
 
-### 10.8 Workspace behaviour (paste block, flags, autosave)
-
-Put these in hooks so every page uses the same code:
-
-| Hook                         | What it does                                                                                                                                      | Requirement  |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| `usePasteBlock`              | Blocks paste in the Monaco editor (keyboard, right-click menu, drag-and-drop)                                                                     | FR-10        |
-| `useFlagTracking(taskId)`    | Listens for tab switch (`visibilitychange`) and fullscreen exit (`fullscreenchange`), calls `logFlagEvent`, shows a warning. No logout or penalty | FR-9, FR-11  |
-| `useAutosave(taskId, files)` | Saves the code a couple of seconds after the trainee stops typing (must save within 10 s)                                                         | FR-5         |
-| `useActivityTimer`           | Counts active / coding / reading seconds and sends them every ~60 s                                                                               | FR-13, FR-14 |
+Focus events never penalise a trainee; they're recorded for mentors.
 
 ---
 
@@ -1497,127 +697,135 @@ Put these in hooks so every page uses the same code:
 
 ### 11.1 Branches
 
-- `main` must always work.
-- Nobody pushes directly to `main`. Every change — even a one-line fix — goes through a pull request.
-- Make a new branch from the latest `main` for each piece of work: `feat/day-unlock`, `fix/paste-block`, `chore/eslint-setup`.
-- Keep branches short-lived (a day or two). Pull the latest `main` into your branch at least once a day.
+- `main` must always work and is deployed automatically.
+- Nobody pushes directly to `main`; every change, even one line, goes through a pull request.
+- Branch from the latest `main` for each piece of work: `type/short-description`, for example
+  `feat/day-task-list`, `fix/journal-limit`, `docs/readme`.
+- Keep branches short-lived (a day or two) and pull `main` into yours at least once a day.
 
 ### 11.2 Commit messages
 
+We use **Conventional Commits**, enforced by commitlint (`@commitlint/config-conventional`). A
+rejected message means the commit wasn't saved; fix the message and commit again.
+
 ```
-feat: add day unlock logic
-fix: block paste in Monaco editor
-refactor: move flag logging into a service
-test: add tests for locked day
-docs: update API table in TRD
-chore: set up prettier
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
 ```
 
-Types: `feat` (new feature), `fix` (bug fix), `refactor`, `test`, `docs`, `chore` (setup/tools). Be specific — "fix: bug" tells nobody anything.
+- **type** (required, lowercase): `feat` (new behaviour a trainee can see), `fix` (something was
+  broken), `refactor` (same behaviour, cleaner code), `test`, `docs`, `style` (formatting only),
+  `chore` (tooling), `build` (dependencies, build setup), `perf`, `ci`, `revert`.
+- **scope** (optional, lowercase): the area. We use `auth`, `dashboard`, `days`, `tasks`, `editor`,
+  `sql`, `typing`, `journal`, `activity`, `profile`, `references`, `types`, `db`, `api`. Leave it out
+  when a change touches many areas.
+- **subject** (required): imperative, lowercase first letter, no full stop:
+  `fix(tasks): save code before page closes`, not `Fixed bug.`
+- The first line is **100 characters or fewer** (aim for 50–70). Body lines are 100 or fewer.
+- Use a body when the subject doesn't explain the change: say what changed and why, after one blank
+  line.
+- Footer: `Closes #42`, or `BREAKING CHANGE: ...` (or `feat(types)!: ...`) when you change something
+  others depend on, such as an API field.
 
-### 11.3 Pull requests
+Check a message without committing: `echo "feat(days): add unlock logic" | npx commitlint`.
 
-- **Every PR is reviewed and approved by at least one other person** before it is merged. You never merge your own PR without an approval.
-- Keep PRs small — one feature or fix per PR.
-- Review each other's PRs quickly (same day). A waiting PR blocks the whole team.
-- Use **"Squash and merge"**, then delete the branch.
+### 11.3 What runs on every commit
 
-**PR description:**
+The Husky hooks run before a commit is accepted:
 
-```md
-## What
+- **pre-commit:** `lint-staged` (ESLint `--fix` and Prettier on staged files), type checks for the
+  frontend and backend (`tsc -b`), then all unit tests.
+- **commit-msg:** commitlint.
 
-Which feature / fix this is (mention the FR number).
+There is no CI pipeline yet, so the hooks are the only automatic gate. Don't skip them with
+`--no-verify`.
 
-## How to test
+### 11.4 Pull requests
 
-Steps to try it locally.
+- **Every PR is approved by at least one other person** before merging. Never merge your own PR
+  without an approval.
+- Keep PRs small: one feature or fix each.
+- Review each other's PRs the same day; a waiting PR blocks the team.
+- Merge with **Squash and merge**, then delete the branch. The PR title becomes the commit
+  message, so write it in commit format.
+- Fill in the template (`.github/pull_request_template.md`): **What changed**, **Why**, **Testing**
+  (what you actually ran), **Related issue** and **Screenshots** for any UI change (before and
+  after, light and dark when colours change).
 
-## Checklist
+**Before you open a PR:**
 
-- [ ] Shared types updated if a request/response changed
-- [ ] Zod schema added for new input
-- [ ] Trainee queries filter by traineeId
+- [ ] Shared types updated if a request or response changed
+- [ ] Zod schema added or updated for new input
+- [ ] Mock adapter updated for new or changed endpoints
+- [ ] Trainee queries filter by the trainee id
 - [ ] Tests added for important logic
-- [ ] Ran `npm run lint` and the app locally
-```
+- [ ] `npm run lint` and `npm test` pass, and you tried it in the app
+- [ ] Docs updated if behaviour, setup or the API changed (API reference, setup guide, README)
 
-**Reviewer checks:**
+**Reviewers check:**
 
 1. Can one trainee see or change another trainee's data?
 2. Does the backend trust something from the frontend that it should check itself?
-3. Is business logic in the service (not the controller or a component)?
+3. Is the business logic in a service, not a controller or component?
 4. Do the shared types match what the backend actually sends?
+5. Does mock mode still work?
 
 ---
 
-## 14. Testing
+## 12. Testing
 
-Tool: **Vitest** for both apps. Backend route tests also use **supertest**.
+Tool: **Vitest** everywhere. The frontend adds **Testing Library** (jsdom); the backend API tests
+add **Supertest**.
 
-### 14.1 Two kinds of tests
+### 12.1 Three kinds of tests
 
-- **Unit tests** — a single function with no database or server. Example: "does completion ignore stretch items?"
-- **Integration tests** — call a real API route against a test database. Example: "does `GET /api/days/:id` return 403 for a locked day?" This is the only way to prove the backend really blocks it (FR-1).
+| Kind                      | Where                                    | Runs with                     | What                                                           |
+| ------------------------- | ---------------------------------------- | ----------------------------- | -------------------------------------------------------------- |
+| Frontend unit / component | next to the file: `DayTaskList.test.tsx` | `npm test` (and every commit) | Components, hooks, `lib/` helpers, API functions, mock adapter |
+| Backend unit              | next to the file: `task.service.test.ts` | `npm test` (and every commit) | Services and helpers, with the repository mocked               |
+| API contract              | `backend/src/test/api/*.api.test.ts`     | `npm run test:api -w backend` | Real HTTP calls through `app` against a real test database     |
 
-### 14.2 Where they go
+- Frontend tests run in mock mode (`VITE_USE_MOCKS=true`); `src/test/setup.ts` replaces Monaco with
+  a plain `<textarea>`.
+- API tests need `TEST_DATABASE_URL` in `backend/.env.test`, pointing to a database you can wipe.
+  Use the helpers: `createTrainee()` returns a trainee with a signed cookie, `api.get(url, cookie)`
+  calls the app, and `expectError(res, 403, 'DAY_LOCKED')` checks the error shape.
 
-Next to the file they test:
+### 12.2 What must have tests
 
-```
-backend/src/modules/days/days.service.test.ts           # unit
-backend/src/modules/days/days.route.integration.test.ts # integration
-frontend/src/components/TaskCard/TaskCard.test.tsx
-```
+- Day locking and completion: a locked day gives 403; Submit Day is refused with required tasks
+  open; completing unlocks the next day; stretch tasks never block.
+- Sign-in checks: wrong domain and unknown email are rejected.
+- Trainee isolation: trainee A can't read or change trainee B's data.
+- Saving: limits and storable-text rules for code and journal.
+- Flag and activity logging: events and seconds are stored for the right trainee and date.
 
-### 14.3 Must have tests
-
-- Day locking and completion (FR-1, FR-2, FR-3) — locked day gives 403; can't complete with unchecked required items; completing unlocks the next day; stretch items don't block.
-- Login checks (FR-20) — wrong domain rejected; unregistered email rejected.
-- Trainee isolation (FR-6) — trainee A can't read or change trainee B's data.
-- Flag logging (FR-9, FR-12) — events are saved with a timestamp.
-
-Nice to have: tests for simple display components.
-
-### 14.4 Example
-
-```ts
-// backend/src/modules/days/days.route.integration.test.ts
-import { describe, it, expect } from 'vitest';
-import request from 'supertest';
-import { createApp } from '../app';
-
-const app = createApp();
-
-describe('GET /api/days/:dayId', () => {
-  it('returns 401 when not logged in', async () => {
-    const res = await request(app).get('/api/days/00000000-0000-0000-0000-000000000000');
-
-    expect(res.status).toBe(401);
-    expect(res.body.error.code).toBe('UNAUTHENTICATED');
-  });
-});
-```
-
-Check the **status** and **`error.code`** in error tests, not the message text.
+In error tests, check the **status** and **`error.code`**, not the message text. In component
+tests, find elements by role and accessible name (`getByRole('button', { name: /submit day/i })`).
 
 ---
 
-## 15. Checklist: adding a new feature
+## 13. Checklist: adding a feature
 
-Example: **save a journal entry** (`PUT /api/journal/:dayId`).
+Example: **save a journal entry** (`PUT /api/days/:dayId/journal`).
 
-1. **TRD** — check the endpoint in the TRD API table. If it's wrong, fix the TRD.
-2. **Shared type** — add `SaveJournalRequest` / `JournalResponse` in `packages/types/src/journal.ts`.
-3. **Database** — change `schema.prisma` if needed, run `prisma migrate dev`.
-4. **Zod schema** — `src/modules/journal/journal.schema.ts`.
-5. **Repository** — `src/modules/journal/journal.repository.ts`: the Prisma query, with `traineeId` in the `where`.
-6. **Service** — `src/modules/journal/journal.service.ts`: the rules (day unlocked? is it today's entry?). Throw errors if not.
-7. **Controller** — `src/modules/journal/journal.controller.ts`: `try` → call service → `res.status(204).end()` → `catch` → `next(error)`.
-8. **Route** — `src/modules/journal/journal.route.ts`: `journalRouter.put("/:dayId", validate({...}), journalController.save)`.
-9. **Tests** — for the important rules.
-10. **Frontend API function** — `src/api/journal.ts`: `saveJournal(dayId, body)`.
-11. **Frontend page** — call it, show saving / saved / error.
-12. **PR** — `feat: save daily journal entry`, get it reviewed, squash and merge.
+1. **Requirements:** check the endpoint in the TRD; if it's wrong there, fix the TRD.
+2. **Shared types:** `SaveJournalRequest` / `DayJournal` in `packages/types/src/dayOverview.ts`.
+3. **Database:** change `schema.prisma` if needed and run `prisma migrate dev` (§9.3).
+4. **Zod schema:** `day-module/journal.schema.ts`.
+5. **Repository:** the Prisma query, with the trainee id in the `where`.
+6. **Service:** the rules (unknown day → 404, locked day → 403). Throw our errors.
+7. **Controller:** `try` → call the service → `res.status(200).json(...)` → `catch` → `next(error)`.
+8. **Route:** `dayRouter.put('/:dayId/journal', validate({ params, body }), journalController.saveJournal)`;
+   new routers are mounted in `app.ts` behind `requireAuth`.
+9. **Tests:** a unit test for the service rules and an API test for the endpoint.
+10. **Frontend API function:** `saveJournal(dayId, responseText)` in `src/api/days.ts`.
+11. **Mock adapter:** the same endpoint and rules in `mockAdapter.ts`.
+12. **Page:** call it, and show saving, saved and error states.
+13. **Docs:** add the endpoint to `docs/api-specifications.md`.
+14. **PR:** `feat(journal): save daily journal entry`, reviewed, squash and merge.
 
 ---
