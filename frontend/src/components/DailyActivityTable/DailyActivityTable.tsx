@@ -13,7 +13,7 @@ function formatDuration(seconds: number): string {
 }
 
 export default function DailyActivityTable({ days }: DailyActivityTableProps) {
-  const maximumTime = Math.max(...days.map((day) => day.timeSpentSeconds));
+  const maximumTime = 28800;
 
   return (
     <section className={styles.activity} aria-label="Daily training activity">
@@ -25,7 +25,7 @@ export default function DailyActivityTable({ days }: DailyActivityTableProps) {
 
       <div>
         {days.map((day) => {
-          const width = maximumTime > 0 ? (day.timeSpentSeconds / maximumTime) * 100 : 0;
+          const width = (day.timeSpentSeconds / maximumTime) * 100;
 
           return (
             <div key={day.date} className={`${styles.row} ${day.isToday ? styles.rowToday : ''}`}>
@@ -35,7 +35,7 @@ export default function DailyActivityTable({ days }: DailyActivityTableProps) {
               </div>
 
               <div className={styles.time}>
-                <div className={styles.bar}>
+                <div className={styles.bar} role="progressbar">
                   <div className={styles.barFill} style={{ width: `${width}%` }} />
                 </div>
 
