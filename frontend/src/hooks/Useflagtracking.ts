@@ -97,17 +97,13 @@ export function useFlagTracking({ taskId, onWarning }: Options): void {
         clearTimeout(windowBlurTimeout);
       }
       windowBlurTimeout = setTimeout(() => {
-        if (!isFullscreenActive()) {
-          return;
-        }
-        // If the document became hidden, this was a tab switch.
-        // visibilitychange handles it, so don't log WINDOW_BLUR.
-        if (document.visibilityState === 'hidden') {
-          return;
-        }
+        if (!isFullscreenActive()) return;
+        if (document.visibilityState === 'hidden') return;
+
+        // Focus just moved into our own preview iframe, not out of the window
+        if (document.hasFocus()) return;
 
         if (isUnfocused) return;
-
         isUnfocused = true;
         startFlag('WINDOW_BLUR');
       }, 500);
