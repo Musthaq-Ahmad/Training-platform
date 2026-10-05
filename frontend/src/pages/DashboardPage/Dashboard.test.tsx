@@ -23,6 +23,10 @@ vi.mock('../../api/courses', () => ({
   getCourseDays: vi.fn(),
 }));
 
+vi.mock('../../context/Useauth', () => ({
+  useAuth: () => ({ user: { name: 'Test Trainee' } }),
+}));
+
 vi.mock('../../components/Header', () => ({
   default: () => <header>Header</header>,
 }));
@@ -197,6 +201,7 @@ function renderPage() {
 describe('DashboardPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.sessionStorage.clear();
     vi.mocked(getCourseDays).mockImplementation((courseId: string) => {
       const days = daysByCourse[courseId];
       return days ? Promise.resolve(days) : Promise.reject(new Error('Course not found.'));
@@ -225,6 +230,19 @@ describe('DashboardPage', () => {
     renderPage();
 
     expect(await screen.findByText('Header')).toBeInTheDocument();
+  });
+
+  it('shows the welcome banner with the trainee first name and curriculum progress', async () => {
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+
+    renderPage();
+
+    expect(await screen.findByText('Welcome back, Test!')).toBeInTheDocument();
+    expect(screen.getByText('17 / 60 days (28%)')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', { name: 'Curriculum completion' })).toHaveAttribute(
+      'aria-valuenow',
+      '28'
+    );
   });
 
   it('renders the next day on the current lesson card', async () => {

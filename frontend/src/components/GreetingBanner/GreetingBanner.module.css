@@ -1,0 +1,105 @@
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1.35rem 1.5rem;
+  border: 1px solid var(--color-border-card);
+  border-radius: 0.85rem;
+  box-shadow: 0 0.2rem 0.6rem var(--color-overlay-highlight-6);
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+.completion {
+  display: flex;
+  flex: 0 0 268px;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--color-border-card);
+  border-radius: 0.75rem;
+  background: var(--color-bg-elevated);
+}
+
+.completionText {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.completionLabel,
+.completionValue {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.completionLabel {
+  color: var(--color-text-secondary);
+}
+
+.completionValue {
+  color: var(--color-accent-purple);
+  font-weight: 700;
+}
+
+.progressTrack {
+  overflow: hidden;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--color-bg-card);
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-accent-purple);
+}
+
+.message {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .banner {
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    padding: 1rem;
+  }
+
+  .message {
+    flex: 1 1 auto;
+    font-size: 1.05rem;
+  }
+
+  .completion {
+    order: 1;
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .banner {
+    animation: greeting-enter 220ms ease-out;
+  }
+}
+
+@keyframes greeting-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.4rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -44,6 +44,7 @@ const email = () => screen.getByTestId('email').textContent;
 
 beforeEach(() => {
   vi.clearAllMocks();
+  window.sessionStorage.clear();
   vi.spyOn(console, 'error').mockImplementation(() => undefined);
 });
 
@@ -103,21 +104,31 @@ describe('AuthProvider: login and logout', () => {
 
   it('AC-06: logout() calls the API and clears the user', async () => {
     vi.mocked(getMe).mockResolvedValue(trainee);
-    vi.mocked(logout).mockResolvedValue(undefined);
+    let finishLogout: (() => void) | undefined;
+    vi.mocked(logout).mockReturnValue(
+      new Promise<void>((resolve) => {
+        finishLogout = resolve;
+      })
+    );
+    window.sessionStorage.setItem('itp:greeting-shown', 'true');
 
     renderProvider();
     await waitFor(() => expect(status()).toBe('authenticated'));
 
     fireEvent.click(screen.getByText('logout'));
+    expect(window.sessionStorage.getItem('itp:greeting-shown')).toBe('true');
+    act(() => finishLogout?.());
 
     await waitFor(() => expect(status()).toBe('unauthenticated'));
     expect(logout).toHaveBeenCalledTimes(1);
     expect(email()).toBe('none');
+    expect(window.sessionStorage.getItem('itp:greeting-shown')).toBeNull();
   });
 
   it('AC-07: logout() still clears the local session when the API request fails', async () => {
     vi.mocked(getMe).mockResolvedValue(trainee);
     vi.mocked(logout).mockRejectedValue(httpError(500));
+    window.sessionStorage.setItem('itp:greeting-shown', 'true');
 
     renderProvider();
     await waitFor(() => expect(status()).toBe('authenticated'));
@@ -126,6 +137,7 @@ describe('AuthProvider: login and logout', () => {
 
     await waitFor(() => expect(status()).toBe('unauthenticated'));
     expect(email()).toBe('none');
+    expect(window.sessionStorage.getItem('itp:greeting-shown')).toBe('true');
   });
 });
 

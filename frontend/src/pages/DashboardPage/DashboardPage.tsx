@@ -11,6 +11,9 @@ import ScheduleGrid from '../../components/ScheduleGrid';
 import StatsRow from '../../components/StatsRow';
 import LoaderOverlay from '../../components/Common/LoadingState';
 import { ErrorState } from '../../components/Common/ErrorState';
+import GreetingBanner from '../../components/GreetingBanner';
+import { useAuth } from '../../context/Useauth';
+import { useGreeting } from '../../hooks/useGreeting';
 import styles from './DashboardPage.module.css';
 
 const DEFAULT_COURSE_ID = 'html';
@@ -24,6 +27,9 @@ function withoutKey<T>(record: Record<string, T>, key: string): Record<string, T
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isVisible: isGreetingVisible } = useGreeting();
+  const traineeFirstName = user?.name?.trim().split(/\s+/)[0] || null;
 
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -124,6 +130,16 @@ export default function DashboardPage() {
   const displayedDay = dashboard.nextDay;
   const displayedDayTrackLabel =
     CURRICULUM_COURSES.find((t) => t.id === displayedDay?.courseId)?.label ?? '';
+  const completionPercent =
+    dashboard.totalDaysOverall > 0
+      ? Math.min(
+          100,
+          Math.max(
+            0,
+            Math.round((dashboard.totalDaysCompleteOverall / dashboard.totalDaysOverall) * 100)
+          )
+        )
+      : 0;
 
   // Locked days are ignored. The backend still returns DAY_LOCKED for direct URLs.
   function openDay(day: DaySummary | null | undefined) {
@@ -136,6 +152,14 @@ export default function DashboardPage() {
       <Header />
 
       <div className={styles.page}>
+        {isGreetingVisible && (
+          <GreetingBanner
+            name={traineeFirstName}
+            completedDays={dashboard.totalDaysCompleteOverall}
+            totalDays={dashboard.totalDaysOverall}
+            completionPercent={completionPercent}
+          />
+        )}
         {displayedDay ? (
           <CurrentLessonCard
             courseTitle={displayedDayTrackLabel}
