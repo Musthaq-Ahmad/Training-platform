@@ -19,7 +19,7 @@ describe('DayBreadcrumb', () => {
   it('renders the Dashboard link', () => {
     renderWithRouterContext(<DayBreadcrumb dayNumber={1} />);
 
-    const dashboardLink = screen.getByRole('link', { name: /dashboard/i });
+    const dashboardLink = screen.getByRole('link', { name: /home/i });
 
     expect(dashboardLink).toBeInTheDocument();
     expect(dashboardLink.getAttribute('href')).toBe('/');

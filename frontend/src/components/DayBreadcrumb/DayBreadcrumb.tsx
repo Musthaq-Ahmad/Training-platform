@@ -15,7 +15,7 @@ export default function DayBreadcrumb({ dayNumber }: DayBreadcrumbProps) {
         <span className={styles.arrow} aria-hidden="true">
           <ArrowLeft size={16} strokeWidth={2} />
         </span>
-        Dashboard
+        Home
       </Link>
       <span className={styles.dayBreadcrumbSeparator}>/</span>
 
