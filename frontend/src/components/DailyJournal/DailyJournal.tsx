@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './DailyJournal.module.css';
 
-const MAX_JOURNAL_LENGTH = 10_000; // keep in sync with saveJournalBodySchema on the backend
+const MAX_JOURNAL_LENGTH = 5_000; // keep in sync with saveJournalBodySchema on the backend
 
 type DailyJournalProps = {
   prompts: string[];
