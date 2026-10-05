@@ -446,6 +446,14 @@ export const dayReferences: DayReferenceConfig[] = [
     ],
   },
   {
+    id: 'prisma-day-04',
+    courseId: 'prisma',
+    dayNumber: 4,
+    instruction:
+      'There are no external references for this day. Use the files already provided in the code editor.',
+    topicIds: [],
+  },
+  {
     id: 'prisma-day-05',
     courseId: 'prisma',
     dayNumber: 5,
