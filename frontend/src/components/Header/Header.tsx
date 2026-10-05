@@ -4,6 +4,7 @@ import { useAuth } from '../../context/Useauth';
 import styles from './Header.module.css';
 import { useActivity } from '../../context/useActivity';
 import { NavLink } from 'react-router';
+import { ConfirmPopover } from '../Common/ConfirmDialog'; // adjust path if needed
 
 type HeaderProps = {
   /** Replaces the app name on the left. The task page puts its breadcrumb here. */
@@ -87,6 +88,7 @@ function PowerIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
 function NavLabel({ text }: { text: string }) {
   return (
     <span className={styles.label} data-text={text}>
@@ -98,20 +100,38 @@ function NavLabel({ text }: { text: string }) {
 export default function Header({ leading, status }: HeaderProps) {
   const activity = useActivity();
   const { user, logout } = useAuth();
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+
+  const openConfirm = () => {
+    setLogoutError(null);
+    setConfirmOpen(true);
+  };
+
+  const closeConfirm = () => {
+    if (isLoggingOut) return;
+    setConfirmOpen(false);
+  };
 
   const handleLogout = async () => {
-    // TODO: replace with useAuth().logout() once AuthContext exists
-    await activity?.flushNow();
     setIsLoggingOut(true);
+    setLogoutError(null);
     try {
+      // Save pending progress / active time before the session ends.
+      await activity?.flushNow();
       await logout();
+      // On success the auth state clears and the app leaves this page,
+      // so the dialog doesn't need to be closed manually.
+      setConfirmOpen(false);
     } catch (error) {
-      console.error('Logout request failed', error);
+      console.error('Logout failed', error);
+      setLogoutError('Could not log out. Please try again.');
     } finally {
       setIsLoggingOut(false);
     }
   };
+
   const profileLabel = user?.name ?? 'Profile';
 
   return (
@@ -154,18 +174,30 @@ export default function Header({ leading, status }: HeaderProps) {
           </nav>
           <span className={styles.divider} aria-hidden="true" />
 
-          <button
-            type="button"
-            className={styles.logoutButton}
-            disabled={isLoggingOut}
-            aria-label={isLoggingOut ? 'Logging out…' : 'Log out'}
-            title="Log out"
-            onClick={() => {
+          <ConfirmPopover
+            open={confirmOpen}
+            message="Log out?"
+            confirmLabel="Log out"
+            busyLabel="Logging out…"
+            isBusy={isLoggingOut}
+            error={logoutError}
+            onConfirm={() => {
               void handleLogout();
             }}
+            onCancel={closeConfirm}
           >
-            <PowerIcon className={styles.logoutIcon} />
-          </button>
+            <button
+              type="button"
+              className={styles.logoutButton}
+              aria-label="Log out"
+              aria-haspopup="dialog"
+              aria-expanded={confirmOpen}
+              title="Log out"
+              onClick={openConfirm}
+            >
+              <PowerIcon className={styles.logoutIcon} />
+            </button>
+          </ConfirmPopover>
         </div>
       </div>
     </header>
