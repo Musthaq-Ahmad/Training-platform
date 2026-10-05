@@ -13,7 +13,7 @@ function formatDuration(seconds: number): string {
 }
 
 export default function DailyActivityTable({ days }: DailyActivityTableProps) {
-  const maximumTime = 28800;
+  const MAX_DAILY_ACTIVE_SECONDS = 28_800; // 8 hours
 
   return (
     <section className={styles.activity} aria-label="Daily training activity">
@@ -25,7 +25,7 @@ export default function DailyActivityTable({ days }: DailyActivityTableProps) {
 
       <div>
         {days.map((day) => {
-          const width = (day.timeSpentSeconds / maximumTime) * 100;
+          const width = (day.timeSpentSeconds / MAX_DAILY_ACTIVE_SECONDS) * 100;
 
           return (
             <div key={day.date} className={`${styles.row} ${day.isToday ? styles.rowToday : ''}`}>
