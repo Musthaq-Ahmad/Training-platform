@@ -14,6 +14,8 @@ import { useNodeSession, type NodeSessionStatus } from './useNodeSession';
 import { getWebContainer } from './webcontainerService';
 import styles from './NodeRuntime.module.css';
 import { useMarkWork } from '../../pages/TaskPage/state/WorkActivityContext';
+import { useAuth } from '../../context/Useauth';
+import { nodeDatabaseStorageName } from './databaseSnapshots';
 
 type NodeRuntimeProps = { task: TaskResponse; isVisible: boolean };
 
@@ -49,6 +51,7 @@ export default function NodeRuntime({ task, isVisible }: NodeRuntimeProps) {
   const state = useWorkspaceState();
   const dispatch = useWorkspaceDispatch();
   const markWork = useMarkWork();
+  const { user } = useAuth();
 
   // The files at mount are what WebContainer starts from; later edits reach it through the sync.
   const [initialFiles] = useState(() => state.files);
@@ -91,6 +94,7 @@ export default function NodeRuntime({ task, isVisible }: NodeRuntimeProps) {
     initialFiles,
     terminal,
     callbacks,
+    databaseStorageName: user ? nodeDatabaseStorageName(user.id, task.id) : null,
   });
   const { status, fileSync, runCommand, resize, retry, errorMessage } = session;
 

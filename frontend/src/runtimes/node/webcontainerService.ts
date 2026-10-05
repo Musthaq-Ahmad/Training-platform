@@ -21,13 +21,22 @@ export function getWebContainer(): Promise<WebContainer> {
   return bootPromise;
 }
 
-/** Empties the working folder and mounts the given files. */
+/**
+ * Empties the working folder and mounts the given files, plus any hidden support files
+ * (see supportFiles.ts). Support files skip toFileSystemTree, which leaves out ignored paths.
+ */
 export async function resetWorkspace(
   wc: WebContainer,
-  files: Record<string, string>
+  files: Record<string, string>,
+  supportFiles: Record<string, string> = {}
 ): Promise<void> {
   // Also removes the previous task's node_modules and anything it created in the terminal.
   const entries = await wc.fs.readdir('/');
   await Promise.all(entries.map((name) => wc.fs.rm(name, { recursive: true, force: true })));
   await wc.mount(toFileSystemTree(files));
+  for (const [path, contents] of Object.entries(supportFiles)) {
+    const folder = path.slice(0, path.lastIndexOf('/'));
+    if (folder) await wc.fs.mkdir(folder, { recursive: true });
+    await wc.fs.writeFile(path, contents);
+  }
 }
