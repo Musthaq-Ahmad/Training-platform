@@ -19,7 +19,7 @@ const POINTER_MOVE_THROTTLE_MS = 5000;
 const MAX_BATCHES_PER_FLUSH = 10;
 
 /**
- * Counts active / coding / reading time for the signed-in trainee and sends it in batches.
+ * Counts active / coding time for the signed-in trainee and sends it in batches.
  * Counts live in refs: they change every second and must not re-render the app.
  */
 export function ActivityProvider({ children }: { children: ReactNode }) {

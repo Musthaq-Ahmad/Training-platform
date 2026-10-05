@@ -29,7 +29,7 @@ export function addTick(
 
 /**
  * Whole seconds to send now, and what is left over for the next batch.
- * One batch holds at most MAX_BATCH_SECONDS, and coding + reading never exceed active.
+ * One batch holds at most MAX_BATCH_SECONDS, and coding  never exceed active.
  */
 export function takeWholeSeconds(totals: Totals): { batch: SecondsBatch; rest: Totals } {
   const activeSeconds = Math.min(Math.floor(totals.activeMs / 1000), MAX_BATCH_SECONDS);
