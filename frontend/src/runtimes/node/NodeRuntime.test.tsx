@@ -13,6 +13,12 @@ import NodeRuntime from './NodeRuntime';
 // --- mocks -------------------------------------------------------------------------------------
 
 vi.mock('@webcontainer/api');
+vi.mock('../../context/Useauth', () => ({
+  useAuth: () => ({
+    user: { id: 'u1', email: 'trainee@example.com', name: 'Test Trainee' },
+    isLoading: false,
+  }),
+}));
 vi.mock('@xterm/xterm', () => ({
   Terminal: class {
     cols = 80;

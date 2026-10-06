@@ -2,7 +2,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { WebContainerProcess } from '@webcontainer/api';
 import type { Terminal } from '@xterm/xterm';
 import { isChromium, isCrossOriginIsolated } from '../../lib/crossOriginIsolation';
+import {
+  canStoreDatabases,
+  createDatabaseSnapshots,
+  indexedDbSnapshotStore,
+  waitForPendingSaves,
+  type DatabaseSnapshots,
+} from './databaseSnapshots';
 import { createFileSync, type FileSync, type FileSyncCallbacks } from './fileSync';
+import { savedDatabasePaths, supportFilesFor } from './supportFiles';
 import { getWebContainer, resetWorkspace } from './webcontainerService';
 
 export type NodeSessionStatus = 'unsupported' | 'booting' | 'installing' | 'ready' | 'error';
@@ -12,6 +20,8 @@ type UseNodeSessionOptions = {
   initialFiles: Record<string, string>;
   terminal: Terminal | null; // from TerminalView
   callbacks: FileSyncCallbacks; // from Blueprint 3
+  /** Where this trainee's copy of the task's database is saved; null keeps it for this visit only */
+  databaseStorageName?: string | null;
 };
 
 type UseNodeSessionResult = {
@@ -64,6 +74,7 @@ export function useNodeSession({
   initialFiles,
   terminal,
   callbacks,
+  databaseStorageName = null,
 }: UseNodeSessionOptions): UseNodeSessionResult {
   // Decided once: the browser doesn't change while the page is open.
   const [isSupported] = useState(() => isCrossOriginIsolated() && isChromium());
@@ -74,6 +85,7 @@ export function useNodeSession({
 
   const callbacksRef = useRef(callbacks);
   const initialFilesRef = useRef(initialFiles);
+  const databaseStorageNameRef = useRef(databaseStorageName);
   useEffect(() => {
     callbacksRef.current = callbacks;
   });
@@ -89,6 +101,7 @@ export function useNodeSession({
     let install: WebContainerProcess | null = null;
     let shell: WebContainerProcess | null = null;
     let fileSync: FileSync | null = null;
+    let snapshots: DatabaseSnapshots | null = null;
     let dataSubscription: { dispose: () => void } | null = null;
     const report = (next: Omit<Progress, 'attempt'>) => {
       if (!isCancelled) setProgress({ attempt, ...next });
@@ -100,8 +113,38 @@ export function useNodeSession({
 
       const wc = await getWebContainer();
       if (isCancelled) return;
-      await resetWorkspace(wc, initialFilesRef.current);
+      await waitForPendingSaves(); // the previous task's database, before its files are deleted
       if (isCancelled) return;
+      const files = initialFilesRef.current;
+      await resetWorkspace(wc, files, supportFilesFor(files));
+      if (isCancelled) return;
+
+      // Prisma tasks: bring back the database saved in this browser, and keep saving it.
+      const databasePaths = savedDatabasePaths(files);
+      const storageName = databaseStorageNameRef.current;
+      if (databasePaths.length > 0 && storageName && canStoreDatabases()) {
+        snapshots = createDatabaseSnapshots(
+          wc.fs,
+          indexedDbSnapshotStore,
+          storageName,
+          databasePaths
+        );
+        try {
+          const { restored, canSave } = await snapshots.open();
+          if (isCancelled) return;
+          if (restored) term.write(`${DIM}Restored your saved database.${RESET}\r\n`);
+          if (!canSave) {
+            term.write(
+              `${YELLOW}This task is open in another tab, so database changes here won't be saved.${RESET}\r\n`
+            );
+          }
+        } catch {
+          if (isCancelled) return;
+          term.write(
+            `${YELLOW}Couldn't load your saved database; Run starts a fresh one.${RESET}\r\n`
+          );
+        }
+      }
       fileSync = createFileSync(wc, initialFilesRef.current, {
         onRemoteChange: (path, content) => callbacksRef.current.onRemoteChange(path, content),
         onRemoteDelete: (path) => callbacksRef.current.onRemoteDelete(path),
@@ -148,6 +191,7 @@ export function useNodeSession({
       install?.kill();
       shell?.kill();
       fileSync?.dispose();
+      void snapshots?.dispose(); // saves the last changes; the next task waits for it
       dataSubscription?.dispose();
       writerRef.current?.releaseLock();
       writerRef.current = null;

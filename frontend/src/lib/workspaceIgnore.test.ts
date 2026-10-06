@@ -14,6 +14,15 @@ describe('isIgnoredPath', () => {
     expect(isIgnoredPath('dist/index.html')).toBe(true);
   });
 
+  it('is true for the workspace helper files and databases in .vinkup', () => {
+    expect(isIgnoredPath('.vinkup/prisma/cli.mjs')).toBe(true);
+    expect(isIgnoredPath('.vinkup/db/dev/PG_VERSION')).toBe(true);
+  });
+
+  it("is true for prisma-pglite's scratch databases in .not-committed", () => {
+    expect(isIgnoredPath('.not-committed/pglite/dev/PG_VERSION')).toBe(true);
+  });
+
   it('is true for package-lock.json', () => {
     expect(isIgnoredPath('package-lock.json')).toBe(true);
   });

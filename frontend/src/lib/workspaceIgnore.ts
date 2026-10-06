@@ -7,6 +7,8 @@ export const IGNORED_DIRS = [
   '.cache',
   '.git',
   'generated',
+  '.vinkup', // workspace helper files and PGlite databases for Prisma tasks (runtimes/node/supportFiles.ts)
+  '.not-committed', // prisma-pglite's scratch databases when it creates a migration
 ];
 export const IGNORED_FILES = ['package-lock.json', '.DS_Store'];
 /** Same limits as the backend's saveCodeBodySchema (see lib/saveRules.ts) */
