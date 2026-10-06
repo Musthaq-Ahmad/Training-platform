@@ -7,7 +7,7 @@ export function useActivity(): ActivityContextValue | null {
 }
 
 /**
- * Tells the activity counter what this page is (coding / reading / none) while it is mounted.
+ * Tells the activity counter what this page is (coding / none) while it is mounted.
  * Two effects on purpose: a change of mode or day only reports the new value, and the reset to
  * 'none' happens once, on unmount. With a single effect, every mode change went through
  * ('none', null), which made the provider see a day change and flush twice.

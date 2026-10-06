@@ -19,16 +19,6 @@ describe('addTick', () => {
     expect(totals).toEqual({ activeMs: 1000, codingMs: 1000 });
   });
 
-  it('counts reading time in the reading bucket only', () => {
-    const totals = addTick(emptyTotals(), {
-      elapsedMs: 1000,
-      isVisible: true,
-      msSinceInput: 10,
-      mode: 'coding',
-    });
-    expect(totals).toEqual({ activeMs: 1000, codingMs: 1000 });
-  });
-
   it('counts only active time when the mode is none', () => {
     const totals = addTick(emptyTotals(), {
       elapsedMs: 1000,
