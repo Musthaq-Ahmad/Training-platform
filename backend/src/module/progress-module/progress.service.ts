@@ -13,6 +13,40 @@ export interface DayProgress {
 
 export class ProgressService {
   /**
+   * THE day-lock rule. This is the only place it is defined; the day module
+   * and every status calculation go through it.
+   *
+   * A day is unlocked when it is already completed, when it is the very first
+   * day of the curriculum, or when the day before it is completed.
+   *
+   * @param orderedDayIds every curriculum day id in curriculum order
+   *                      (course sort_order, then day_number)
+   * @param completedDayIds ids of the days the trainee has completed
+   * @returns false for a day id that is not in the curriculum
+   */
+  isDayUnlocked(
+    orderedDayIds: readonly string[],
+    completedDayIds: ReadonlySet<string>,
+    dayId: string
+  ): boolean {
+    const index = orderedDayIds.indexOf(dayId);
+
+    if (index === -1) {
+      return false;
+    }
+
+    if (completedDayIds.has(dayId)) {
+      return true;
+    }
+
+    if (index === 0) {
+      return true;
+    }
+
+    return completedDayIds.has(orderedDayIds[index - 1]);
+  }
+
+  /**
    * Returns the status of every curriculum day for a trainee.
    * Uses two bulk queries, regardless of the number of days.
    */
@@ -22,31 +56,19 @@ export class ProgressService {
       progressRepository.getDayCompletions(traineeId),
     ]);
 
+    const orderedDayIds = days.map((day) => day.id);
     const completedDayIds = new Set(completions.map((completion) => completion.curriculum_day_id));
 
-    let unlockedDayFound = false;
-
-    return days.map((day) => {
+    return days.map<DayProgress>((day) => {
       if (completedDayIds.has(day.id)) {
-        return {
-          dayId: day.id,
-          status: 'COMPLETED',
-        };
+        return { dayId: day.id, status: 'COMPLETED' };
       }
 
-      if (!unlockedDayFound) {
-        unlockedDayFound = true;
-
-        return {
-          dayId: day.id,
-          status: 'UNLOCKED',
-        };
+      if (this.isDayUnlocked(orderedDayIds, completedDayIds, day.id)) {
+        return { dayId: day.id, status: 'UNLOCKED' };
       }
 
-      return {
-        dayId: day.id,
-        status: 'LOCKED',
-      };
+      return { dayId: day.id, status: 'LOCKED' };
     });
   }
 

@@ -36,6 +36,32 @@ describe('ProgressService', () => {
     });
   });
 
+  describe('isDayUnlocked', () => {
+    const ordered = ['day-1', 'day-2', 'day-3'];
+    const done = (...ids: string[]) => new Set(ids);
+
+    it('unlocks the first day with no progress', () => {
+      expect(service.isDayUnlocked(ordered, done(), 'day-1')).toBe(true);
+    });
+
+    it('locks a day whose previous day is not completed', () => {
+      expect(service.isDayUnlocked(ordered, done(), 'day-2')).toBe(false);
+    });
+
+    it('unlocks a day once the previous day is completed', () => {
+      expect(service.isDayUnlocked(ordered, done('day-1'), 'day-2')).toBe(true);
+      expect(service.isDayUnlocked(ordered, done('day-1'), 'day-3')).toBe(false);
+    });
+
+    it('keeps a completed day unlocked even if its previous day is not completed', () => {
+      expect(service.isDayUnlocked(ordered, done('day-3'), 'day-3')).toBe(true);
+    });
+
+    it('returns false for a day that is not in the curriculum', () => {
+      expect(service.isDayUnlocked(ordered, done('day-1'), 'unknown')).toBe(false);
+    });
+  });
+
   describe('getDayStatuses', () => {
     it('unlocks only the first day for a new trainee', async () => {
       await expect(service.getDayStatuses(traineeId)).resolves.toEqual([
@@ -55,6 +81,26 @@ describe('ProgressService', () => {
         { dayId: 'day-1', status: 'COMPLETED' },
         { dayId: 'day-2', status: 'COMPLETED' },
         { dayId: 'day-3', status: 'UNLOCKED' },
+      ]);
+    });
+
+    it('unlocks a day whose previous day is completed even if an earlier day is not', async () => {
+      mockGetCurriculumDays.mockResolvedValue([
+        { id: 'day-1' },
+        { id: 'day-2' },
+        { id: 'day-3' },
+        { id: 'day-4' },
+      ]);
+      mockGetDayCompletions.mockResolvedValue([
+        { curriculum_day_id: 'day-1' },
+        { curriculum_day_id: 'day-3' },
+      ]);
+
+      await expect(service.getDayStatuses(traineeId)).resolves.toEqual([
+        { dayId: 'day-1', status: 'COMPLETED' },
+        { dayId: 'day-2', status: 'UNLOCKED' },
+        { dayId: 'day-3', status: 'COMPLETED' },
+        { dayId: 'day-4', status: 'UNLOCKED' },
       ]);
     });
 
