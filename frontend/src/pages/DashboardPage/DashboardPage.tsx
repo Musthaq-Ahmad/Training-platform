@@ -46,8 +46,23 @@ export default function DashboardPage() {
     let cancelled = false;
 
     void getDashboard()
-      .then((data) => {
+      .then(async (data) => {
+        const courseId = data.nextDay?.courseId ?? DEFAULT_COURSE_ID;
+        // This effect owns the first request, so the effect below must not repeat it
+        requestedCourses.current.add(courseId);
+        let firstDays: DaySummary[] | null = null;
+        let firstDaysError: Error | null = null;
+        try {
+          firstDays = await getCourseDays(courseId);
+        } catch (err: unknown) {
+          firstDaysError = err instanceof Error ? err : new Error('Something went wrong');
+        }
+        return { data, courseId, firstDays, firstDaysError };
+      })
+      .then(({ data, courseId, firstDays, firstDaysError }) => {
         if (cancelled) return;
+        if (firstDays) setDaysByCourse((prev) => ({ ...prev, [courseId]: firstDays }));
+        if (firstDaysError) setDaysErrors((prev) => ({ ...prev, [courseId]: firstDaysError }));
         setDashboard(data);
         setActiveCourseId(data.nextDay?.courseId ?? DEFAULT_COURSE_ID);
       })

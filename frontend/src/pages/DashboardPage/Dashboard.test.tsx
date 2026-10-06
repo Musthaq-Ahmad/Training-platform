@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
@@ -289,14 +289,29 @@ describe('DashboardPage', () => {
     expect(getCourseDays).toHaveBeenCalledWith('js');
   });
 
-  it('shows a loading message while the days of the course are loading', async () => {
+  it('keeps the full-page loader until the days of the first tab are loaded', async () => {
     vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
     vi.mocked(getCourseDays).mockReturnValue(new Promise(() => {}));
 
     renderPage();
 
+    await waitFor(() => expect(getCourseDays).toHaveBeenCalledWith('js'));
+    expect(screen.getByRole('status')).toBeInTheDocument(); // the full-page loader
+    expect(screen.queryByText('Header')).not.toBeInTheDocument(); // the page is not shown yet
+    expect(screen.queryByText('Loading days...')).not.toBeInTheDocument(); // no second loader
+  });
+
+  it('shows "Loading days..." for a tab that is opened later', async () => {
+    const user = userEvent.setup();
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+
+    renderPage();
+    await screen.findByText('JavaScript Module — Schedule');
+
+    vi.mocked(getCourseDays).mockReturnValue(new Promise(() => {}));
+    await user.click(screen.getByRole('tab', { name: 'Node.js' }));
+
     expect(await screen.findByText('Loading days...')).toBeInTheDocument();
-    expect(screen.queryByText('JavaScript Module — Schedule')).not.toBeInTheDocument();
   });
 
   it('shows the error message when the days of the course fail to load', async () => {
