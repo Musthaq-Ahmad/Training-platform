@@ -7,6 +7,16 @@ datasource db {
   provider = "postgresql"
 }
 
+// ---------- Admins (mentors). Separate from trainee: never part of trainee queries. ----------
+model admin {
+id String @id @default(uuid()) @db.Uuid
+email String @unique // stored lower-case
+name String
+is_active Boolean @default(true) // false = can no longer log in or call /api/admin
+created_at DateTime @default(now()) @db.Timestamptz
+last_login_at DateTime? @db.Timestamptz
+}
+
 // ---------- Enums ----------
 
 enum task_runtime {

@@ -1,14 +1,26 @@
 import { describe, it, expect } from 'vitest';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
-import { signJwt, verifyJwt } from './jwt';
+import { signJwt, verifyJwt, type JwtPayload } from './jwt';
 
-const payload = { id: 'u1', name: 'Test Trainee', email: 'trainee@vonnue.com' };
+const payload: JwtPayload = {
+  id: 'u1',
+  name: 'Test Trainee',
+  email: 'trainee@vonnue.com',
+  role: 'trainee',
+};
+
+const adminPayload: JwtPayload = {
+  id: 'a1',
+  name: 'Test Mentor',
+  email: 'mentor@vonnue.com',
+  role: 'admin',
+};
 
 const nowInSeconds = () => Math.floor(Date.now() / 1000);
 
 describe('signJwt', () => {
-  it('JWT-01: returns a three-part token with id, name, email, iat and exp', () => {
+  it('JWT-01: returns a three-part token with id, name, email, role, iat and exp', () => {
     const token = signJwt(payload);
 
     expect(token.split('.')).toHaveLength(3);
@@ -29,7 +41,7 @@ describe('signJwt', () => {
 
 describe('verifyJwt', () => {
   it('JWT-03: returns the payload for a valid token', () => {
-    expect(verifyJwt(signJwt(payload))).toMatchObject(payload);
+    expect(verifyJwt(signJwt(payload))).toEqual(payload);
   });
 
   it('JWT-04: rejects an expired token', () => {
@@ -54,6 +66,15 @@ describe('verifyJwt', () => {
     expect(() => verifyJwt(`${header}.${forgedPayload}.${signature}`)).toThrow();
   });
 
+  it('JWT-05c: rejects a trainee token whose role was edited to admin', () => {
+    const [header, , signature] = signJwt(payload).split('.');
+    const forgedPayload = Buffer.from(JSON.stringify({ ...payload, role: 'admin' })).toString(
+      'base64url'
+    );
+
+    expect(() => verifyJwt(`${header}.${forgedPayload}.${signature}`)).toThrow();
+  });
+
   it('JWT-06: rejects a token signed with a different secret', () => {
     const forged = jwt.sign(payload, 'some-other-secret');
 
@@ -70,5 +91,28 @@ describe('verifyJwt', () => {
     const unsigned = `${encode({ alg: 'none', typ: 'JWT' })}.${encode({ ...payload, exp: nowInSeconds() + 3600 })}.`;
 
     expect(() => verifyJwt(unsigned)).toThrow();
+  });
+
+  it('JWT-09: treats a token issued before roles existed (no role claim) as a trainee', () => {
+    const legacy = jwt.sign(
+      { id: payload.id, name: payload.name, email: payload.email },
+      env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    expect(verifyJwt(legacy)).toEqual({ ...payload, role: 'trainee' });
+  });
+
+  it('JWT-10: keeps the admin role through sign and verify', () => {
+    expect(verifyJwt(signJwt(adminPayload))).toEqual(adminPayload);
+  });
+
+  it('JWT-11: returns only id, email, name and role (no iat or exp)', () => {
+    expect(Object.keys(verifyJwt(signJwt(payload))).sort()).toEqual([
+      'email',
+      'id',
+      'name',
+      'role',
+    ]);
   });
 });

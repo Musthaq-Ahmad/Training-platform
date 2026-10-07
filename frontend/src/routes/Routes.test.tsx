@@ -4,8 +4,14 @@ import { MemoryRouter, Route, Routes } from 'react-router';
 import { AuthContext, type AuthContextValue } from '../context/AuthContext';
 import { ProtectedRoute } from './ProtectedRoute';
 import { PublicOnlyRoute } from './PublicOnlyRoute';
+import type { MeResponse } from '@itp/types';
 
-const user = { id: 'u1', email: 'trainee@vonnue.com', name: 'Test Trainee' };
+const user: MeResponse = {
+  id: 'u1',
+  email: 'trainee@vonnue.com',
+  name: 'Test Trainee',
+  role: 'trainee',
+};
 
 function fakeAuth(overrides: Partial<AuthContextValue>): AuthContextValue {
   return {
