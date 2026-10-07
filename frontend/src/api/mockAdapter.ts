@@ -14,6 +14,13 @@ import type {
   SaveJournalRequest,
 } from '@itp/types';
 import { mockUser } from '../test/fixtures/user';
+import {
+  buildAdminFlags,
+  buildAdminTaskCode,
+  buildAdminTraineeDetail,
+  buildAdminTrainees,
+  mockAdmin,
+} from '../test/fixtures/admin';
 import { mockTaskStatus, mockTasksByDay } from '../test/fixtures/dayTasks';
 import {
   catalogTaskCode,
@@ -29,6 +36,14 @@ import { addTypingResult, buildTypingResults } from '../test/fixtures/typingTest
 import { mockProfile } from '../test/fixtures/profile';
 
 const MOCK_DELAY_MS = 300;
+
+/**
+ * Who `/auth/me` answers as. Default is the trainee; run with VITE_MOCK_ROLE=admin to see the
+ * mentor pages. Read on every call so tests can switch it with vi.stubEnv.
+ */
+function currentMockUser() {
+  return import.meta.env.VITE_MOCK_ROLE === 'admin' ? mockAdmin : mockUser;
+}
 
 const savedFiles = new Map<string, TaskFile[]>();
 const JOURNAL_STORAGE_KEY = 'itp-mock-journals-v1';
@@ -131,6 +146,9 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   const dayCompleteMatch = /^\/days\/([^/]+)\/complete$/.exec(url);
   const dayJournalMatch = /^\/days\/([^/]+)\/journal$/.exec(url);
   const courseDaysMatch = /^\/courses\/([^/]+)\/days$/.exec(url);
+  const adminTraineeMatch = /^\/admin\/trainees\/([^/]+)$/.exec(url);
+  const adminFlagsMatch = /^\/admin\/trainees\/([^/]+)\/flags$/.exec(url);
+  const adminCodeMatch = /^\/admin\/trainees\/([^/]+)\/tasks\/([^/]+)\/code$/.exec(url);
 
   if (method === 'get' && codeMatch) {
     const taskId = codeMatch[1];
@@ -199,7 +217,7 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   }
 
   if (method === 'get' && url === '/auth/me') {
-    return respond(config, 200, mockUser);
+    return respond(config, 200, currentMockUser());
   }
 
   if (method === 'get' && dayContentMatch) {
@@ -295,6 +313,45 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
 
   if (method === 'get' && url === '/profile') {
     return respond(config, 200, mockProfile);
+  }
+
+  // Mentor endpoints: read-only, and only for the admin role, like requireAdmin on the backend.
+  if (url.startsWith('/admin/')) {
+    if (currentMockUser().role !== 'admin') {
+      return errorResponse(config, 403, 'FORBIDDEN', 'Admin access only.');
+    }
+    if (method !== 'get') {
+      return errorResponse(config, 404, 'NOT_FOUND', 'Not found.');
+    }
+
+    if (url === '/admin/trainees') {
+      return respond(config, 200, buildAdminTrainees());
+    }
+
+    if (adminFlagsMatch) {
+      const flags = buildAdminFlags(adminFlagsMatch[1]);
+      return flags
+        ? respond(config, 200, flags)
+        : errorResponse(config, 404, 'NOT_FOUND', 'Trainee not found.');
+    }
+
+    if (adminCodeMatch) {
+      const result = buildAdminTaskCode(adminCodeMatch[1], adminCodeMatch[2]);
+      if (result.kind === 'no-trainee') {
+        return errorResponse(config, 404, 'NOT_FOUND', 'Trainee not found.');
+      }
+      if (result.kind === 'no-task') {
+        return errorResponse(config, 404, 'NOT_FOUND', 'Task not found.');
+      }
+      return respond(config, 200, result.data);
+    }
+
+    if (adminTraineeMatch) {
+      const detail = buildAdminTraineeDetail(adminTraineeMatch[1]);
+      return detail
+        ? respond(config, 200, detail)
+        : errorResponse(config, 404, 'NOT_FOUND', 'Trainee not found.');
+    }
   }
 
   if (method === 'get' && courseDaysMatch) {

@@ -23,7 +23,8 @@ const MAX_BATCHES_PER_FLUSH = 10;
  * Counts live in refs: they change every second and must not re-render the app.
  */
 export function ActivityProvider({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const isTrainee = isAuthenticated && user?.role !== 'admin';
 
   const totalsRef = useRef<Totals>(emptyTotals());
   const modeRef = useRef<ActivityMode>('none');
@@ -74,7 +75,7 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isTrainee) return;
 
     const start = Date.now();
     lastTickAtRef.current = start;
@@ -122,7 +123,7 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
       window.clearInterval(flushTimer);
       totalsRef.current = emptyTotals(); // signed out: don't carry time over to the next user
     };
-  }, [isAuthenticated, tick, flush]);
+  }, [isTrainee, tick, flush]);
 
   const value = useMemo<ActivityContextValue>(
     () => ({

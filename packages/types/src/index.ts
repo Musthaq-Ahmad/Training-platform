@@ -5,4 +5,5 @@ export * from './tasks';
 export * from './activity';
 export * from './dayOverview';
 export * from './typingTest';
+export * from './admin';
 export * from './journal';
