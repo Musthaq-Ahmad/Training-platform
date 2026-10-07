@@ -50,6 +50,25 @@ function KeyboardIcon() {
   );
 }
 
+function JournalIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 3.5h9a2 2 0 0 1 2 2v9H5a2 2 0 0 1-2-2v-9Z" />
+      <path d="M5 3.5v9a2 2 0 0 0 2 2M7 7h4M7 10h4" />
+    </svg>
+  );
+}
+
 function UserIcon() {
   return (
     <svg
@@ -163,7 +182,14 @@ export default function Header({ leading, status }: HeaderProps) {
               <KeyboardIcon />
               <NavLabel text="Typing Test" />
             </NavLink>
-
+            <NavLink
+              to="/journal"
+              end
+              className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+            >
+              <JournalIcon />
+              <NavLabel text="Journal" />
+            </NavLink>
             <NavLink
               to="/profile"
               className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
