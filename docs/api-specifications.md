@@ -153,8 +153,9 @@ In normal use (days completed in order) both give the same result.
 | POST   | `/api/typing-test/results`     | Yes  | Save a typing test result                                         |
 | GET    | `/api/typing-test/results`     | Yes  | All typing results, newest first                                  |
 | GET    | `/api/profile`                 | Yes  | Profile page data                                                 |
+| GET    | `/api/journal`                 | Yes  | Accessible journal entries, newest curriculum day first           |
 
-24 endpoints (including the legacy `PATCH /api/days/:dayId/status`).
+25 endpoints (including the legacy `PATCH /api/days/:dayId/status`).
 
 ---
 
@@ -442,6 +443,11 @@ or `{ "responseText": "Because padding and border stay inside the declared width
 ```
 
 - **Errors:** 400 `VALIDATION_FAILED` (bad `dayId`, missing/empty/too-long `responseText`); 401; 403 `DAY_LOCKED`; 404 `"Day not found"`.
+
+### GET /api/journal
+
+- **Auth:** required.
+- **Response 200** (`JournalListResponse`): `{ "entries": [...] }`, with accessible days only (completed days and the next unlocked day), newest curriculum day first. Each entry includes the curriculum title, track label, journal prompt, saved text and update time. `isEditable` is true only for the next unlocked day.
 
 ### GET /api/days/:dayId/tasks
 
