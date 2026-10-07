@@ -1,0 +1,92 @@
+.badge {
+  /* Score-band colours (light theme). */
+  --tone-high: #069669;
+  --tone-mid: #8a5d00;
+  --tone-low: #b91c1c; /* score and icon: deep red, readable on its own tint */
+  --tone-low-fill: #dc2626; /* border and tint: the brighter red that makes the badge stand out */
+  --tint: 13%;
+  --edge: 28%;
+  --tint-low: 15%;
+  --edge-low: 55%;
+  --tone: var(--color-text-muted); /* neutral until a band class sets it */
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border-card);
+  border-radius: 999px;
+  background: var(--color-bg-surface-2);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Calmer, less saturated tones and a quieter tint on dark backgrounds. Low stays a clear red. */
+@media (prefers-color-scheme: dark) {
+  .badge {
+    --tone-high: #4cbf9b;
+    --tone-mid: #d4a24c;
+    --tone-low: #ff6b6b;
+    --tone-low-fill: #ff6b6b;
+    --tint: 10%;
+    --edge: 24%;
+    --tint-low: 16%;
+    --edge-low: 50%;
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--tone);
+}
+
+.label {
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.score {
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.max {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.high {
+  --tone: var(--tone-high);
+}
+
+.mid {
+  --tone: var(--tone-mid);
+}
+
+.low {
+  --tone: var(--tone-low);
+  --tone-fill: var(--tone-low-fill);
+  --tint: var(--tint-low);
+  --edge: var(--edge-low);
+}
+
+.high,
+.mid,
+.low {
+  border-color: color-mix(in srgb, var(--tone-fill, var(--tone)) var(--edge), transparent);
+  background: color-mix(in srgb, var(--tone-fill, var(--tone)) var(--tint), transparent);
+}
+
+.high .score,
+.mid .score,
+.low .score {
+  color: var(--tone);
+}

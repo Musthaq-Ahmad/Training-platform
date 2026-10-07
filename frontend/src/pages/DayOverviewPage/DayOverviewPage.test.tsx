@@ -1,10 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import type { DayCurrentStatus, DayTask } from '@itp/types';
+import type { DayCurrentStatus, DayTask, DayIntegrityResponse } from '@itp/types';
 import { ApiError } from '../../api/errors';
 import { mockDayContents } from '../../api/dayOverview';
-import { completeDay, getDayJournal, getDayStatus, getDayTasks, saveJournal } from '../../api/days';
+import {
+  completeDay,
+  getDayJournal,
+  getDayStatus,
+  getDayTasks,
+  saveJournal,
+  getDayIntegrity,
+} from '../../api/days';
 import DayOverviewPage from './DayOverviewPage';
 
 vi.mock('../../api/days');
@@ -19,6 +26,13 @@ const completedTask = {
   status: 'completed' as const,
   isStretchGoal: false,
 } as DayTask;
+
+const integrityResponse = {
+  state: 'in_progress',
+  score: 31,
+  tasksCounted: 2,
+  breakdown: { pasteAttempts: 0, tabSwitches: 3, fullscreenExits: 1, windowBlurs: 0 },
+} as DayIntegrityResponse;
 
 const openStatus = { isLocked: false, isCompleted: false } as DayCurrentStatus;
 
@@ -43,6 +57,7 @@ beforeEach(() => {
   vi.mocked(getDayTasks).mockResolvedValue([completedTask]);
   vi.mocked(getDayStatus).mockResolvedValue(openStatus);
   vi.mocked(getDayJournal).mockResolvedValue({ responseText: null });
+  vi.mocked(getDayIntegrity).mockResolvedValue(integrityResponse);
 });
 
 afterEach(() => {
@@ -58,6 +73,7 @@ describe('DayOverviewPage: loading', () => {
     expect(getDayTasks).toHaveBeenCalledWith(dayId);
     expect(getDayStatus).toHaveBeenCalledWith(dayId);
     expect(getDayJournal).toHaveBeenCalledWith(dayId);
+    expect(getDayIntegrity).toHaveBeenCalledWith(dayId);
   });
 
   it('shows the locked message when the status says the day is locked', async () => {
