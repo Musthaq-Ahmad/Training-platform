@@ -1,9 +1,19 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { DayJournal, SaveJournalRequest } from '@itp/types';
+import type { DayJournal, JournalListResponse, SaveJournalRequest } from '@itp/types';
 import type { AuthenticatedRequest } from '../../types/auth.types';
 import { journalService } from './journal.services';
 
 export const journalController = {
+  listJournal: async (req: Request, res: Response<JournalListResponse>, next: NextFunction) => {
+    try {
+      const traineeId = (req as AuthenticatedRequest).user.id;
+      const response = await journalService.listJournalEntries(traineeId);
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   getJournal: async (req: Request, res: Response<DayJournal>, next: NextFunction) => {
     try {
       const traineeId = (req as AuthenticatedRequest).user.id; // requireAuth guarantees req.user exists

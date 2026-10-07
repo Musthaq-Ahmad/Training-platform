@@ -1,0 +1,165 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border-card);
+  border-radius: 10px;
+}
+
+.prompts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.promptItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.promptNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent-label);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  border-radius: 50%;
+}
+
+.promptText {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 160px;
+  padding: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  resize: vertical;
+  background: var(--color-bg-code-block);
+  border: 1px solid var(--color-border-input);
+  border-radius: 8px;
+}
+
+.textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.textarea:focus {
+  border-color: var(--color-accent-label);
+}
+
+.counter {
+  align-self: flex-end;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: var(--color-text-muted);
+  border-radius: 50%;
+}
+
+.saved {
+  color: color-mix(in srgb, var(--color-text-green) 80%, var(--color-text-primary));
+}
+
+.saved .dot {
+  background: var(--color-status-success);
+}
+
+.saving .dot {
+  background: var(--color-accent-spinner);
+}
+
+.error {
+  color: var(--color-status-error-text);
+}
+
+.error .dot {
+  background: var(--color-status-error-icon);
+}
+
+.retry {
+  margin-left: 0.25rem;
+  padding: 0 0.25rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-accent-label);
+  text-decoration: underline;
+  border-radius: 4px;
+}
+
+.saveButton {
+  min-height: 40px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-on-accent);
+  background: var(--color-accent-purple);
+  border-radius: 8px;
+  transition:
+    opacity 0.15s ease,
+    transform 0.1s ease;
+}
+
+.saveButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.saveButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 639px) {
+  .saveButton {
+    width: 100%;
+    min-height: 44px;
+  }
+}

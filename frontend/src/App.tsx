@@ -12,6 +12,7 @@ import DayOverviewPage from './pages/DayOverviewPage';
 import TaskPageSkeleton from './components/TaskPageSkeleton';
 import NotFoundPage from './pages/NotFoundPage';
 import TypingTestPage from './pages/TypingTestPage/TypingTestPage';
+import JournalPage from './pages/JournalPage';
 import HelpPage from './pages/HelpPage';
 import ReferencePage from './pages/ReferencePage';
 import { useParams } from 'react-router';
@@ -43,6 +44,7 @@ export default function App() {
                 <Route path="/help" element={<HelpPage />}></Route>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/typing-test" element={<TypingTestPage />} />
+                <Route path="/journal" element={<JournalPage />} />
                 <Route
                   path="/tasks/:taskId"
                   element={

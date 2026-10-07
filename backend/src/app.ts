@@ -16,6 +16,7 @@ import activityRoutes from './module/activity-module/activity.routes';
 import taskRoutes from './module/task-module/task.routes';
 import typingRoutes from './module/typing-test-module/typing.routes';
 import dayRouter from './module/day-module/day.routes';
+import journalRouter from './module/day-module/journal.routes';
 
 const app: Express = express();
 
@@ -43,6 +44,7 @@ app.use('/api/dashboard', requireTrainee, dashboardRoutes);
 app.use('/api/courses', requireTrainee, courseRoutes);
 app.use('/api/tasks', requireTrainee, taskRoutes);
 app.use('/api/days', requireTrainee, dayRouter);
+app.use('/api/journal', requireTrainee, journalRouter);
 app.use('/api/typing-test', requireTrainee, typingRoutes);
 
 app.use(notFoundHandler);
