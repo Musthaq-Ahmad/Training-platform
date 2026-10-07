@@ -16,6 +16,9 @@ const prisma = new PrismaClient({ adapter });
 
 // ---------- Data ----------
 
+// Mentors who can open the admin dashboard. Emails must be on ALLOWED_EMAIL_DOMAIN.
+const admins = [{ email: 'hawas.backer@vonnue.com', name: 'hawas' }];
+
 const trainees = [
   { email: 'hawas.backer@vonnue.com', name: 'Hawas Backer' },
   { email: 'aswin.vijayan@vonnue.com', name: 'Aswin Vijayan' },
@@ -336,6 +339,17 @@ async function main() {
     }
     await seedDemo(curriculum);
   }
+
+  for (const admin of admins) {
+    const email = admin.email.toLowerCase();
+    await prisma.admin.upsert({
+      where: { email },
+      update: { name: admin.name },
+      create: { email, name: admin.name },
+    });
+  }
+
+  console.log(`Admins: ${admins.length}`);
 
   console.log('Seeding complete.');
 }

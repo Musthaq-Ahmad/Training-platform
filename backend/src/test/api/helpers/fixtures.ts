@@ -190,7 +190,8 @@ export type TestTrainee = { id: string; name: string; email: string; cookie: str
 export async function createTrainee(name = 'Test Trainee'): Promise<TestTrainee> {
   const email = `${name.toLowerCase().replace(/[^a-z]+/g, '.')}@vonnue.com`;
   const row = await db.trainee.create({ data: { name, email } });
-  const token = signJwt({ id: row.id, name: row.name, email: row.email });
+  const token = signJwt({ id: row.id, name: row.name, email: row.email, role: 'trainee' });
+
   return { ...row, cookie: `${AUTH_COOKIE_NAME}=${token}` };
 }
 
@@ -241,4 +242,18 @@ export function istDate(daysAgo = 0): Date {
 
 export function minutesAgo(minutes: number): Date {
   return new Date(Date.now() - minutes * 60 * 1000);
+}
+
+export type TestAdmin = { id: string; name: string; email: string; cookie: string };
+
+/** An admin (mentor) row plus a login cookie. Upserts, so calling it in every beforeEach is safe. */
+export async function createAdmin(name = 'Test Mentor', isActive = true): Promise<TestAdmin> {
+  const email = `${name.toLowerCase().replace(/[^a-z]+/g, '.')}@vonnue.com`;
+  const row = await db.admin.upsert({
+    where: { email },
+    update: { name, is_active: isActive },
+    create: { name, email, is_active: isActive },
+  });
+  const token = signJwt({ id: row.id, name: row.name, email: row.email, role: 'admin' });
+  return { id: row.id, name: row.name, email: row.email, cookie: `${AUTH_COOKIE_NAME}=${token}` };
 }

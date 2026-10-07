@@ -8,7 +8,7 @@ import passport from './module/auth-module/passport';
 import authRoutes from './module/auth-module/auth.routes';
 import { env } from './config/env';
 import profileRoutes from './module/profile-module/profile.routes';
-import { requireAuth } from './middleware/authMiddleware';
+import { requireTrainee } from './middleware/authMiddleware';
 import { dashboardRoutes } from './module/dashboard-module/dashboard.routes';
 import { courseRoutes } from './module/dashboard-module/dashboard.routes';
 import flagRoutes from './module/flag-module/flag.routes';
@@ -37,13 +37,13 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/activity', flagRoutes);
 
-app.use('/api/profile', requireAuth, profileRoutes);
-app.use('/api/activity', requireAuth, activityRoutes);
-app.use('/api/dashboard', requireAuth, dashboardRoutes);
-app.use('/api/courses', requireAuth, courseRoutes);
-app.use('/api/tasks', requireAuth, taskRoutes);
-app.use('/api/days', requireAuth, dayRouter);
-app.use('/api/typing-test', requireAuth, typingRoutes);
+app.use('/api/profile', requireTrainee, profileRoutes);
+app.use('/api/activity', requireTrainee, activityRoutes);
+app.use('/api/dashboard', requireTrainee, dashboardRoutes);
+app.use('/api/courses', requireTrainee, courseRoutes);
+app.use('/api/tasks', requireTrainee, taskRoutes);
+app.use('/api/days', requireTrainee, dayRouter);
+app.use('/api/typing-test', requireTrainee, typingRoutes);
 
 app.use(notFoundHandler);
 

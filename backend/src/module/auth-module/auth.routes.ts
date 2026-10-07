@@ -23,14 +23,10 @@ authRoutes.get('/google/callback', (req: Request, res: Response, next: NextFunct
   const authenticateCallback: RequestHandler = passport.authenticate(
     'google',
     { session: false },
-    (
-      error: unknown,
-      trainee: Express.User | false,
-      info?: { message?: string; email?: string }
-    ) => {
+    (error: unknown, user: Express.User | false, info?: { message?: string; email?: string }) => {
       if (error) return next(error);
 
-      if (!trainee) {
+      if (!user) {
         const params = new URLSearchParams({
           error: info?.message ?? 'LOGIN_FAILED',
           email: info?.email ?? '',
@@ -38,13 +34,13 @@ authRoutes.get('/google/callback', (req: Request, res: Response, next: NextFunct
 
         return res.redirect(`${env.FRONTEND_URL}/login?${params.toString()}`);
       }
-      const token = signJwt({ id: trainee.id, name: trainee.name, email: trainee.email });
+      const token = signJwt({ id: user.id, name: user.name, email: user.email, role: user.role });
 
       res.cookie(AUTH_COOKIE_NAME, token, {
         ...AUTH_COOKIE_OPTIONS,
         maxAge: AUTH_COOKIE_MAX_AGE_MS, //7 days should keep in sync with JWT_EXPIRES_IN
       });
-      res.redirect(`${env.FRONTEND_URL}`);
+      res.redirect(user.role === 'admin' ? `${env.FRONTEND_URL}/admin` : `${env.FRONTEND_URL}`);
     }
   ) as RequestHandler;
 
