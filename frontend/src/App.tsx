@@ -65,16 +65,16 @@ export default function App() {
                       <AdminTraineesPage />
                     </Suspense>
                   }
-                >
-                  <Route
-                    path="/admin/trainees/:traineeId"
-                    element={
-                      <Suspense fallback={<LoaderOverlay fullPage />}>
-                        <AdminTraineePage />
-                      </Suspense>
-                    }
-                  ></Route>
-                </Route>
+                ></Route>
+
+                <Route
+                  path="/admin/trainees/:traineeId"
+                  element={
+                    <Suspense fallback={<LoaderOverlay fullPage />}>
+                      <AdminTraineePage />
+                    </Suspense>
+                  }
+                ></Route>
               </Route>
             </Route>
             <Route element={<PublicOnlyRoute />}>
