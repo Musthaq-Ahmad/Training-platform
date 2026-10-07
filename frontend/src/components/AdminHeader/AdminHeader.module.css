@@ -1,0 +1,152 @@
+.header {
+  margin-bottom: 2.5rem;
+}
+
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--color-border-divider);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.appName {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--color-text-primary);
+}
+
+.up {
+  color: var(--color-accent-purple);
+}
+
+/* Tells a mentor at a glance this is not the trainee app. */
+.badge {
+  padding: 2px 10px;
+  border: 1px solid var(--color-accent-purple-wash);
+  border-radius: 999px;
+  background-color: var(--color-accent-tint);
+  color: var(--color-accent-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.end {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 16px;
+  /* Border is always there (transparent) so hover/active never move anything */
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.link svg {
+  flex-shrink: 0;
+}
+
+.link:hover {
+  border-color: var(--color-overlay-highlight-8);
+  color: var(--color-text-primary);
+}
+
+.link.active,
+.link.active:hover {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* Reserves the bold width so the nav doesn't shift when the link becomes active. */
+.label {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.label::after {
+  content: attr(data-text);
+  font-weight: 600;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  user-select: none;
+  pointer-events: none;
+}
+
+.userName {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 1px;
+  background-color: var(--color-border-default);
+}
+
+.logoutButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 28px;
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+}
+
+.logoutIcon {
+  opacity: 0.65;
+  transition:
+    opacity 150ms ease,
+    filter 150ms ease,
+    color 150ms ease;
+}
+
+.logoutButton:hover:not(:disabled) .logoutIcon,
+.logoutButton:focus-visible .logoutIcon {
+  opacity: 1;
+  filter: brightness(1.3);
+  color: var(--color-text-primary);
+}
+
+.logoutButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

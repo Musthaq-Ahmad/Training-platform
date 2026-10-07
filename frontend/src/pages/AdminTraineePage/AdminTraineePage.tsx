@@ -1,4 +1,11 @@
+import AdminHeader from '../../components/AdminHeader';
+
 export default function AdminTraineePage() {
   //place holder
-  return <div>Single Trainee page</div>;
+  return (
+    <>
+      <AdminHeader></AdminHeader>
+      <div>Single Trainee page</div>;
+    </>
+  );
 }

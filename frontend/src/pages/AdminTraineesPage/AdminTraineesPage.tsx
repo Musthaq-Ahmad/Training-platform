@@ -1,3 +1,10 @@
+import AdminHeader from '../../components/AdminHeader';
+
 export default function AdminTraineesPage() {
-  return <div>trainees list page</div>;
+  return (
+    <>
+      <AdminHeader></AdminHeader>
+      <div>trainees list page</div>
+    </>
+  );
 }
