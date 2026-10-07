@@ -12,6 +12,7 @@ import DayOverviewPage from './pages/DayOverviewPage';
 import TaskPageSkeleton from './components/TaskPageSkeleton';
 import NotFoundPage from './pages/NotFoundPage';
 import TypingTestPage from './pages/TypingTestPage/TypingTestPage';
+import JournalPage from './pages/JournalPage';
 
 const TaskPage = lazy(() => import('./pages/TaskPage'));
 import ReferencePage from './pages/ReferencePage';
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/" element={<DashboardPage />} />
               <Route path="/typing-test" element={<TypingTestPage />} />
+              <Route path="/journal" element={<JournalPage />} />
               <Route
                 path="/tasks/:taskId"
                 element={
