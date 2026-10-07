@@ -19,6 +19,7 @@ const TABLES = [
   'curriculum_day',
   'course',
   'trainee',
+  'admin',
 ];
 
 /** Empties every table. Only ever runs against TEST_DATABASE_URL (see setup.ts). */

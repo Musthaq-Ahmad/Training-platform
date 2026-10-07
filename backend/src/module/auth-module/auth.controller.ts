@@ -12,6 +12,7 @@ class AuthController {
         id: trainee.id,
         email: trainee.email,
         name: trainee.name,
+        role: trainee.role,
       });
     } catch (error) {
       next(error);

@@ -1,5 +1,7 @@
+import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { clear, keys } from 'idb-keyval';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import type { DayCurrentStatus, DayTask } from '@itp/types';
 import { ApiError } from '../../api/errors';
@@ -10,6 +12,13 @@ import DayOverviewPage from './DayOverviewPage';
 vi.mock('../../api/days');
 // The header needs providers we don't care about here.
 vi.mock('../../components/Header', () => ({ default: () => null }));
+// The self-check checklist stores its ticks per trainee, so it needs a user.
+vi.mock('../../context/Useauth', () => ({
+  useAuth: () => ({
+    user: { id: 'user-1', email: 'a@vonnue.com', name: 'A' },
+    isLoading: false,
+  }),
+}));
 
 const dayId = Object.keys(mockDayContents)[0];
 
@@ -23,7 +32,7 @@ const completedTask = {
 const openStatus = { isLocked: false, isCompleted: false } as DayCurrentStatus;
 
 function renderPage() {
-  render(
+  return render(
     <MemoryRouter initialEntries={[`/days/${dayId}`]}>
       <Routes>
         <Route path="/days/:dayId" element={<DayOverviewPage />} />
@@ -45,8 +54,9 @@ beforeEach(() => {
   vi.mocked(getDayJournal).mockResolvedValue({ responseText: null });
 });
 
-afterEach(() => {
+afterEach(async () => {
   cleanup();
+  await clear(); // ticks from one test must not leak into the next
 });
 
 describe('DayOverviewPage: loading', () => {
@@ -226,5 +236,27 @@ describe('DayOverviewPage: daily journal', () => {
     fireEvent.click(screen.getByRole('button', { name: /save journal/i }));
 
     expect(saveJournal).not.toHaveBeenCalled();
+  });
+});
+
+describe('DayOverviewPage: self-check checklist', () => {
+  it('keeps ticked items after leaving the page and coming back', async () => {
+    const first = renderPage();
+    await screen.findByRole('button', { name: /submit day/i });
+
+    // Checkboxes stay disabled until the saved state has loaded.
+    const checkbox = screen.getAllByRole('checkbox')[0];
+    await waitFor(() => expect(checkbox).toBeEnabled());
+    fireEvent.click(checkbox);
+    expect(checkbox).toBeChecked();
+
+    // Make sure the write has reached IndexedDB before "leaving" the page.
+    await waitFor(async () => expect(await keys()).toHaveLength(1));
+    first.unmount();
+
+    renderPage();
+    await screen.findByRole('button', { name: /submit day/i });
+
+    await waitFor(() => expect(screen.getAllByRole('checkbox')[0]).toBeChecked());
   });
 });

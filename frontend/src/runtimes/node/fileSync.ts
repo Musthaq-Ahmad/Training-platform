@@ -5,6 +5,7 @@ import { isIgnoredPath, MAX_FILE_CHARS } from '../../lib/workspaceIgnore';
 export type WebContainerLike = {
   fs: {
     readFile(path: string, encoding: 'utf-8'): Promise<string>;
+    readdir(path: string): Promise<unknown>;
     writeFile(path: string, data: string): Promise<void>;
     mkdir(path: string, options: { recursive: true }): Promise<unknown>;
     rm(path: string, options?: { force?: boolean; recursive?: boolean }): Promise<void>;
@@ -131,6 +132,15 @@ export function createFileSync(
   }
 
   async function readFromContainer(path: string) {
+    // A folder is not a file. Don't rely on readFile failing with EISDIR: in WebContainer
+    // it can succeed with '', which would add an empty "file" named like the folder.
+    try {
+      await wc.fs.readdir(path);
+      return; // it's a folder
+    } catch {
+      // not a folder, or already deleted: carry on, readFile below handles both
+    }
+
     let text: string;
     try {
       text = await wc.fs.readFile(path, 'utf-8');
