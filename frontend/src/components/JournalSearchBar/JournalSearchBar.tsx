@@ -49,12 +49,7 @@ export default function JournalSearchBar({
         />
       </div>
 
-      {entryCount !== null && (
-        <p className={styles.count}>
-          <Icon name="sliders" size={14} className={styles.countIcon} />
-          {countLabel}
-        </p>
-      )}
+      {entryCount !== null && <p className={styles.count}>{countLabel}</p>}
     </div>
   );
 }
