@@ -155,7 +155,7 @@ In normal use (days completed in order) both give the same result.
 | GET    | `/api/profile`                 | Yes  | Profile page data                                                 |
 | GET    | `/api/journal`                 | Yes  | Accessible journal entries, newest curriculum day first           |
 
-26 endpoints (including the legacy `PATCH /api/days/:dayId/status`).
+25 endpoints (including the legacy `PATCH /api/days/:dayId/status`).
 
 ---
 
