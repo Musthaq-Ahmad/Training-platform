@@ -15,6 +15,7 @@ import GreetingBanner from '../../components/GreetingBanner';
 import { useAuth } from '../../context/Useauth';
 import { useGreeting } from '../../hooks/useGreeting';
 import styles from './DashboardPage.module.css';
+import HelpButton from '../../components/HelpButton';
 
 const DEFAULT_COURSE_ID = 'html';
 
@@ -232,6 +233,7 @@ export default function DashboardPage() {
           />
         </section>
       </div>
+      <HelpButton />
     </>
   );
 }

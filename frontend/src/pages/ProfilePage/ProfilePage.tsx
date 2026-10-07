@@ -8,6 +8,7 @@ import styles from './ProfilePage.module.css';
 import Header from '../../components/Header';
 import LoaderOverlay from '../../components/Common/LoadingState';
 import { ErrorState } from '../../components/Common/ErrorState';
+import HelpButton from '../../components/HelpButton';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -88,6 +89,7 @@ export default function ProfilePage() {
           <DailyActivityTable days={profile.dailyActivity} />
         </section>
       </main>
+      <HelpButton />
     </>
   );
 }

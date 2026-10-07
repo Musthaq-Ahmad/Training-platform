@@ -9,6 +9,7 @@ import JournalSearchBar from '../../components/JournalSearchBar';
 import JournalSkeleton from './JournalSkeleton';
 import Header from '../../components/Header';
 import styles from './JournalPage.module.css';
+import HelpButton from '../../components/HelpButton';
 
 function hasWrittenText(entry: JournalEntry): boolean {
   return entry.responseText.trim() !== '';
@@ -131,6 +132,7 @@ export default function JournalPage() {
 
         {renderContent()}
       </main>
+      <HelpButton />
     </>
   );
 }
