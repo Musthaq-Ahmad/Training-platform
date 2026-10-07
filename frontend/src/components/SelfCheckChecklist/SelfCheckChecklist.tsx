@@ -1,25 +1,23 @@
-import { useState } from 'react';
 import type { SelfCheckItem } from '@itp/types';
+import { useSelfCheckProgress } from '../../hooks/useSelfCheckProgress';
 import styles from './SelfCheckChecklist.module.css';
 
 interface SelfCheckChecklistProps {
+  dayId: string;
   items: SelfCheckItem[];
   description?: string;
 }
 
 export default function SelfCheckChecklist({
+  dayId,
   items,
   description = 'Self-check verification criteria separate from the practical coding tasks.',
 }: SelfCheckChecklistProps) {
-  const [checkedItems, setCheckedItems] = useState<string[]>([]);
+  const { checkedIds, isLoaded, toggle } = useSelfCheckProgress(dayId);
 
-  const handleToggle = (id: string) => {
-    setCheckedItems((previous) =>
-      previous.includes(id) ? previous.filter((itemId) => itemId !== id) : [...previous, id]
-    );
-  };
-
-  const completedCount = checkedItems.length;
+  const checkedSet = new Set(checkedIds);
+  // Count only items that still exist, in case the curriculum changed after saving.
+  const completedCount = items.filter((item) => checkedSet.has(item.id)).length;
 
   return (
     <section className={styles.selfCheck}>
@@ -36,7 +34,7 @@ export default function SelfCheckChecklist({
 
       <div className={styles.selfCheckList}>
         {items.map((item, index) => {
-          const isChecked = checkedItems.includes(item.id);
+          const isChecked = checkedSet.has(item.id);
 
           return (
             <label
@@ -46,7 +44,8 @@ export default function SelfCheckChecklist({
               <input
                 type="checkbox"
                 checked={isChecked}
-                onChange={() => handleToggle(item.id)}
+                disabled={!isLoaded} // prevents toggling before saved state is loaded
+                onChange={() => toggle(item.id)}
                 className={styles.selfCheckCheckbox}
               />
 
@@ -55,10 +54,8 @@ export default function SelfCheckChecklist({
                   <p className={styles.selfCheckItemLabel}>
                     {index + 1}. {item.label}
                   </p>
-
                   <span className={styles.selfCheckCode}>{item.code}</span>
                 </div>
-
                 <p className={styles.selfCheckItemDescription}>{item.description}</p>
               </div>
             </label>
