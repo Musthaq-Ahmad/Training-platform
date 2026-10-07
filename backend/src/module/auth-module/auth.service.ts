@@ -10,15 +10,33 @@ import {
 const authRepository = new AuthRepository();
 
 export class AuthService {
-  async verifyGoogleProfile(profile: Profile) {
+  async verifyGoogleProfile(profile: Profile): Promise<Express.User> {
     const email = profile.emails?.[0]?.value;
+
     if (!email) throw new UnauthorizedError('Google did not return an email address.');
 
     if (!email.endsWith(`@${env.ALLOWED_EMAIL_DOMAIN}`)) throw new DomainNotPermittedError();
 
+    const admin = await authRepository.findActiveAdminByEmail(email);
+    if (admin) {
+      await authRepository.recordAdminLogin(admin.id);
+
+      return {
+        id: admin.id,
+        email: admin.email,
+        name: admin.name,
+        role: 'admin',
+      };
+    }
+
     const trainee = await authRepository.findBymail(email);
     if (!trainee) throw new NotProvisionedError();
 
-    return trainee;
+    return {
+      id: trainee.id,
+      email: trainee.email,
+      name: trainee.name,
+      role: 'trainee',
+    };
   }
 }

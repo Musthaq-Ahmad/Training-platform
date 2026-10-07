@@ -16,7 +16,12 @@ vi.mock('../../api/client', () => ({ setUnauthorizedHandler: vi.fn() }));
 import { ApiError } from '../../api/errors';
 
 const httpError = (status: number) => new ApiError(status, 'NETWORK_ERROR', `HTTP ${status}`);
-const trainee = { id: 'u1', email: 'trainee@vonnue.com', name: 'Test Trainee' };
+const trainee = {
+  id: 'u1',
+  email: 'trainee@vonnue.com',
+  name: 'Test Trainee',
+  role: 'trainee' as const,
+};
 
 function Probe() {
   const { status, user, login, logout: doLogout, refresh } = useAuth();
