@@ -18,10 +18,12 @@ export type ApiErrorResponse = {
   };
 };
 
+export type UserRole = 'trainee' | 'admin';
+
 // Response returned by the authenticated user profile endpoint
 export type MeResponse = {
   id: string;
   email: string;
   name: string;
-  role: 'trainee' | 'admin';
+  role: UserRole;
 };

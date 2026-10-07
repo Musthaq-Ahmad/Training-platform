@@ -12,10 +12,14 @@ import DayOverviewPage from './pages/DayOverviewPage';
 import TaskPageSkeleton from './components/TaskPageSkeleton';
 import NotFoundPage from './pages/NotFoundPage';
 import TypingTestPage from './pages/TypingTestPage/TypingTestPage';
-
-const TaskPage = lazy(() => import('./pages/TaskPage'));
 import ReferencePage from './pages/ReferencePage';
 import { useParams } from 'react-router';
+import { RoleRoute } from './routes/RoleRoute';
+import LoaderOverlay from './components/Common/LoadingState';
+
+const TaskPage = lazy(() => import('./pages/TaskPage'));
+const AdminTraineesPage = lazy(() => import('./pages/AdminTraineesPage'));
+const AdminTraineePage = lazy(() => import('./pages/AdminTraineePage'));
 
 function ReferenceRoute() {
   const { dayId } = useParams();
@@ -33,19 +37,41 @@ export default function App() {
         <ActivityProvider>
           <Routes>
             <Route element={<ProtectedRoute />}>
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/" element={<DashboardPage />} />
-              <Route path="/typing-test" element={<TypingTestPage />} />
-              <Route
-                path="/tasks/:taskId"
-                element={
-                  <Suspense fallback={<TaskPageSkeleton />}>
-                    <TaskPage />
-                  </Suspense>
-                }
-              />
-              <Route path="/days/:dayId" element={<DayOverviewPage />} />
-              <Route path="/days/:dayId/references" element={<ReferenceRoute />} />
+              <Route element={<RoleRoute role="trainee" />}>
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/" element={<DashboardPage />} />
+                <Route path="/typing-test" element={<TypingTestPage />} />
+                <Route
+                  path="/tasks/:taskId"
+                  element={
+                    <Suspense fallback={<TaskPageSkeleton />}>
+                      <TaskPage />
+                    </Suspense>
+                  }
+                />
+                <Route path="/days/:dayId" element={<DayOverviewPage />} />
+                <Route path="/days/:dayId/references" element={<ReferenceRoute />} />
+              </Route>
+
+              <Route element={<RoleRoute role="admin" />}>
+                <Route
+                  path="/admin"
+                  element={
+                    <Suspense fallback={<LoaderOverlay fullPage />}>
+                      <AdminTraineesPage />
+                    </Suspense>
+                  }
+                >
+                  <Route
+                    path="/admin/trainees/:traineeId"
+                    element={
+                      <Suspense fallback={<LoaderOverlay fullPage />}>
+                        <AdminTraineePage />
+                      </Suspense>
+                    }
+                  ></Route>
+                </Route>
+              </Route>
             </Route>
             <Route element={<PublicOnlyRoute />}>
               <Route path="/login" element={<LoginPage />} />

@@ -4,10 +4,11 @@ import LoaderOverlay from '../components/Common/LoadingState/Loader';
 
 /** Layout route for pages like /login: signed-in users are sent to the home page. */
 export function PublicOnlyRoute() {
-  const { status } = useAuth();
+  const { status, user } = useAuth();
 
   if (status === 'loading') return <LoaderOverlay fullPage={true} />;
-  if (status === 'authenticated') return <Navigate to="/" replace />;
+  if (status === 'authenticated')
+    return <Navigate to={user?.role === 'admin' ? '/admin' : '/'} replace />;
 
   return <Outlet />;
 }
