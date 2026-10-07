@@ -9,10 +9,15 @@ function createFakeContainer(initial: Record<string, string>) {
   const folders = new Set<string>();
   let listener: Listener | null = null;
   const close = vi.fn();
+  let folderReadsSucceed = false;
 
   const fs = {
     readFile: vi.fn((path: string) => {
-      if (folders.has(path)) return Promise.reject(new Error(`EISDIR: ${path}`));
+      if (folders.has(path)) {
+        return folderReadsSucceed
+          ? Promise.resolve('')
+          : Promise.reject(new Error(`EISDIR: ${path}`));
+      }
       const content = disk.get(path);
       return content === undefined
         ? Promise.reject(
@@ -20,6 +25,12 @@ function createFakeContainer(initial: Record<string, string>) {
           )
         : Promise.resolve(content);
     }),
+    readdir: vi.fn((path: string) =>
+      folders.has(path)
+        ? Promise.resolve([])
+        : Promise.reject(Object.assign(new Error(`ENOTDIR: ${path}`), { code: 'ENOTDIR' }))
+    ),
+
     writeFile: vi.fn((path: string, data: string) => {
       disk.set(path, data);
       return Promise.resolve();
@@ -45,6 +56,9 @@ function createFakeContainer(initial: Record<string, string>) {
     disk,
     folders,
     close,
+    setFolderReadsSucceed(value: boolean) {
+      folderReadsSucceed = value;
+    },
     /** What the terminal would do: change the disk, then the watcher fires. */
     remoteWrite(path: string, content: string) {
       disk.set(path, content);
@@ -211,6 +225,21 @@ describe('createFileSync: Node → editor', () => {
 
     expect(callbacks.onRemoteChange).not.toHaveBeenCalled();
     expect(callbacks.onRemoteDelete).not.toHaveBeenCalled();
+  });
+
+  it('ignores a folder even when readFile on it succeeds with an empty string', async () => {
+    const container = createFakeContainer(initial);
+    const callbacks = makeCallbacks();
+    createFileSync(container.wc, initial, callbacks);
+
+    container.setFolderReadsSucceed(true);
+    container.folders.add('prisma/migrations');
+    container.folders.add('prisma/migrations/20261006062809_init');
+    container.fire('prisma/migrations');
+    container.fire('prisma/migrations/20261006062809_init');
+    await vi.advanceTimersByTimeAsync(300);
+
+    expect(callbacks.onRemoteChange).not.toHaveBeenCalled();
   });
 
   it('ignores node_modules events without reading them', async () => {
