@@ -1,0 +1,92 @@
+.page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  margin: 0;
+
+  font-family: var(--font-sans);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.2;
+
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  margin: 0;
+
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.card {
+  margin-top: 20px;
+  overflow: hidden;
+
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: 12px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.emptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+
+  border-radius: 50%;
+  background: var(--color-accent-tint);
+  color: var(--color-accent-purple);
+}
+
+.emptyTitle {
+  margin: 0;
+
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 700;
+
+  color: var(--color-text-primary);
+}
+
+.emptyText {
+  margin: 0;
+  max-width: 28rem;
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 0 12px 3rem;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+}
