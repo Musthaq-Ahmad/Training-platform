@@ -7,3 +7,4 @@ export * from './dayOverview';
 export * from './typingTest';
 export * from './admin';
 export * from './journal';
+export * from './admin';
