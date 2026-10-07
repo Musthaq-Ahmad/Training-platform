@@ -7,5 +7,5 @@ export async function getJournalEntries(): Promise<JournalListResponse> {
 }
 
 export async function saveJournal(dayId: string, body: SaveJournalRequest): Promise<void> {
-  await apiClient.put(`/journal/${dayId}`, body);
+  await apiClient.put(`days/${dayId}/journal`, body);
 }
