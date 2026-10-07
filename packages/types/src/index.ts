@@ -6,3 +6,4 @@ export * from './activity';
 export * from './dayOverview';
 export * from './typingTest';
 export * from './journal';
+export * from './admin';
