@@ -8,7 +8,7 @@ import passport from './module/auth-module/passport';
 import authRoutes from './module/auth-module/auth.routes';
 import { env } from './config/env';
 import profileRoutes from './module/profile-module/profile.routes';
-import { requireTrainee } from './middleware/authMiddleware';
+import { requireTrainee, requireAdmin } from './middleware/authMiddleware';
 import { dashboardRoutes } from './module/dashboard-module/dashboard.routes';
 import { courseRoutes } from './module/dashboard-module/dashboard.routes';
 import flagRoutes from './module/flag-module/flag.routes';
@@ -18,6 +18,7 @@ import typingRoutes from './module/typing-test-module/typing.routes';
 import dayRouter from './module/day-module/day.routes';
 import journalRouter from './module/day-module/journal.routes';
 
+import { adminRoutes } from './module/admin-module/admin.routes';
 const app: Express = express();
 
 app.use(
@@ -46,7 +47,7 @@ app.use('/api/tasks', requireTrainee, taskRoutes);
 app.use('/api/days', requireTrainee, dayRouter);
 app.use('/api/journal', requireTrainee, journalRouter);
 app.use('/api/typing-test', requireTrainee, typingRoutes);
-
+app.use('/api/admin', requireAdmin, adminRoutes);
 app.use(notFoundHandler);
 
 app.use(errorHandler);
