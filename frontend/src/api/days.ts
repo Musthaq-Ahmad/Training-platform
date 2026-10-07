@@ -39,20 +39,7 @@ export async function completeDay(dayId: string): Promise<DayCurrentStatus> {
   return data.status;
 }
 
-export function getDayIntegrity(_dayId: string): Promise<DayIntegrityResponse> {
-  //  const res = await apiClient.get<DayIntegrityResponse>(`/days/${dayId}/integrity`);
-  // return res.data;
-  return new Promise((resolve) => {
-    // The delay lets you see the loading state.
-    setTimeout(
-      () =>
-        resolve({
-          state: 'in_progress',
-          score: 31,
-          tasksCounted: 2,
-          breakdown: { pasteAttempts: 0, tabSwitches: 3, fullscreenExits: 1, windowBlurs: 0 },
-        }),
-      400
-    );
-  });
+export async function getDayIntegrity(dayId: string): Promise<DayIntegrityResponse> {
+  const res = await apiClient.get<DayIntegrityResponse>(`/days/${dayId}/integrity`);
+  return res.data;
 }

@@ -11,12 +11,6 @@ type DayIntegrityBadgeProps = {
 
 const EXPLANATION = 'Based on recorded workspace activity and integrity-related events.';
 
-const STATE_LABEL = {
-  not_started: 'Not started',
-  in_progress: 'In progress',
-  completed: 'Completed',
-} as const;
-
 export default function DayIntegrityBadge({
   integrity,
   isLoading,
@@ -42,7 +36,7 @@ export default function DayIntegrityBadge({
     );
   }
 
-  const { score, state } = integrity;
+  const { score } = integrity;
   const band = getIntegrityBand(score); // null = neutral (no score yet)
 
   return (
@@ -50,9 +44,7 @@ export default function DayIntegrityBadge({
       className={`${styles.badge} ${band ? styles[band] : ''}`}
       title={EXPLANATION}
       aria-label={
-        score === null
-          ? `Integrity score not available yet, ${STATE_LABEL[state]}`
-          : `Integrity score ${score} out of 100, ${STATE_LABEL[state]}`
+        score === null ? `Integrity score not available yet` : `Integrity score ${score} out of 100`
       }
     >
       <ShieldCheck size={16} strokeWidth={2} className={styles.icon} aria-hidden="true" />

@@ -67,12 +67,7 @@ export type IntegrityBreakdown = {
   windowBlurs: number;
 };
 
-export type DayIntegrityState = 'not_started' | 'in_progress' | 'completed';
-
 /** GET /api/days/:dayId/integrity */
 export type DayIntegrityResponse = {
-  state: DayIntegrityState;
   score: number | null; // null = no task worked on yet, show "-"
-  tasksCounted: number; // started tasks the score is based on
-  breakdown: IntegrityBreakdown;
 };

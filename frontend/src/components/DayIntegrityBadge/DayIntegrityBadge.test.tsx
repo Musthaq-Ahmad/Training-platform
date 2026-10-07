@@ -22,9 +22,6 @@ const mockedGetIntegrityBand = vi.mocked(getIntegrityBand);
 
 const createIntegrity = (overrides: Partial<DayIntegrityResponse> = {}): DayIntegrityResponse => ({
   score: 94,
-  state: 'completed',
-  tasksCounted: 2,
-  breakdown: { pasteAttempts: 0, tabSwitches: 3, fullscreenExits: 1, windowBlurs: 0 },
   ...overrides,
 });
 
@@ -256,14 +253,13 @@ describe('DayIntegrityBadge', () => {
         <DayIntegrityBadge
           integrity={createIntegrity({
             score: 94,
-            state: 'completed',
           })}
           isLoading={false}
           hasError={false}
         />
       );
 
-      expect(screen.getByLabelText('Integrity score 94 out of 100, Completed')).toBeInTheDocument();
+      expect(screen.getByLabelText('Integrity score 94 out of 100')).toBeInTheDocument();
     });
 
     it('renders the correct aria-label for an in-progress score', () => {
@@ -273,16 +269,13 @@ describe('DayIntegrityBadge', () => {
         <DayIntegrityBadge
           integrity={createIntegrity({
             score: 75,
-            state: 'in_progress',
           })}
           isLoading={false}
           hasError={false}
         />
       );
 
-      expect(
-        screen.getByLabelText('Integrity score 75 out of 100, In progress')
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Integrity score 75 out of 100')).toBeInTheDocument();
     });
 
     it('renders the correct aria-label for a not-started state', () => {
@@ -292,16 +285,13 @@ describe('DayIntegrityBadge', () => {
         <DayIntegrityBadge
           integrity={createIntegrity({
             score: null,
-            state: 'not_started',
           })}
           isLoading={false}
           hasError={false}
         />
       );
 
-      expect(
-        screen.getByLabelText('Integrity score not available yet, Not started')
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Integrity score not available yet')).toBeInTheDocument();
     });
 
     it('hides the shield icon from screen readers', () => {
@@ -317,7 +307,7 @@ describe('DayIntegrityBadge', () => {
         <DayIntegrityBadge integrity={createIntegrity()} isLoading={false} hasError={false} />
       );
 
-      expect(screen.getByLabelText('Integrity score 94 out of 100, Completed')).toHaveAttribute(
+      expect(screen.getByLabelText('Integrity score 94 out of 100')).toHaveAttribute(
         'title',
         'Based on recorded workspace activity and integrity-related events.'
       );
