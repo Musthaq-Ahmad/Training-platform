@@ -14,6 +14,11 @@ import { ErrorState } from '../../components/Common/ErrorState';
 import ProfileHeader from '../../components/ProfileHeader';
 import StateMessage from '../../components/StateMessage';
 import StatsSummary from '../../components/StatsSummary';
+import PrintReport from '../../components/PrintReport';
+import PrintReportButton from '../../components/PrintReportButton';
+import { useAuth } from '../../context/Useauth';
+import { usePrintMode } from '../../hooks/usePrintMode';
+import { DEFAULT_PRINT_OPTIONS, reportDocumentTitle } from '../../lib/printReport';
 import { useAdminResource } from './hooks/useAdminResource';
 import styles from './AdminTraineePage.module.css';
 
@@ -55,6 +60,12 @@ function TraineeDetail({ traineeId }: { traineeId: string }) {
   const code = useAdminResource(loadCode);
 
   const handleCloseCode = useCallback(() => setSelectedTaskId(null), []);
+
+  const { user } = useAuth();
+  const { printJob, print } = usePrintMode({
+    defaults: DEFAULT_PRINT_OPTIONS,
+    documentTitle: reportDocumentTitle(detail.data?.profile.trainee.name ?? 'Trainee'),
+  });
 
   const dayLabels = useMemo(() => {
     const labels = new Map<string, string>();
@@ -127,85 +138,102 @@ function TraineeDetail({ traineeId }: { traineeId: string }) {
 
   return (
     <>
-      <AdminHeader />
-      <main className={styles.page}>
-        <BackLink />
+      {/* Everything on screen; hidden when printing, where only the report below is shown. */}
+      <div className={styles.screenOnly}>
+        <AdminHeader />
+        <main className={styles.page}>
+          <div className={styles.topBar}>
+            <BackLink />
+            <PrintReportButton onPrint={print} />
+          </div>
 
-        <ProfileHeader trainee={profile.trainee} />
+          <ProfileHeader trainee={profile.trainee} />
 
-        <section className={styles.card} aria-label="Progress and activity">
-          <StatsSummary total={profile.total} typing={profile.typing} />
-          <DailyActivityTable days={profile.dailyActivity} />
-        </section>
+          <section className={styles.card} aria-label="Progress and activity">
+            <StatsSummary total={profile.total} typing={profile.typing} />
+            <DailyActivityTable days={profile.dailyActivity} />
+          </section>
 
-        <AdminDayGrid courses={courses} />
+          <AdminDayGrid courses={courses} />
 
-        <div className={styles.tabs} role="tablist" aria-label="Trainee details">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              role="tab"
-              id={`tab-${tab.id}`}
-              aria-selected={activeTab === tab.id}
-              aria-controls={`panel-${tab.id}`}
-              className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+          <div className={styles.tabs} role="tablist" aria-label="Trainee details">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                id={`tab-${tab.id}`}
+                aria-selected={activeTab === tab.id}
+                aria-controls={`panel-${tab.id}`}
+                className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-        <div
-          role="tabpanel"
-          id={`panel-${activeTab}`}
-          aria-labelledby={`tab-${activeTab}`}
-          className={styles.panel}
-        >
-          {activeTab === 'tasks' && (
-            <>
-              {selectedTaskId && (
-                <AdminCodePanel
-                  traineeId={traineeId}
-                  taskTitle={selectedTask?.title ?? 'Task code'}
-                  code={code.data}
-                  isLoading={code.isLoading}
-                  error={code.error}
-                  onRetry={code.retry}
-                  onClose={handleCloseCode}
+          <div
+            role="tabpanel"
+            id={`panel-${activeTab}`}
+            aria-labelledby={`tab-${activeTab}`}
+            className={styles.panel}
+          >
+            {activeTab === 'tasks' && (
+              <>
+                {selectedTaskId && (
+                  <AdminCodePanel
+                    traineeId={traineeId}
+                    taskTitle={selectedTask?.title ?? 'Task code'}
+                    code={code.data}
+                    isLoading={code.isLoading}
+                    error={code.error}
+                    onRetry={code.retry}
+                    onClose={handleCloseCode}
+                  />
+                )}
+                <AdminTaskList
+                  tasks={tasks}
+                  courses={courses}
+                  selectedTaskId={selectedTaskId}
+                  onViewCode={setSelectedTaskId}
                 />
-              )}
-              <AdminTaskList
-                tasks={tasks}
-                courses={courses}
-                selectedTaskId={selectedTaskId}
-                onViewCode={setSelectedTaskId}
-              />
-            </>
-          )}
+              </>
+            )}
 
-          {activeTab === 'journal' && <AdminJournalList entries={journal} />}
+            {activeTab === 'journal' && <AdminJournalList entries={journal} />}
 
-          {activeTab === 'flags' && (
-            <>
-              {flags.isLoading && (
-                <div className={styles.state}>
-                  <LoaderOverlay label="Loading flags…" />
-                </div>
-              )}
-              {flags.error && (
-                <ErrorState
-                  title="Unable to load flags"
-                  message={flags.error.message}
-                  onRetry={flags.retry}
-                />
-              )}
-              {flags.data && <AdminFlagTable flags={flags.data} dayLabels={dayLabels} />}
-            </>
-          )}
-        </div>
-      </main>
+            {activeTab === 'flags' && (
+              <>
+                {flags.isLoading && (
+                  <div className={styles.state}>
+                    <LoaderOverlay label="Loading flags…" />
+                  </div>
+                )}
+                {flags.error && (
+                  <ErrorState
+                    title="Unable to load flags"
+                    message={flags.error.message}
+                    onRetry={flags.retry}
+                  />
+                )}
+                {flags.data && <AdminFlagTable flags={flags.data} dayLabels={dayLabels} />}
+              </>
+            )}
+          </div>
+        </main>
+      </div>
+
+      {printJob && (
+        <PrintReport
+          detail={detail.data}
+          flags={flags.data}
+          dayLabels={dayLabels}
+          options={printJob.options}
+          mentorName={user?.name ?? null}
+          generatedAt={printJob.startedAt}
+        />
+      )}
     </>
   );
 }
