@@ -7,7 +7,9 @@ export type ErrorCode =
   | 'DAY_LOCKED'
   | 'CHECKLIST_INCOMPLETE'
   | 'DOMAIN_NOT_PERMITTED'
-  | 'NOT_PROVISIONED';
+  | 'NOT_PROVISIONED'
+  | 'TRAINEE_EXISTS'
+  | 'EMAIL_BELONGS_TO_ADMIN';
 
 /** Every error response from the API looks exactly like this. */
 export type ApiErrorResponse = {

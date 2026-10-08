@@ -151,6 +151,16 @@ export class AdminRepository {
         task: { select: { id: true, title: true, curriculum_day_id: true } },
       },
     });
+
+  findTraineeByEmail = (email: string) =>
+    prisma.trainee.findUnique({ where: { email }, select: { id: true } });
+
+  /** Any admin row, active or not: a deactivated admin can be reactivated later. */
+  findAdminByEmail = (email: string) =>
+    prisma.admin.findUnique({ where: { email }, select: { id: true } });
+
+  createTrainee = (data: { name: string; email: string }) =>
+    prisma.trainee.create({ data, select: { id: true, name: true, email: true } });
   /** Tasks each trainee has worked on (a task_progress row that is not "not_started"), with the task's day. */
   findStartedTasks = (traineeIds: string[]) => {
     return prisma.task_progress.findMany({

@@ -34,6 +34,8 @@ import { mockDayContents } from './dayOverview';
 import { buildCourseDays, buildDashboard } from '../test/fixtures/dashboard';
 import { addTypingResult, buildTypingResults } from '../test/fixtures/typingTest';
 import { mockProfile } from '../test/fixtures/profile';
+import { addMockTrainee } from '../test/fixtures/admin';
+import type { CreateTraineeRequest } from '@itp/types';
 
 const MOCK_DELAY_MS = 300;
 
@@ -320,6 +322,37 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
     if (currentMockUser().role !== 'admin') {
       return errorResponse(config, 403, 'FORBIDDEN', 'Admin access only.');
     }
+
+    if (method === 'post' && url === '/admin/trainees') {
+      const body = JSON.parse(config.data as string) as CreateTraineeRequest;
+      const result = addMockTrainee(body);
+      if (result.kind === 'domain') {
+        return errorResponse(
+          config,
+          400,
+          'DOMAIN_NOT_PERMITTED',
+          'Use a company email address ending in @vonnue.com.'
+        );
+      }
+      if (result.kind === 'admin') {
+        return errorResponse(
+          config,
+          409,
+          'EMAIL_BELONGS_TO_ADMIN',
+          'This email belongs to a mentor account.'
+        );
+      }
+      if (result.kind === 'exists') {
+        return errorResponse(
+          config,
+          409,
+          'TRAINEE_EXISTS',
+          'A trainee with this email already exists.'
+        );
+      }
+      return respond(config, 201, result.trainee);
+    }
+
     if (method !== 'get') {
       return errorResponse(config, 404, 'NOT_FOUND', 'Not found.');
     }

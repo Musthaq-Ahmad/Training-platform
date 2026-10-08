@@ -6,6 +6,8 @@ import type {
   AdminTraineeSummary,
 } from '@itp/types';
 import { AdminService } from './admin.service';
+import { CreateTraineeBody } from './admin.schema';
+import { AuthenticatedRequest } from '../../types/auth.types';
 
 const adminService = new AdminService();
 
@@ -44,6 +46,16 @@ class AdminController {
     try {
       const { traineeId, taskId } = req.params as { traineeId: string; taskId: string };
       res.status(200).json(await adminService.getTaskCode(traineeId, taskId));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createTrainee = async (req: Request, res: Response<AdminTraineeSummary>, next: NextFunction) => {
+    try {
+      const adminId = (req as AuthenticatedRequest).user.id;
+      const trainee = await adminService.createTrainee(req.body as CreateTraineeBody, adminId);
+      res.status(201).json(trainee);
     } catch (error) {
       next(error);
     }

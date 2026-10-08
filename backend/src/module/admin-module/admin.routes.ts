@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { validate } from '../../middleware/validate';
 import { adminController } from './admin.controller';
 import { traineeIdParamsSchema, traineeTaskParamsSchema } from './admin.schema';
+import { createTraineeSchema } from './admin.schema';
 
 export const adminRoutes = Router();
 
@@ -23,4 +24,10 @@ adminRoutes.get(
   '/trainees/:traineeId/tasks/:taskId/code',
   validate({ params: traineeTaskParamsSchema }),
   adminController.getTaskCode
+);
+
+adminRoutes.post(
+  '/trainees',
+  validate({ body: createTraineeSchema }),
+  adminController.createTrainee
 );

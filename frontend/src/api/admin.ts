@@ -5,6 +5,7 @@ import type {
   AdminTraineeSummary,
 } from '@itp/types';
 import { apiClient } from './client';
+import type { CreateTraineeRequest } from '@itp/types';
 
 export async function getAdminTrainees(): Promise<AdminTraineeSummary[]> {
   const res = await apiClient.get<AdminTraineeSummary[]>('/admin/trainees');
@@ -25,5 +26,10 @@ export async function getAdminTaskCode(traineeId: string, taskId: string): Promi
   const res = await apiClient.get<AdminTaskCode>(
     `/admin/trainees/${traineeId}/tasks/${taskId}/code`
   );
+  return res.data;
+}
+
+export async function createAdminTrainee(body: CreateTraineeRequest): Promise<AdminTraineeSummary> {
+  const res = await apiClient.post<AdminTraineeSummary>('/admin/trainees', body);
   return res.data;
 }

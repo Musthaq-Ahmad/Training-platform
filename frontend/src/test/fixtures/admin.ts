@@ -13,6 +13,7 @@ import type {
 } from '@itp/types';
 import { mockDayContents } from '../../api/dayOverview';
 import { catalogDays, catalogTaskCode, findCatalogTask } from '../../api/mockTasks';
+import type { CreateTraineeRequest } from '@itp/types';
 
 // Mock data for the mentor pages (GET /admin/...). Built from the same catalog as the trainee
 // pages, so day ids, task ids and titles match what a mentor sees when they open a task.
@@ -416,3 +417,34 @@ export function buildAdminTaskCode(traineeId: string, taskId: string): AdminTask
 
 /** Ids the tests and pages can rely on. */
 export const mockAdminTraineeIds = trainees.map((t) => t.id);
+
+export type AddMockTraineeResult =
+  | { kind: 'created'; trainee: AdminTraineeSummary }
+  | { kind: 'exists' }
+  | { kind: 'admin' }
+  | { kind: 'domain' };
+
+/** POST /admin/trainees in mock mode. Same rules as the backend. */
+export function addMockTrainee(body: CreateTraineeRequest): AddMockTraineeResult {
+  const email = body.email.trim().toLowerCase();
+  if (!email.endsWith('@vonnue.com')) return { kind: 'domain' };
+  if (email === mockAdmin.email) return { kind: 'admin' };
+  if (trainees.some((t) => t.email === email)) return { kind: 'exists' };
+
+  const id = crypto.randomUUID();
+  trainees.push({
+    id,
+    name: body.name.trim().replace(/\s+/g, ' '),
+    email,
+    completed: 0,
+    lastActiveDaysAgo: null,
+    todayActiveSeconds: 0,
+    latestWpm: null,
+    latestAccuracy: null,
+    flags: [],
+    averageScore: 0,
+    daysScored: 0,
+  });
+  const trainee = buildAdminTrainees().find((t) => t.id === id) as AdminTraineeSummary;
+  return { kind: 'created', trainee };
+}

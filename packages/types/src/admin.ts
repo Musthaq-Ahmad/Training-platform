@@ -94,3 +94,9 @@ export type AdminTaskCode = {
   codeUpdatedAt: string | null;
   lastSubmittedAt: string | null;
 };
+
+/** POST /api/admin/trainees. The response is the new trainee's AdminTraineeSummary (201). */
+export type CreateTraineeRequest = {
+  name: string;
+  email: string;
+};
