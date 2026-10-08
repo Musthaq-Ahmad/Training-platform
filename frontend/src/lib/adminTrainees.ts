@@ -144,7 +144,10 @@ const CSV_COLUMNS: CsvColumn[] = [
   { header: 'Today', value: (t) => formatDurationHM(t.todayActiveSeconds) },
   { header: 'Total active', value: (t) => formatDurationHM(t.totalActiveSeconds) },
   { header: 'WPM', value: (t) => t.latestWpm ?? '—' },
-  { header: 'Flags (7 days)', value: (t) => t.flagsLast7Days },
+  {
+    header: 'Integrity Score',
+    value: (t) => (t.averageScore !== null ? `${t.averageScore}/100` : '—'),
+  },
   { header: 'Last active', value: (t) => formatLastActive(t.lastActiveDate) },
 ];
 

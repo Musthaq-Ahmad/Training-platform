@@ -52,8 +52,8 @@ describe('summarizeCohort', () => {
     expect(summary).toEqual({
       traineeCount: 3,
       finishedCount: 1,
-      averageProgressPercent: 50, // (50 + 0 + 100) / 3
-      averageDaysCompleted: 27, // (27 + 0 + 54) / 3
+      averageProgressPercent: 50,
+      averageDaysCompleted: 27,
       totalDays: 54,
       activeTodayCount: 2,
       flagsThisWeek: 5,
@@ -68,8 +68,8 @@ describe('summarizeCohort', () => {
       trainee({ daysCompleted: 7 }),
     ]);
 
-    expect(summary.averageDaysCompleted).toBe(7.3); // 22 / 3 = 7.333
-    expect(summary.averageProgressPercent).toBe(14); // 7.333 / 54 = 13.58%
+    expect(summary.averageDaysCompleted).toBe(7.3);
+    expect(summary.averageProgressPercent).toBe(14);
   });
 
   it('does not count a trainee with zero seconds today as active', () => {
@@ -84,7 +84,7 @@ describe('summarizeCohort', () => {
   it('uses each trainee’s own curriculum length and never exceeds 100%', () => {
     const summary = summarizeCohort([
       trainee({ daysCompleted: 10, totalDays: 10 }),
-      trainee({ daysCompleted: 12, totalDays: 10 }), // bad data: more days than the curriculum
+      trainee({ daysCompleted: 12, totalDays: 10 }),
     ]);
 
     expect(summary.averageProgressPercent).toBe(100);
@@ -106,7 +106,7 @@ describe('summarizeCohort', () => {
 
 describe('toCsv', () => {
   const HEADER =
-    'Trainee,Email,Progress,Current day,Today,Total active,WPM,Flags (7 days),Last active';
+    'Trainee,Email,Progress,Current day,Today,Total active,WPM,Integrity Score,Last active';
 
   /** The data rows, one string per trainee. */
   const rowsOf = (csv: string) => csv.split('\n').slice(1);
@@ -130,7 +130,6 @@ describe('toCsv', () => {
         todayActiveSeconds: 5_400,
         totalActiveSeconds: 153_000,
         latestWpm: 48,
-        flagsLast7Days: 2,
         lastActiveDate: '2026-10-07',
       }),
       trainee({ name: 'Ben Cole', email: 'ben.cole@vonnue.com' }),
@@ -138,8 +137,8 @@ describe('toCsv', () => {
 
     expect(csv.split('\n')).toEqual([
       HEADER,
-      'Asha Rao,asha.rao@vonnue.com,12 / 54,JavaScript · Day 3 — Functions,1h 30m,42h 30m,48,2,2026-10-07',
-      'Ben Cole,ben.cole@vonnue.com,0 / 54,HTML · Day 1 — Structure,0h 0m,0h 0m,—,0,Never',
+      'Asha Rao,asha.rao@vonnue.com,12 / 54,JavaScript · Day 3 — Functions,1h 30m,42h 30m,48,85/100,2026-10-07',
+      'Ben Cole,ben.cole@vonnue.com,0 / 54,HTML · Day 1 — Structure,0h 0m,0h 0m,—,85/100,Never',
     ]);
   });
 
@@ -180,7 +179,12 @@ describe('toCsv', () => {
   it('escapes the day title as well, since it is data too', () => {
     const csv = toCsv([
       trainee({
-        currentDay: { id: 'x', courseTitle: 'CSS', dayNumber: 2, title: 'Boxes, margins & "gaps"' },
+        currentDay: {
+          id: 'x',
+          courseTitle: 'CSS',
+          dayNumber: 2,
+          title: 'Boxes, margins & "gaps"',
+        },
       }),
     ]);
 
@@ -194,8 +198,9 @@ describe('toCsv', () => {
   });
 
   it('shows a dash for a trainee with no typing result, like the table', () => {
-    expect(rowsOf(toCsv([trainee({ latestWpm: null })]))[0]).toContain(',0h 0m,—,0,');
-    expect(rowsOf(toCsv([trainee({ latestWpm: 0 })]))[0]).toContain(',0h 0m,0,0,');
+    expect(rowsOf(toCsv([trainee({ latestWpm: null })]))[0]).toContain(',0h 0m,—,85/100,');
+
+    expect(rowsOf(toCsv([trainee({ latestWpm: 0 })]))[0]).toContain(',0h 0m,0,85/100,');
   });
 
   it('says Never for a trainee who has not logged any time, like the table', () => {
@@ -213,5 +218,23 @@ describe('toCsv', () => {
     toCsv(list);
 
     expect(list).toEqual(copy);
+  });
+
+  it('exports the integrity score like the table', () => {
+    expect(rowsOf(toCsv([trainee({ averageScore: 92 })]))[0]).toContain(',92/100,');
+  });
+
+  it('shows a dash when the integrity score is unavailable', () => {
+    expect(
+      rowsOf(
+        toCsv([
+          trainee({
+            averageScore: null,
+            daysScored: 0,
+            lastActiveDate: null,
+          }),
+        ])
+      )[0]
+    ).toContain(',—,Never');
   });
 });

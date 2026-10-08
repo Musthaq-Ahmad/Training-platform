@@ -28,7 +28,6 @@ export type AdminTraineeSummary = {
   lastActiveDate: string | null; // "YYYY-MM-DD" (IST calendar day)
   latestWpm: number | null;
   flagsLast7Days: number;
-
   averageScore: number | null;
   daysScored: number;
 };

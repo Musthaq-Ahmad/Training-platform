@@ -3,7 +3,7 @@ import type { AdminTraineeSummary } from '@itp/types';
 import { toCsv } from './adminTrainees';
 
 const HEADER =
-  'Trainee,Email,Progress,Current day,Today,Total active,WPM,Flags (7 days),Last active';
+  'Trainee,Email,Progress,Current day,Today,Total active,WPM,Integrity Score,Last active';
 
 function trainee(overrides: Partial<AdminTraineeSummary> = {}): AdminTraineeSummary {
   return {
@@ -19,6 +19,8 @@ function trainee(overrides: Partial<AdminTraineeSummary> = {}): AdminTraineeSumm
     lastActiveDate: '2026-10-07',
     latestWpm: 48,
     flagsLast7Days: 2,
+    averageScore: 85,
+    daysScored: 23,
     ...overrides,
   };
 }
@@ -36,7 +38,12 @@ describe('toCsv', () => {
         name: 'Ben Cole',
         email: 'ben.cole@vonnue.com',
         daysCompleted: 0,
-        currentDay: { id: 'html-day-01', courseTitle: 'HTML', dayNumber: 1, title: 'Structure' },
+        currentDay: {
+          id: 'html-day-01',
+          courseTitle: 'HTML',
+          dayNumber: 1,
+          title: 'Structure',
+        },
         todayActiveSeconds: 0,
         totalActiveSeconds: 0,
         totalCodingSeconds: 0,
@@ -48,8 +55,8 @@ describe('toCsv', () => {
 
     expect(csv.split('\n')).toEqual([
       HEADER,
-      'Asha Rao,asha.rao@vonnue.com,12 / 54,JavaScript · Day 3 — Functions,1h 30m,42h 30m,48,2,2026-10-07',
-      'Ben Cole,ben.cole@vonnue.com,0 / 54,HTML · Day 1 — Structure,0h 0m,0h 0m,—,0,Never',
+      'Asha Rao,asha.rao@vonnue.com,12 / 54,JavaScript · Day 3 — Functions,1h 30m,42h 30m,48,85/100,2026-10-07',
+      'Ben Cole,ben.cole@vonnue.com,0 / 54,HTML · Day 1 — Structure,0h 0m,0h 0m,—,85/100,Never',
     ]);
   });
 
@@ -95,7 +102,12 @@ describe('toCsv', () => {
   it('escapes the day title as well, since it is data too', () => {
     const csv = toCsv([
       trainee({
-        currentDay: { id: 'x', courseTitle: 'CSS', dayNumber: 2, title: 'Boxes, margins & "gaps"' },
+        currentDay: {
+          id: 'x',
+          courseTitle: 'CSS',
+          dayNumber: 2,
+          title: 'Boxes, margins & "gaps"',
+        },
       }),
     ]);
 
@@ -111,7 +123,30 @@ describe('toCsv', () => {
   it('shows a dash for a trainee with no typing result, like the table', () => {
     const csv = toCsv([trainee({ latestWpm: null })]);
 
-    expect(csv.split('\n')[1]).toContain(',—,2,');
+    expect(csv.split('\n')[1]).toContain(',—,85/100,');
+  });
+
+  it('shows a dash for a trainee with no integrity score', () => {
+    const csv = toCsv([
+      trainee({
+        averageScore: null,
+        daysScored: 0,
+        lastActiveDate: null,
+      }),
+    ]);
+
+    expect(csv.split('\n')[1]).toContain(',—,Never');
+  });
+
+  it('exports the integrity score', () => {
+    const csv = toCsv([
+      trainee({
+        averageScore: 92,
+        daysScored: 5,
+      }),
+    ]);
+
+    expect(csv.split('\n')[1]).toContain(',92/100,');
   });
 
   it('says Never for a trainee who has not logged any time, like the table', () => {
