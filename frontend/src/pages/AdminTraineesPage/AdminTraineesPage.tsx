@@ -7,6 +7,7 @@ import LoaderOverlay from '../../components/Common/LoadingState';
 import { ErrorState } from '../../components/Common/ErrorState';
 import TraineeTable from './TraineeTable';
 import styles from './AdminTraineesPage.module.css';
+import CohortSummary from '../../components/CohortSummary';
 
 function UsersIcon() {
   return (
@@ -95,6 +96,8 @@ export default function AdminTraineesPage() {
             {trainees.length} {trainees.length === 1 ? 'trainee' : 'trainees'}
           </p>
         </div>
+
+        {trainees.length > 0 && <CohortSummary trainees={trainees} />}
 
         <section className={styles.card} aria-label="Trainee overview">
           {trainees.length === 0 ? (
