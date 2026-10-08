@@ -70,23 +70,12 @@ function JournalIcon() {
   );
 }
 
-function UserIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="8" cy="5" r="3" />
-      <path d="M2 14.5c.4-2.6 2.8-4.2 6-4.2s5.6 1.6 6 4.2" />
-    </svg>
-  );
+function getInitials(name?: string) {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? '';
+  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : '';
+  return (first + last).toUpperCase();
 }
 
 function PowerIcon({ className }: { className?: string }) {
@@ -157,51 +146,59 @@ export default function Header({ leading, status }: HeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        {leading ?? (
-          <span className={styles.appName}>
-            Vink<span className={styles.up}>Up</span>
-          </span>
-        )}
+        <div className={styles.start}>
+          {leading ?? (
+            <span className={styles.appName}>
+              Vink<span className={styles.up}>Up</span>
+            </span>
+          )}
+        </div>
+
+        <nav className={styles.nav} aria-label="Main">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+          >
+            <HomeIcon />
+            <NavLabel text="Home" />
+          </NavLink>
+          <NavLink
+            to="/typing-test"
+            end
+            className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+          >
+            <KeyboardIcon />
+            <NavLabel text="Typing Test" />
+          </NavLink>
+          <NavLink
+            to="/journal"
+            end
+            className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+          >
+            <JournalIcon />
+            <NavLabel text="Journal" />
+          </NavLink>
+        </nav>
 
         <div className={styles.end}>
           {status}
-          <nav className={styles.nav}>
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
-            >
-              <HomeIcon />
-              <NavLabel text="Home" />
-            </NavLink>
-
-            <NavLink
-              to="/typing-test"
-              end
-              className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
-            >
-              <KeyboardIcon />
-              <NavLabel text="Typing Test" />
-            </NavLink>
-            <NavLink
-              to="/journal"
-              end
-              className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
-            >
-              <JournalIcon />
-              <NavLabel text="Journal" />
-            </NavLink>
-            <NavLink
-              to="/profile"
-              className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
-            >
-              <UserIcon />
-              <NavLabel text={profileLabel} />
-            </NavLink>
-          </nav>
-          <ThemeToggle />
+          <NavLink
+            to="/profile"
+            aria-label={profileLabel}
+            title={profileLabel}
+            className={({ isActive }) =>
+              `${styles.profile} ${isActive ? styles.profileActive : ''}`
+            }
+          >
+            <span className={styles.avatar} aria-hidden="true">
+              {getInitials(user?.name)}
+            </span>
+            <span className={styles.profileName}>{profileLabel}</span>
+          </NavLink>
           <span className={styles.divider} aria-hidden="true" />
           <div className={styles.actions}>
+            <ThemeToggle />
             <ConfirmPopover
               open={confirmOpen}
               message="Log out?"

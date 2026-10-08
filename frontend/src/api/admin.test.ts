@@ -1,9 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { get } = vi.hoisted(() => ({ get: vi.fn() }));
-vi.mock('./client', () => ({ apiClient: { get } }));
+const { get, post } = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn() }));
+vi.mock('./client', () => ({ apiClient: { get, post } }));
 
-import { getAdminFlags, getAdminTaskCode, getAdminTrainee, getAdminTrainees } from './admin';
+import {
+  createAdminTrainee,
+  getAdminFlags,
+  getAdminTaskCode,
+  getAdminTrainee,
+  getAdminTrainees,
+} from './admin';
 
 type Case = [name: string, call: () => Promise<unknown>, url: string];
 
@@ -20,6 +26,7 @@ const cases: Case[] = [
 
 beforeEach(() => {
   get.mockReset();
+  post.mockReset();
 });
 
 describe('admin API', () => {
@@ -37,5 +44,19 @@ describe('admin API', () => {
     get.mockRejectedValue(error);
 
     await expect(getAdminTrainees()).rejects.toBe(error);
+  });
+
+  it('createAdminTrainee posts the name and email and returns the new row', async () => {
+    const data = { id: 't-new' };
+    post.mockResolvedValue({ data });
+
+    await expect(
+      createAdminTrainee({ name: 'Asha Rao', email: 'asha.rao@vonnue.com' })
+    ).resolves.toBe(data);
+    expect(post).toHaveBeenCalledWith('/admin/trainees', {
+      name: 'Asha Rao',
+      email: 'asha.rao@vonnue.com',
+    });
+    expect(get).not.toHaveBeenCalled();
   });
 });

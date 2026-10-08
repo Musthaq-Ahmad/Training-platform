@@ -36,6 +36,8 @@ function row(overrides: Partial<AdminTraineeSummary> = {}): AdminTraineeSummary 
     lastActiveDate: null,
     latestWpm: null,
     flagsLast7Days: 0,
+    averageScore: 0,
+    daysScored: 0,
     ...overrides,
   };
 }

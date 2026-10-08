@@ -14,6 +14,7 @@ import { AdminRepository } from './admin.repository';
 import { env } from '../../config/env';
 import { ConflictError, TraineeDomainError } from '../../errors/AppError';
 import type { CreateTraineeBody } from './admin.schema';
+import { buildAdminIntegrity } from './integrity.overall';
 
 const repo = new AdminRepository();
 const profileService = new ProfileService();
@@ -42,6 +43,30 @@ export class AdminService {
       repo.flagCountsSince(new Date(Date.now() - WEEK_MS)),
     ]);
 
+    const traineeIds = trainees.map((trainee) => trainee.id);
+    const [startedTasks, flagEvents] = await Promise.all([
+      repo.findStartedTasks(traineeIds),
+      repo.findFlagEvents(traineeIds),
+    ]);
+    const progressRows = startedTasks.map((row) => ({
+      traineeId: row.trainee_id,
+      taskId: row.task_id,
+      dayId: row.task.curriculum_day_id,
+    }));
+    const flagRows = flagEvents.map((row) => ({
+      traineeId: row.trainee_id,
+      taskId: row.task_id,
+      dayId: row.task.curriculum_day_id,
+      type: row.type,
+      reviewPriority: row.review_priority,
+      durationMs: row.duration_ms,
+    }));
+    const integrity = buildAdminIntegrity({
+      traineeIds,
+      progressRows,
+      flagRows,
+    });
+
     const completedBy = new Map<string, Set<string>>();
     for (const completion of completions) {
       const set = completedBy.get(completion.trainee_id) ?? new Set<string>();
@@ -52,12 +77,14 @@ export class AdminService {
     const todayBy = new Map(today.map((row) => [row.trainee_id, row.active_seconds]));
     const wpmBy = new Map(typing.map((row) => [row.trainee_id, row.wpm]));
     const flagsBy = new Map(flags.map((row) => [row.trainee_id, row._count._all]));
+    const integrityByTrainee = new Map(integrity.trainees.map((item) => [item.traineeId, item]));
 
     return trainees.map((trainee) => {
       const done = completedBy.get(trainee.id) ?? new Set<string>();
       // First day in curriculum order that isn't completed; null = finished everything.
       const current = days.find((day) => !done.has(day.id));
       const total = totalsBy.get(trainee.id);
+      const traineeIntegrity = integrityByTrainee.get(trainee.id);
 
       return {
         id: trainee.id,
@@ -79,6 +106,8 @@ export class AdminService {
         lastActiveDate: total?._max.date ? total._max.date.toISOString().slice(0, 10) : null,
         latestWpm: wpmBy.get(trainee.id) ?? null,
         flagsLast7Days: flagsBy.get(trainee.id) ?? 0,
+        averageScore: traineeIntegrity?.score ?? null,
+        daysScored: traineeIntegrity?.daysScored ?? 0,
       };
     });
   };
@@ -87,21 +116,21 @@ export class AdminService {
   getTraineeDetail = async (traineeId: string): Promise<AdminTraineeDetail> => {
     await this.assertTrainee(traineeId); // 404 before any other work
 
-    const [profile, statuses, courses, tasks, progress, completions, journal] = await Promise.all([
-      profileService.getProfile(traineeId),
-      progressService.getDayStatuses(traineeId),
-      repo.listCoursesWithDays(),
-      repo.listTasks(),
-      repo.listTaskProgress(traineeId),
-      repo.listCompletionsFor(traineeId),
-      repo.listJournal(traineeId),
-    ]);
+    const [profile, statuses, courses, startedTasks, totalTasks, completions, journal] =
+      await Promise.all([
+        profileService.getProfile(traineeId),
+        progressService.getDayStatuses(traineeId),
+        repo.listCoursesWithDays(),
+        repo.listStartedTasks(traineeId),
+        repo.getTotalTasks(),
+        repo.listCompletionsFor(traineeId),
+        repo.listJournal(traineeId),
+      ]);
 
     const statusByDay = new Map(statuses.map((day) => [day.dayId, day.status]));
     const completedAtByDay = new Map(
       completions.map((c) => [c.curriculum_day_id, c.completed_at.toISOString()])
     );
-    const progressByTask = new Map(progress.map((p) => [p.task_id, p]));
 
     return {
       id: traineeId,
@@ -117,18 +146,17 @@ export class AdminService {
           completedAt: completedAtByDay.get(day.id) ?? null,
         })),
       })),
-      tasks: tasks.map((task) => {
-        const p = progressByTask.get(task.id);
-        return {
-          taskId: task.id,
-          title: task.title,
-          dayId: task.curriculum_day_id,
-          isStretchGoal: task.is_stretch_goal,
-          status: p?.status ?? 'not_started',
-          codeUpdatedAt: p?.code_updated_at?.toISOString() ?? null,
-          lastSubmittedAt: p?.last_submitted_at?.toISOString() ?? null,
-        };
-      }),
+      // Only tasks the trainee has worked on: in progress or completed.
+      tasks: startedTasks.map((row) => ({
+        taskId: row.task.id,
+        title: row.task.title,
+        dayId: row.task.curriculum_day_id,
+        isStretchGoal: row.task.is_stretch_goal,
+        status: row.status,
+        codeUpdatedAt: row.code_updated_at?.toISOString() ?? null,
+        lastSubmittedAt: row.last_submitted_at?.toISOString() ?? null,
+      })),
+      totalTasks,
       journal: journal.map((entry) => ({
         dayId: entry.curriculum_day.id,
         courseTitle: entry.curriculum_day.course.title,

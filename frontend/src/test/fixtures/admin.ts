@@ -38,6 +38,8 @@ type MockTrainee = {
   latestAccuracy: number | null;
   /** Flag events: [type, days ago, duration in ms, priority]. */
   flags: [FlagEventType, number, number | null, AdminFlagEvent['reviewPriority']][];
+  averageScore: number | null;
+  daysScored: number;
 };
 
 const HOUR = 60 * 60;
@@ -58,6 +60,8 @@ const trainees: MockTrainee[] = [
       ['TAB_SWITCH', 1, 12000, 'LOW'],
       ['WINDOW_BLUR', 3, 4000, 'LOW'],
     ],
+    averageScore: 20,
+    daysScored: 12,
   },
   {
     id: '3f0c1a52-8d4e-4b7a-9a11-0c5d2e7b1002',
@@ -69,6 +73,8 @@ const trainees: MockTrainee[] = [
     latestWpm: 82,
     latestAccuracy: 98.1,
     flags: [],
+    averageScore: 70,
+    daysScored: 32,
   },
   {
     id: '3f0c1a52-8d4e-4b7a-9a11-0c5d2e7b1003',
@@ -91,6 +97,8 @@ const trainees: MockTrainee[] = [
       ['WINDOW_BLUR', 6, 2500, 'LOW'],
       ['TAB_SWITCH', 9, 6000, 'LOW'],
     ],
+    averageScore: 81,
+    daysScored: 32,
   },
   {
     id: '3f0c1a52-8d4e-4b7a-9a11-0c5d2e7b1004',
@@ -102,6 +110,8 @@ const trainees: MockTrainee[] = [
     latestWpm: 91,
     latestAccuracy: 99,
     flags: [['WINDOW_BLUR', 20, 3000, 'LOW']],
+    averageScore: 90,
+    daysScored: 2,
   },
   {
     id: '3f0c1a52-8d4e-4b7a-9a11-0c5d2e7b1005',
@@ -113,6 +123,8 @@ const trainees: MockTrainee[] = [
     latestWpm: null,
     latestAccuracy: null,
     flags: [],
+    averageScore: null,
+    daysScored: 0,
   },
 ];
 
@@ -176,6 +188,8 @@ export function buildAdminTrainees(): AdminTraineeSummary[] {
       lastActiveDate: lastActive ? lastActive.toISOString().slice(0, 10) : null,
       latestWpm: t.latestWpm,
       flagsLast7Days: t.flags.filter(([, daysAgo]) => daysAgo < 7).length,
+      averageScore: t.averageScore,
+      daysScored: t.daysScored,
     };
   });
 }
@@ -313,6 +327,7 @@ export function buildAdminTraineeDetail(traineeId: string): AdminTraineeDetail |
     },
     courses: buildCourses(t),
     tasks: buildTaskRows(t),
+    totalTasks: 7,
     journal: buildJournal(t),
   };
 }
@@ -427,6 +442,8 @@ export function addMockTrainee(body: CreateTraineeRequest): AddMockTraineeResult
     latestWpm: null,
     latestAccuracy: null,
     flags: [],
+    averageScore: 0,
+    daysScored: 0,
   });
   const trainee = buildAdminTrainees().find((t) => t.id === id) as AdminTraineeSummary;
   return { kind: 'created', trainee };

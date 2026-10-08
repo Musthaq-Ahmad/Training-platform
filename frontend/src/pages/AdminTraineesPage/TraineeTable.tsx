@@ -18,9 +18,18 @@ const COLUMNS = [
   'Today',
   'Total active',
   'WPM',
-  'Flags (7 days)',
+  'Integrity Score',
   'Last active',
 ];
+
+type IntegrityScoreBand = 'high' | 'mid' | 'low' | 'neutral';
+
+function getIntegrityScoreBand(score: number | null): IntegrityScoreBand {
+  if (score === null) return 'neutral';
+  if (score >= 90) return 'high';
+  if (score > 75) return 'mid';
+  return 'low';
+}
 
 /**
  * One row per trainee. The name is the only real link; its ::after covers the whole row,
@@ -40,8 +49,6 @@ export default function TraineeTable({ trainees, attentionReasons = {} }: Traine
 
         <div role="rowgroup">
           {trainees.map((trainee) => {
-            const isFlagged = trainee.flagsLast7Days > 0;
-
             return (
               <div
                 key={trainee.id}
@@ -95,8 +102,12 @@ export default function TraineeTable({ trainees, attentionReasons = {} }: Traine
                 </div>
 
                 <div role="cell">
-                  <span className={styles.flags} data-flagged={isFlagged}>
-                    {trainee.flagsLast7Days}
+                  <span
+                    className={`${styles.integrityScore} ${
+                      styles[getIntegrityScoreBand(trainee.averageScore)]
+                    }`}
+                  >
+                    {trainee.averageScore !== null ? `${trainee.averageScore}/100` : '—'}
                   </span>
                 </div>
 
