@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import DayCelebration from './DayCelebration';
 
 afterEach(() => {
@@ -44,9 +44,8 @@ describe('DayCelebration', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Nice work. Your progress is saved.');
     expect(screen.getByTestId('day-celebration-confetti')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Day submitted!' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
-
-    expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument();
+    expect(onDismiss).not.toHaveBeenCalled();
   });
 
   it('shows a static confirmation when reduced motion is preferred', () => {

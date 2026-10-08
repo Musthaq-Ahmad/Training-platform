@@ -10,6 +10,7 @@ import {
   completeDay,
   getDayIntegrity,
 } from '../../api/days';
+import { getCourseDays } from '../../api/courses';
 import { mockDayContents } from '../../api/dayOverview';
 import DaySummary from '../../components/DaySummary/DaySummary';
 import LearningObjectives from '../../components/LearningObjectives/LearningObjectives';
@@ -298,6 +299,24 @@ function DayOverviewContent() {
     }
   }
 
+  async function handleNextDay() {
+    if (!day) return;
+
+    const { courseSlug, dayNumber } = day;
+
+    try {
+      const courseDays = await getCourseDays(courseSlug);
+      const nextDay = courseDays.find((courseDay) => courseDay.dayNumber === dayNumber + 1);
+      if (!nextDay) {
+        setCompletionError('The next day could not be found. Please return to the dashboard.');
+        return;
+      }
+      void navigate(`/days/${nextDay.id}`);
+    } catch (err) {
+      setCompletionError(getErrorMessage(err, 'Unable to open the next day. Please try again.'));
+    }
+  }
+
   return (
     <>
       <Header />
@@ -356,6 +375,8 @@ function DayOverviewContent() {
           isCompleted={status.isCompleted}
           isSubmitting={isCompletingDay}
           onComplete={handleCompleteDay}
+          showNextDay={day.dayNumber < day.totalDays}
+          onNextDay={handleNextDay}
         />
         {completionError && (
           <p className={styles.error} role="alert">
