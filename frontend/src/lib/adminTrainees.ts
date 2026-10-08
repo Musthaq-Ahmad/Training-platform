@@ -88,6 +88,9 @@ export const ATTENTION_REASONS = {
   behind: 'Behind cohort',
 } as const;
 
+/** Informational only: a new trainee and one who never opens the platform look the same. */
+export const NOT_STARTED_NOTE = 'Not started yet';
+
 const INACTIVE_AFTER_DAYS = 2;
 const BEHIND_BY_MORE_THAN_DAYS = 3;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -120,7 +123,8 @@ export function needsAttention(
   const isFinished = t.currentDay === null;
   if (
     !isFinished &&
-    (t.lastActiveDate === null || daysBetween(t.lastActiveDate, today) >= INACTIVE_AFTER_DAYS)
+    t.lastActiveDate !== null &&
+    daysBetween(t.lastActiveDate, today) >= INACTIVE_AFTER_DAYS
   ) {
     reasons.push(ATTENTION_REASONS.inactive);
   }
