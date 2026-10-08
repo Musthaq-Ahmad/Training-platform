@@ -114,7 +114,7 @@ function TraineeDetail({ traineeId }: { traineeId: string }) {
 
   const { profile, courses, journal } = detail.data;
   // Only work the trainee has started matters for review; the day grid already shows the rest.
-  const tasks = detail.data.tasks.filter((task) => task.status !== 'not_started');
+  const tasks = detail.data.tasks;
   const selectedTask = tasks.find((task) => task.taskId === selectedTaskId);
 
   const tabs: { id: TabId; label: string }[] = [
