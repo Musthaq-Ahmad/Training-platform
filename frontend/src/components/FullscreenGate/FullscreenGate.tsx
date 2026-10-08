@@ -51,9 +51,10 @@ function Overlay() {
 
 /** Blocks the whole app for signed-in trainees until the page is fullscreen. */
 export default function FullscreenGate({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const isFullscreen = useIsFullscreen();
-  const isBlocked = isAuthenticated && !isFullscreen;
+  // full screen is only mandatory for trainees
+  const isBlocked = isAuthenticated && user?.role !== 'admin' && !isFullscreen;
 
   return (
     <>

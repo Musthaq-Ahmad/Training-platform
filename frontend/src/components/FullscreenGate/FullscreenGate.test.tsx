@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import FullscreenGate from './FullscreenGate';
 
-const auth = vi.hoisted(() => ({ isAuthenticated: true }));
+const auth = vi.hoisted(() => ({
+  isAuthenticated: true,
+  user: null as { role: 'trainee' | 'admin' } | null,
+}));
 const requestAppFullscreen = vi.hoisted(() => vi.fn());
 vi.mock('../../context/Useauth', () => ({ useAuth: () => auth }));
 vi.mock('../../lib/fullscreen', () => ({ requestAppFullscreen }));
@@ -26,6 +29,7 @@ function renderGate() {
 describe('FullscreenGate', () => {
   afterEach(() => {
     auth.isAuthenticated = true;
+    auth.user = null;
     setFullscreen(null);
     vi.clearAllMocks();
   });
@@ -65,5 +69,18 @@ describe('FullscreenGate', () => {
     renderGate();
     await userEvent.click(screen.getByRole('button', { name: 'Enter fullscreen' }));
     expect(await screen.findByRole('alert')).toBeTruthy();
+  });
+
+  it('blocks a signed-in trainee who is not fullscreen', () => {
+    auth.user = { role: 'trainee' };
+    renderGate();
+    expect(screen.getByRole('alertdialog')).toBeTruthy();
+  });
+
+  it('never blocks an admin (mentors are not monitored)', () => {
+    auth.user = { role: 'admin' };
+    renderGate();
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(screen.getByText('app content').closest('[inert]')).toBeNull();
   });
 });

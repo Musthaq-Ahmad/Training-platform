@@ -332,7 +332,7 @@ function DayOverviewContent() {
           </div>
 
           <div className={styles.right}>
-            <SelfCheckChecklist items={day.selfCheckItems} />
+            <SelfCheckChecklist dayId={day.dayId} items={day.selfCheckItems} />
 
             <DailyJournal
               prompts={day.journalPrompt ? [day.journalPrompt] : []}
