@@ -24,6 +24,7 @@ import { ApiError } from '../../api/errors';
 import Loader from '../../components/Common/LoadingState';
 import DayCelebration from '../../components/DayCelebration/DayCelebration';
 import DayIntegrityBadge from '../../components/DayIntegrityBadge/DayIntegrityBadge';
+import HelpButton from '../../components/HelpButton';
 
 type LoadResult =
   | { dayId: string; tasks: DayTask[]; status: DayCurrentStatus; journalResponse: string }
@@ -362,6 +363,7 @@ function DayOverviewContent() {
           </p>
         )}
       </main>
+      <HelpButton />
     </>
   );
 }

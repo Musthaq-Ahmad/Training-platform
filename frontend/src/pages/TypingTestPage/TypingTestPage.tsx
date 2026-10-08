@@ -9,6 +9,7 @@ import Header from '../../components/Header';
 import PassageDisplay from '../../components/PassageDisplay';
 import TestHistory from '../../components/TestHistory';
 import styles from './TypingTestPage.module.css';
+import HelpButton from '../../components/HelpButton';
 
 const DEFAULT_DURATION = 30;
 
@@ -222,6 +223,7 @@ export default function TypingTestPage() {
           <TestHistory results={results} />
         ) : null}
       </div>
+      <HelpButton />
     </>
   );
 }

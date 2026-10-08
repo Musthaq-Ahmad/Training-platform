@@ -1,6 +1,7 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router';
 import type { TypingResultRecord, TypingTestStats } from '@itp/types';
 
 import TypingTestPage from './TypingTestPage';
@@ -14,6 +15,14 @@ vi.mock('../../api/typingTest', () => ({
 
 vi.mock('../../components/Header', () => ({
   default: () => <header>Header</header>,
+}));
+
+vi.mock('../../components/HelpButton', () => ({
+  default: () => (
+    <a href="/help" aria-label="Open help">
+      Help
+    </a>
+  ),
 }));
 
 vi.mock('../../components/PassageDisplay', () => ({
@@ -66,8 +75,18 @@ vi.mock('../../hooks/useTypingTest', () => ({
 }));
 
 const history: TypingResultRecord[] = [
-  { id: 'typing-2', wpm: 51, accuracy: 98, takenAt: '2026-09-30T14:20:00.000Z' },
-  { id: 'typing-1', wpm: 42, accuracy: 94, takenAt: '2026-09-30T09:00:00.000Z' },
+  {
+    id: 'typing-2',
+    wpm: 51,
+    accuracy: 98,
+    takenAt: '2026-09-30T14:20:00.000Z',
+  },
+  {
+    id: 'typing-1',
+    wpm: 42,
+    accuracy: 94,
+    takenAt: '2026-09-30T09:00:00.000Z',
+  },
 ];
 
 const savedResult: TypingResultRecord = {
@@ -98,12 +117,25 @@ function getTypingInput() {
 }
 
 function renderTypingTestPage(overrides: Partial<MockTypingTestState> = {}) {
-  mockUseTypingTest.mockReturnValue({
-    ...defaultTypingTestState,
-    ...overrides,
-  });
+  /*
+   * Only replace the mock state when overrides are explicitly supplied.
+   *
+   * This is important because some tests configure mockUseTypingTest
+   * themselves using mockReturnValue/mockImplementation before rendering.
+   * The previous helper always overwrote those configurations.
+   */
+  if (Object.keys(overrides).length > 0) {
+    mockUseTypingTest.mockReturnValue({
+      ...defaultTypingTestState,
+      ...overrides,
+    });
+  }
 
-  return render(<TypingTestPage />);
+  return render(
+    <MemoryRouter>
+      <TypingTestPage />
+    </MemoryRouter>
+  );
 }
 
 describe('TypingTestPage', () => {
@@ -122,7 +154,7 @@ describe('TypingTestPage', () => {
   });
 
   it('renders the page header, title and typing area', () => {
-    render(<TypingTestPage />);
+    renderTypingTestPage();
 
     expect(screen.getByText('Header')).toBeInTheDocument();
 
@@ -136,15 +168,16 @@ describe('TypingTestPage', () => {
   it('shows a loading message while history loads', () => {
     vi.mocked(getTypingResults).mockReturnValue(new Promise(() => {}));
 
-    render(<TypingTestPage />);
+    renderTypingTestPage();
 
     expect(screen.getByText('Loading history...')).toBeInTheDocument();
   });
 
   it('shows history once it has loaded', async () => {
-    render(<TypingTestPage />);
+    renderTypingTestPage();
 
     expect(await screen.findByText('51 WPM')).toBeInTheDocument();
+
     expect(screen.getByText('42 WPM')).toBeInTheDocument();
   });
 
@@ -153,7 +186,7 @@ describe('TypingTestPage', () => {
       new ApiError(500, 'INTERNAL_ERROR', 'Failed to load history')
     );
 
-    render(<TypingTestPage />);
+    renderTypingTestPage();
 
     expect(await screen.findByText('Failed to load history')).toBeInTheDocument();
 
@@ -169,6 +202,7 @@ describe('TypingTestPage', () => {
     const overlay = screen.getByRole('status');
 
     expect(overlay).toHaveTextContent("Time's up!");
+
     expect(overlay).toHaveTextContent('Press Enter or Restart Test to try again');
 
     expect(
@@ -193,7 +227,11 @@ describe('TypingTestPage', () => {
       };
     });
 
-    const { rerender } = render(<TypingTestPage />);
+    const { rerender } = render(
+      <MemoryRouter>
+        <TypingTestPage />
+      </MemoryRouter>
+    );
 
     act(() => {
       finishCallback?.({
@@ -205,7 +243,11 @@ describe('TypingTestPage', () => {
       testFinished = true;
     });
 
-    rerender(<TypingTestPage />);
+    rerender(
+      <MemoryRouter>
+        <TypingTestPage />
+      </MemoryRouter>
+    );
 
     expect(screen.getByRole('status')).toHaveTextContent("Time's up!");
 
@@ -233,7 +275,11 @@ describe('TypingTestPage', () => {
 
     vi.mocked(saveTypingResult).mockReturnValue(new Promise(() => {}));
 
-    render(<TypingTestPage />);
+    /*
+     * Do not pass overrides here.
+     * This allows the mockImplementation above to remain active.
+     */
+    renderTypingTestPage();
 
     expect(screen.getByText("Time's up!")).toBeInTheDocument();
 
@@ -277,7 +323,11 @@ describe('TypingTestPage', () => {
       new ApiError(500, 'INTERNAL_ERROR', 'Server unavailable')
     );
 
-    render(<TypingTestPage />);
+    /*
+     * Do not pass overrides here.
+     * This preserves the mockImplementation above.
+     */
+    renderTypingTestPage();
 
     act(() => {
       finishCallback?.({
@@ -299,7 +349,10 @@ describe('TypingTestPage', () => {
       restart,
     });
 
-    render(<TypingTestPage />);
+    /*
+     * Do not pass overrides so the test's mockReturnValue is preserved.
+     */
+    renderTypingTestPage();
 
     await user.click(
       screen.getByRole('button', {
@@ -320,7 +373,7 @@ describe('TypingTestPage', () => {
       restart,
     });
 
-    render(<TypingTestPage />);
+    renderTypingTestPage();
 
     await user.click(
       screen.getByRole('button', {
@@ -340,7 +393,7 @@ describe('TypingTestPage', () => {
       toggleOption,
     });
 
-    render(<TypingTestPage />);
+    renderTypingTestPage();
 
     const punctuation = screen.getByRole('button', {
       name: 'punctuation',
@@ -371,10 +424,12 @@ describe('TypingTestPage', () => {
       isPaused: true,
     });
 
-    render(<TypingTestPage />);
+    renderTypingTestPage();
 
     expect(screen.getByText('PAUSED')).toBeInTheDocument();
+
     expect(screen.getByText('Press any key to continue')).toBeInTheDocument();
+
     expect(screen.getByRole('timer')).toHaveTextContent('00:42');
   });
 
@@ -384,7 +439,7 @@ describe('TypingTestPage', () => {
       secondsLeft: 30,
     });
 
-    render(<TypingTestPage />);
+    renderTypingTestPage();
 
     expect(screen.getByRole('timer')).toHaveTextContent('00:30');
   });
@@ -395,7 +450,7 @@ describe('TypingTestPage', () => {
       durationSeconds: 30,
     });
 
-    render(<TypingTestPage />);
+    renderTypingTestPage();
 
     expect(
       screen.getByRole('button', {
@@ -419,7 +474,7 @@ describe('TypingTestPage', () => {
       },
     });
 
-    render(<TypingTestPage />);
+    renderTypingTestPage();
 
     expect(
       screen.getByRole('button', {

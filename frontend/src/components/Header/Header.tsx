@@ -5,6 +5,7 @@ import styles from './Header.module.css';
 import { useActivity } from '../../context/useActivity';
 import { NavLink } from 'react-router';
 import { ConfirmPopover } from '../Common/ConfirmDialog'; // adjust path if needed
+import ThemeToggle from '../ThemeToggle';
 
 type HeaderProps = {
   /** Replaces the app name on the left. The task page puts its breadcrumb here. */
@@ -198,32 +199,34 @@ export default function Header({ leading, status }: HeaderProps) {
               <NavLabel text={profileLabel} />
             </NavLink>
           </nav>
+          <ThemeToggle />
           <span className={styles.divider} aria-hidden="true" />
-
-          <ConfirmPopover
-            open={confirmOpen}
-            message="Log out?"
-            confirmLabel="Log out"
-            busyLabel="Logging out…"
-            isBusy={isLoggingOut}
-            error={logoutError}
-            onConfirm={() => {
-              void handleLogout();
-            }}
-            onCancel={closeConfirm}
-          >
-            <button
-              type="button"
-              className={styles.logoutButton}
-              aria-label="Log out"
-              aria-haspopup="dialog"
-              aria-expanded={confirmOpen}
-              title="Log out"
-              onClick={openConfirm}
+          <div className={styles.actions}>
+            <ConfirmPopover
+              open={confirmOpen}
+              message="Log out?"
+              confirmLabel="Log out"
+              busyLabel="Logging out…"
+              isBusy={isLoggingOut}
+              error={logoutError}
+              onConfirm={() => {
+                void handleLogout();
+              }}
+              onCancel={closeConfirm}
             >
-              <PowerIcon className={styles.logoutIcon} />
-            </button>
-          </ConfirmPopover>
+              <button
+                type="button"
+                className={styles.logoutButton}
+                aria-label="Log out"
+                aria-haspopup="dialog"
+                aria-expanded={confirmOpen}
+                title="Log out"
+                onClick={openConfirm}
+              >
+                <PowerIcon className={styles.logoutIcon} />
+              </button>
+            </ConfirmPopover>
+          </div>
         </div>
       </div>
     </header>

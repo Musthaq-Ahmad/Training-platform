@@ -1,15 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,500&family=Manrope:wght@400;600;700;800&display=swap');
 
+/* =========================================================
+   Theme-independent tokens (apply in both light and dark)
+   ========================================================= */
 :root {
-  /* =========================================================
-     Typography
-     ========================================================= */
   --font-sans: 'Manrope', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Liberation Mono', monospace;
+}
 
-  /* =========================================================
-     Backgrounds
-     ========================================================= */
+/* =========================================================
+   Light theme (default if data-theme is missing)
+   ========================================================= */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  /* Backgrounds */
   --color-bg-deep: #f8fafc;
   --color-bg-base: #f5f6fa;
   --color-bg-page: #f5f6fa;
@@ -27,14 +33,12 @@
   --color-bg-surface-1: #ffffff;
   --color-bg-surface-2: #f5f6fa;
   --color-bg-surface-3: #eef0f4;
-  --color-bg-surface-3: #0a0e1a1a;
 
   --color-bg-green-fill: #10b98114;
 
   --color-bg-code-block: #ffffff;
-  /* =========================================================
-     Text
-     ========================================================= */
+
+  /* Text */
   --color-text-primary: #14162a;
   --color-text-secondary: #5b5d6e;
   --color-text-tertiary: #716c82;
@@ -50,9 +54,7 @@
   --color-text-slate: #475569;
   --color-text-stroke: #716c82;
 
-  /* =========================================================
-     Borders
-     ========================================================= */
+  /* Borders */
   --color-border-card: #e4e5ec;
   --color-border-default: #e4e5ec;
   --color-border-divider: #e2e8f0;
@@ -61,11 +63,8 @@
   --color-border-emphasis: #cbd5e1b2;
   --color-border-strong: #8f8aa1;
   --color-border-subtle: #e4e5ec99;
-  --color-border-subtle: #4944544c;
 
-  /* =========================================================
-     Purple / Accent
-     ========================================================= */
+  /* Purple / Accent */
   --color-accent-purple: #7c41e4;
   --color-accent-purple-lightest: #ead5ff;
   --color-accent-purple-soft: #8e51e6;
@@ -96,9 +95,7 @@
   --color-button-primary-bg-hover: #6b32d1;
   --color-button-primary-text: #ffffff;
 
-  /* =========================================================
-     Status
-     ========================================================= */
+  /* Status */
   --color-status-success: #069669;
   --color-status-success-alt: #0d9488;
 
@@ -114,9 +111,7 @@
 
   --color-tag-bg: #d69ca2;
 
-  /* =========================================================
-     Overlays
-     ========================================================= */
+  /* Overlays */
   --color-overlay-highlight-0-1: #00000000;
   --color-overlay-highlight-02: #00000001;
   --color-overlay-highlight-6: #00000008;
@@ -125,9 +120,7 @@
   --color-overlay-highlight-15: #00000026;
   --color-overlay-scrim: #00000066;
 
-  /* =========================================================
-     Misc
-     ========================================================= */
+  /* Misc */
   --color-generated-fill-cebdff: #cebdff;
 
   --color-google-blue: #4285f4;
@@ -135,9 +128,7 @@
   --color-google-red: #ea4335;
   --color-google-yellow: #fbbc05;
 
-  /* =========================================================
-     File type badges
-     ========================================================= */
+  /* File type badges */
   --color-filetype-html: #c2410c;
   --color-filetype-css: #1d4ed8;
   --color-filetype-js: #a16207;
@@ -147,179 +138,162 @@
 /* =========================================================
    Dark theme
    ========================================================= */
+:root[data-theme='dark'] {
+  color-scheme: dark;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* -------------------------------------------------------
-       Backgrounds
-       ------------------------------------------------------- */
-    --color-bg-deep: #0a0d16;
-    --color-bg-base: #0d111a;
-    --color-bg-page: #10131f;
-    --color-bg-page-tint: #10131fe5;
+  /* Backgrounds */
+  --color-bg-deep: #0a0d16;
+  --color-bg-base: #0d111a;
+  --color-bg-page: #10131f;
+  --color-bg-page-tint: #10131fe5;
 
-    --color-bg-card: #181b28;
-    --color-bg-panel: #121420;
-    --color-bg-elevated: #141926;
-    --color-bg-sunken: #0f1420;
+  --color-bg-card: #181b28;
+  --color-bg-panel: #121420;
+  --color-bg-elevated: #141926;
+  --color-bg-sunken: #0f1420;
 
-    --color-bg-button-secondary: #25293a;
-    --color-bg-pill-inactive: #262937;
+  --color-bg-button-secondary: #25293a;
+  --color-bg-pill-inactive: #262937;
+  --color-bg-pill-inactive-legacy: #262937;
 
-    --color-bg-surface-1: #1e2235;
-    --color-bg-surface-2: #1c1f2c;
-    --color-bg-surface-3: #0a0e1a;
+  --color-bg-surface-1: #1e2235;
+  --color-bg-surface-2: #1c1f2c;
+  --color-bg-surface-3: #0a0e1a;
 
-    --color-bg-green-fill: #10b9811a;
-    --color-bg-code-block: #0a0e1a;
+  --color-bg-green-fill: #10b9811a;
+  --color-bg-code-block: #0a0e1a;
 
-    /* -------------------------------------------------------
-       Text
-       ------------------------------------------------------- */
-    --color-text-primary: #e0e1f4;
-    --color-text-secondary: #958ea0;
-    --color-text-tertiary: #cbc3d7;
-    --color-text-muted: #94a3b8;
-    --color-text-dim: #64748b;
-    --color-text-subtle: #475569;
-    --color-text-light: #cbd5e1;
-    --color-text-bright: #f1f5f9;
+  /* Text */
+  --color-text-primary: #e0e1f4;
+  --color-text-secondary: #958ea0;
+  --color-text-tertiary: #cbc3d7;
+  --color-text-muted: #94a3b8;
+  --color-text-dim: #64748b;
+  --color-text-subtle: #475569;
+  --color-text-light: #cbd5e1;
+  --color-text-bright: #f1f5f9;
 
-    --color-text-green: #4edea3;
-    --color-text-green-40: #4edea366;
+  --color-text-green: #4edea3;
+  --color-text-green-40: #4edea366;
 
-    --color-text-on-accent: #ffffff;
-    --color-text-on-inverted: #cbc3d7;
-    --color-text-slate: #94a3b8;
-    --color-text-stroke: #cbd5e1;
+  --color-text-on-accent: #ffffff;
+  --color-text-on-inverted: #cbc3d7;
+  --color-text-slate: #94a3b8;
+  --color-text-stroke: #cbd5e1;
 
-    --color-tag-bg: #93000a66;
+  --color-tag-bg: #93000a66;
 
-    /* -------------------------------------------------------
-       Borders
-       ------------------------------------------------------- */
-    --color-border-card: #23293d;
-    --color-border-default: #313442;
-    --color-border-divider: #1c2235;
-    --color-border-section: #334155;
-    --color-border-input: #293147;
-    --color-border-emphasis: #49445466;
-    --color-border-strong: #494454;
-    --color-border-subtle: #4944544d;
+  /* Borders */
+  --color-border-card: #23293d;
+  --color-border-default: #313442;
+  --color-border-divider: #1c2235;
+  --color-border-section: #334155;
+  --color-border-input: #293147;
+  --color-border-emphasis: #49445466;
+  --color-border-strong: #494454;
+  --color-border-subtle: #4944544d;
 
-    /* -------------------------------------------------------
-       Purple / Accent
-       ------------------------------------------------------- */
-    --color-accent-purple: #8b5cf6;
-    --color-accent-purple-lightest: #e9d5ff;
-    --color-accent-purple-soft: #d8b4fe;
-    --color-accent-purple-wash: #a855f733;
+  /* Purple / Accent */
+  --color-accent-purple: #8b5cf6;
+  --color-accent-purple-lightest: #e9d5ff;
+  --color-accent-purple-soft: #d8b4fe;
+  --color-accent-purple-wash: #a855f733;
 
-    --color-accent-label: #c084fc;
-    --color-accent-text: #8b5cf6;
-    --color-accent-tint: #8b5cf61a;
-    --color-accent-lock: #c084fc;
+  --color-accent-label: #c084fc;
+  --color-accent-text: #8b5cf6;
+  --color-accent-tint: #8b5cf61a;
+  --color-accent-lock: #c084fc;
 
-    --color-accent-gradient-start: #d0bcff;
-    --color-accent-gradient-end: #0a0e1a;
+  --color-accent-gradient-start: #d0bcff;
+  --color-accent-gradient-end: #0a0e1a;
 
-    --color-accent-spinner: #a078ff;
-    --color-accent-spinner-track: #d0bcff1a;
+  --color-accent-spinner: #a078ff;
+  --color-accent-spinner-track: #d0bcff1a;
 
-    --color-accent-icon-tint: #a855f74d;
-    --color-accent-icon-shadow: #a855f740;
+  --color-accent-icon-tint: #a855f74d;
+  --color-accent-icon-shadow: #a855f740;
 
-    --color-accent-glow-600: #6b21a866;
-    --color-accent-glow-700: #9333ea66;
-    --color-accent-glow-800: #6b21a866;
-    --color-accent-glow-950: #3b076499;
-    --color-accent-glow-deep: #3b0764b2;
+  --color-accent-glow-600: #6b21a866;
+  --color-accent-glow-700: #9333ea66;
+  --color-accent-glow-800: #6b21a866;
+  --color-accent-glow-950: #3b076499;
+  --color-accent-glow-deep: #3b0764b2;
 
-    /* Primary button (Submit Task) */
-    --color-button-primary-bg: #d0bcff;
-    --color-button-primary-bg-hover: #e0d2ff;
-    --color-button-primary-text: #3c0091;
+  /* Primary button (Submit Task) */
+  --color-button-primary-bg: #d0bcff;
+  --color-button-primary-bg-hover: #e0d2ff;
+  --color-button-primary-text: #3c0091;
 
-    /* -------------------------------------------------------
-       Status
-       ------------------------------------------------------- */
-    --color-status-success: #34d399;
-    --color-status-success-alt: #2dd4bf;
+  /* Status */
+  --color-status-success: #34d399;
+  --color-status-success-alt: #2dd4bf;
 
-    --color-status-warning: #fcd34d;
-    --color-status-warning-bg: #451a0399;
-    --color-status-warning-border: #b4530966;
+  --color-status-warning: #fcd34d;
+  --color-status-warning-bg: #451a0399;
+  --color-status-warning-border: #b4530966;
 
-    --color-status-error-bg: #93000a;
-    --color-status-error-icon: #ffb4ab;
-    --color-status-error-soft: #fca5a5;
-    --color-status-error-text: #ffb4ab;
-    --color-status-error-tint: #ef44444d;
+  --color-status-error-bg: #93000a;
+  --color-status-error-icon: #ffb4ab;
+  --color-status-error-soft: #fca5a5;
+  --color-status-error-text: #ffb4ab;
+  --color-status-error-tint: #ef44444d;
 
-    /* -------------------------------------------------------
-       Overlays
-       ------------------------------------------------------- */
-    --color-overlay-highlight-0-1: #ffffff00;
-    --color-overlay-highlight-02: #ffffff01;
-    --color-overlay-highlight-6: #ffffff0f;
-    --color-overlay-highlight-8: #ffffff26;
-    --color-overlay-highlight-9: #ffffff17;
-    --color-overlay-highlight-15: #ffffff26;
-    --color-overlay-scrim: #0d111acc;
+  /* Overlays */
+  --color-overlay-highlight-0-1: #ffffff00;
+  --color-overlay-highlight-02: #ffffff01;
+  --color-overlay-highlight-6: #ffffff0f;
+  --color-overlay-highlight-8: #ffffff26;
+  --color-overlay-highlight-9: #ffffff17;
+  --color-overlay-highlight-15: #ffffff26;
+  --color-overlay-scrim: #0d111acc;
 
-    /* -------------------------------------------------------
-       Generated colors
-       ------------------------------------------------------- */
-    --color-generated-fill-0a0d14: #0a0d14;
-    --color-generated-fill-0a0e1a99: #0a0e1a99;
-    --color-generated-fill-0d0f17: #0d0f17;
-    --color-generated-fill-10b98126: #10b98126;
-    --color-generated-fill-22d3ee: #22d3ee;
-    --color-generated-fill-4edea31a: #4edea31a;
-    --color-generated-fill-4edea333: #4edea333;
-    --color-generated-fill-8b5cf626: #8b5cf626;
-    --color-generated-fill-8b5cf633: #8b5cf633;
-    --color-generated-fill-c4b5fd: #c4b5fd;
-    --color-generated-fill-cebdff33: #cebdff33;
-    --color-generated-fill-d0bcff26: #d0bcff26;
-    --color-generated-fill-d0bcff33: #d0bcff33;
-    --color-generated-fill-d0bcffcc: #d0bcffcc;
-    --color-generated-fill-f59e0b0d: #f59e0b0d;
-    --color-generated-fill-f59e0b26: #f59e0b26;
-    --color-generated-fill-fbbf24: #fbbf24;
-    --color-generated-fill-fde047: #fde047;
+  /* Generated colors */
+  --color-generated-fill-cebdff: #cebdff;
+  --color-generated-fill-0a0d14: #0a0d14;
+  --color-generated-fill-0a0e1a99: #0a0e1a99;
+  --color-generated-fill-0d0f17: #0d0f17;
+  --color-generated-fill-10b98126: #10b98126;
+  --color-generated-fill-22d3ee: #22d3ee;
+  --color-generated-fill-4edea31a: #4edea31a;
+  --color-generated-fill-4edea333: #4edea333;
+  --color-generated-fill-8b5cf626: #8b5cf626;
+  --color-generated-fill-8b5cf633: #8b5cf633;
+  --color-generated-fill-c4b5fd: #c4b5fd;
+  --color-generated-fill-cebdff33: #cebdff33;
+  --color-generated-fill-d0bcff26: #d0bcff26;
+  --color-generated-fill-d0bcff33: #d0bcff33;
+  --color-generated-fill-d0bcffcc: #d0bcffcc;
+  --color-generated-fill-f59e0b0d: #f59e0b0d;
+  --color-generated-fill-f59e0b26: #f59e0b26;
+  --color-generated-fill-fbbf24: #fbbf24;
+  --color-generated-fill-fde047: #fde047;
 
-    --color-generated-stroke-10b9814d: #10b9814d;
-    --color-generated-stroke-2a2e42: #2a2e42;
-    --color-generated-stroke-31344280: #31344280;
-    --color-generated-stroke-31344299: #31344299;
-    --color-generated-stroke-313442cc: #313442cc;
-    --color-generated-stroke-8b5cf64d: #8b5cf64d;
-    --color-generated-stroke-8b5cf666: #8b5cf666;
-    --color-generated-stroke-d0bcff4d: #d0bcff4d;
-    --color-generated-stroke-f59e0b: #f59e0b;
-    --color-generated-stroke-f59e0b4d: #f59e0b4d;
+  --color-generated-stroke-10b9814d: #10b9814d;
+  --color-generated-stroke-2a2e42: #2a2e42;
+  --color-generated-stroke-31344280: #31344280;
+  --color-generated-stroke-31344299: #31344299;
+  --color-generated-stroke-313442cc: #313442cc;
+  --color-generated-stroke-8b5cf64d: #8b5cf64d;
+  --color-generated-stroke-8b5cf666: #8b5cf666;
+  --color-generated-stroke-d0bcff4d: #d0bcff4d;
+  --color-generated-stroke-f59e0b: #f59e0b;
+  --color-generated-stroke-f59e0b4d: #f59e0b4d;
 
-    --color-generated-text-10b981: #10b981;
-    --color-generated-text-340080: #340080;
-    --color-generated-text-3c0091: #3c0091;
+  --color-generated-text-10b981: #10b981;
+  --color-generated-text-340080: #340080;
+  --color-generated-text-3c0091: #3c0091;
 
-    /* -------------------------------------------------------
-       Google colors
-       ------------------------------------------------------- */
-    --color-google-blue: #4285f4;
-    --color-google-green: #34a853;
-    --color-google-red: #ea4335;
-    --color-google-yellow: #fbbc05;
+  /* Google colors */
+  --color-google-blue: #4285f4;
+  --color-google-green: #34a853;
+  --color-google-red: #ea4335;
+  --color-google-yellow: #fbbc05;
 
-    /* -------------------------------------------------------
-       File type badges
-       ------------------------------------------------------- */
-    --color-filetype-html: #fb923c;
-    --color-filetype-css: #60a5fa;
-    --color-filetype-js: #facc15;
-    --color-filetype-ts: #3b82f6;
-  }
+  /* File type badges */
+  --color-filetype-html: #fb923c;
+  --color-filetype-css: #60a5fa;
+  --color-filetype-js: #facc15;
+  --color-filetype-ts: #3b82f6;
 }
 
 /* =========================================================
