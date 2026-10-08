@@ -68,3 +68,20 @@ export class ChecklistIncompleteError extends AppError {
     });
   }
 }
+
+/** 409: the request is valid but clashes with existing data. */
+export class ConflictError extends AppError {
+  constructor(
+    code: Extract<ErrorCode, 'TRAINEE_EXISTS' | 'EMAIL_BELONGS_TO_ADMIN'>,
+    message: string
+  ) {
+    super(409, code, message);
+  }
+}
+
+/** 400: an admin tried to add a trainee whose email is not on the company domain. */
+export class TraineeDomainError extends AppError {
+  constructor(domain: string) {
+    super(400, 'DOMAIN_NOT_PERMITTED', `Use a company email address ending in @${domain}.`);
+  }
+}

@@ -11,6 +11,9 @@ import { istDateValue } from '../../utils/istDate';
 import { ProfileService } from '../profile-module/profile.service';
 import { ProgressService } from '../progress-module/progress.service';
 import { AdminRepository } from './admin.repository';
+import { env } from '../../config/env';
+import { ConflictError, TraineeDomainError } from '../../errors/AppError';
+import type { CreateTraineeBody } from './admin.schema';
 
 const repo = new AdminRepository();
 const profileService = new ProfileService();
@@ -18,6 +21,13 @@ const progressService = new ProgressService();
 
 const FLAG_LIMIT = 500;
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Prisma's unique-constraint error, without importing Prisma's error classes. */
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === 'object' && error !== null && (error as { code?: unknown }).code === 'P2002'
+  );
+}
 
 export class AdminService {
   /** GET /api/admin/trainees: a fixed number of queries, however many trainees there are. */
@@ -171,5 +181,50 @@ export class AdminService {
   private assertTrainee = async (traineeId: string) => {
     const trainee = await repo.findTrainee(traineeId);
     if (!trainee) throw new NotFoundError('Trainee not found.');
+  };
+
+  /**
+   * POST /api/admin/trainees. The body is already validated: name trimmed, email trimmed
+   * and lower-cased. Returns the new trainee's list row (day 1, zeros).
+   */
+  createTrainee = async (
+    input: CreateTraineeBody,
+    adminId: string
+  ): Promise<AdminTraineeSummary> => {
+    const name = input.name.replace(/\s+/g, ' ');
+    const { email } = input;
+
+    if (!email.endsWith(`@${env.ALLOWED_EMAIL_DOMAIN.toLowerCase()}`)) {
+      throw new TraineeDomainError(env.ALLOWED_EMAIL_DOMAIN);
+    }
+
+    const [existingTrainee, existingAdmin] = await Promise.all([
+      repo.findTraineeByEmail(email),
+      repo.findAdminByEmail(email),
+    ]);
+    if (existingAdmin) {
+      throw new ConflictError('EMAIL_BELONGS_TO_ADMIN', 'This email belongs to a mentor account.');
+    }
+    if (existingTrainee) {
+      throw new ConflictError('TRAINEE_EXISTS', 'A trainee with this email already exists.');
+    }
+
+    let created: { id: string };
+    try {
+      created = await repo.createTrainee({ name, email });
+    } catch (error) {
+      // Two requests for the same email at the same time: the second hits the unique index.
+      if (isUniqueViolation(error)) {
+        throw new ConflictError('TRAINEE_EXISTS', 'A trainee with this email already exists.');
+      }
+      throw error;
+    }
+
+    console.info(`[admin] ${adminId} added trainee ${created.id}`);
+
+    // Build the row exactly as the list does, so the page can insert it as is.
+    const row = (await this.listTrainees()).find((trainee) => trainee.id === created.id);
+    if (!row) throw new NotFoundError('Trainee not found.');
+    return row;
   };
 }
