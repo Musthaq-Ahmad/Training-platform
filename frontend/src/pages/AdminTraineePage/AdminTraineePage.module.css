@@ -1,0 +1,82 @@
+.page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
+/* Gives the contained loader a box to cover. */
+.state {
+  position: relative;
+  min-height: 40vh;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-bottom: 16px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: var(--color-accent-text);
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.card {
+  margin: 20px 0;
+  overflow: hidden;
+
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: 12px;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin: 28px 0 16px;
+}
+
+.tab {
+  padding: 10px 16px;
+
+  font-size: 14px;
+  color: var(--color-text-tertiary);
+
+  background: var(--color-bg-surface-1);
+  border: 1px solid var(--color-border-default);
+  border-radius: 10px;
+}
+
+.tab:hover {
+  color: var(--color-text-secondary);
+}
+
+.tabActive {
+  font-weight: 700;
+  color: var(--color-accent-text);
+  border-color: var(--color-accent-purple);
+}
+
+.panel {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 0 1.25rem 3rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 0 12px 3rem;
+  }
+}

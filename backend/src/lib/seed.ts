@@ -17,7 +17,10 @@ const prisma = new PrismaClient({ adapter });
 // ---------- Data ----------
 
 // Mentors who can open the admin dashboard. Emails must be on ALLOWED_EMAIL_DOMAIN.
-const admins = [{ email: 'hawas.backer@vonnue.com', name: 'hawas' }];
+const admins = [
+  { email: 'hawas.backer@vonnue.com', name: 'hawas' },
+  { email: 'ameesha.t@vonnue.com', name: 'Ameesha T' },
+];
 
 const trainees = [
   { email: 'hawas.backer@vonnue.com', name: 'Hawas Backer' },

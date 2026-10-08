@@ -218,7 +218,8 @@ describe('GET /api/admin/trainees/:traineeId', () => {
     expect(courses[0].days[1].completedAt).toBeNull();
   });
 
-  it("returns the trainee's tasks and journal, and nothing of another trainee", async () => {
+  it("returns only the tasks the trainee has started, and nothing of another trainee's", async () => {
+    // markDayCompleted completes the day's required task (html1Main), not its stretch task.
     await markDayCompleted(a.id, DAY.html1);
     await db.task_progress.create({
       data: {
@@ -239,23 +240,27 @@ describe('GET /api/admin/trainees/:traineeId', () => {
 
     const detailA = await getAs<AdminTraineeDetail>(`/api/admin/trainees/${a.id}`, admin.cookie);
     const detailB = await getAs<AdminTraineeDetail>(`/api/admin/trainees/${b.id}`, admin.cookie);
-    const started = (detail: AdminTraineeDetail) =>
-      detail.tasks.filter((task) => task.status !== 'not_started');
 
-    expect(detailA.tasks).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          taskId: TASK.html1Main,
-          title: 'Profile page',
-          status: 'completed',
-        }),
-        expect.objectContaining({
-          taskId: TASK.html2First,
-          title: 'Semantic article',
-          status: 'in_progress',
-        }),
-      ])
-    );
+    // Exactly the two started tasks: the stretch task, html2Second and the pg1 tasks never appear.
+    expect(detailA.tasks).toEqual([
+      expect.objectContaining({
+        taskId: TASK.html1Main,
+        title: 'Profile page',
+        dayId: DAY.html1,
+        isStretchGoal: false,
+        status: 'completed',
+      }),
+      expect.objectContaining({
+        taskId: TASK.html2First,
+        title: 'Semantic article',
+        dayId: DAY.html2,
+        isStretchGoal: false,
+        status: 'in_progress',
+      }),
+    ]);
+    expectIsoDateTime(detailA.tasks[0].lastSubmittedAt);
+    expect(detailA.tasks[1].lastSubmittedAt).toBeNull();
+    expectIsoDateTime(detailA.tasks[1].codeUpdatedAt);
     expect(detailA.journal).toEqual([
       expect.objectContaining({
         dayId: DAY.html1,
@@ -265,9 +270,35 @@ describe('GET /api/admin/trainees/:traineeId', () => {
         responseText: 'Learned the boilerplate.',
       }),
     ]);
-    expect(started(detailB)).toEqual([]);
-    expect(detailB.tasks.length).toBe(detailA.tasks.length);
+    expect(detailB.tasks).toEqual([]);
     expect(detailB.journal).toEqual([]);
+  });
+
+  it('lists started tasks in curriculum order, not the order they were started in', async () => {
+    const data = { status: 'in_progress' as const, files: STARTER_FILES };
+    await db.task_progress.create({
+      data: { trainee_id: a.id, task_id: TASK.pg1Sql, ...data },
+    });
+    await db.task_progress.create({
+      data: { trainee_id: a.id, task_id: TASK.html2First, ...data },
+    });
+    await db.task_progress.create({
+      data: { trainee_id: a.id, task_id: TASK.html1Main, ...data },
+    });
+
+    const { tasks } = await getAs<AdminTraineeDetail>(`/api/admin/trainees/${a.id}`, admin.cookie);
+
+    expect(tasks.map((t) => t.taskId)).toEqual([TASK.html1Main, TASK.html2First, TASK.pg1Sql]);
+  });
+
+  it('leaves out a task whose progress row says it was never started', async () => {
+    await db.task_progress.create({
+      data: { trainee_id: a.id, task_id: TASK.html1Main, status: 'not_started' },
+    });
+
+    const { tasks } = await getAs<AdminTraineeDetail>(`/api/admin/trainees/${a.id}`, admin.cookie);
+
+    expect(tasks).toEqual([]);
   });
 
   it('returns 404 NOT_FOUND for an unknown trainee', async () => {

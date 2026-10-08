@@ -56,7 +56,10 @@ vi.mock('@monaco-editor/react', () => ({
   },
 }));
 
-vi.mock('/src/lib/monacoSetup', () => ({ applyRuntimeSettings: vi.fn() }));
+vi.mock('/src/lib/monacoSetup', () => ({
+  applyRuntimeSettings: vi.fn(),
+  applyViewerSettings: vi.fn(),
+}));
 
 window.matchMedia = (): MediaQueryList =>
   ({

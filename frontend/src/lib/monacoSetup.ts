@@ -122,3 +122,17 @@ export function applyRuntimeSettings(runtime: TaskRuntime): void {
     defaults.setDiagnosticsOptions(diagnosticsOptions);
   }
 }
+
+/**
+ * For the admin code viewer. Starter files import packages the browser can't resolve, so type
+ * checking would only show red squiggles on someone else's code. Opening a task in the trainee
+ * workspace calls applyRuntimeSettings, which sets the options again.
+ */
+export function applyViewerSettings(): void {
+  for (const defaults of [
+    monaco.typescript.typescriptDefaults,
+    monaco.typescript.javascriptDefaults,
+  ]) {
+    defaults.setDiagnosticsOptions({ noSemanticValidation: true, noSyntaxValidation: true });
+  }
+}

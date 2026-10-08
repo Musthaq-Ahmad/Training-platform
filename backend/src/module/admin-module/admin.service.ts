@@ -77,12 +77,11 @@ export class AdminService {
   getTraineeDetail = async (traineeId: string): Promise<AdminTraineeDetail> => {
     await this.assertTrainee(traineeId); // 404 before any other work
 
-    const [profile, statuses, courses, tasks, progress, completions, journal] = await Promise.all([
+    const [profile, statuses, courses, startedTasks, completions, journal] = await Promise.all([
       profileService.getProfile(traineeId),
       progressService.getDayStatuses(traineeId),
       repo.listCoursesWithDays(),
-      repo.listTasks(),
-      repo.listTaskProgress(traineeId),
+      repo.listStartedTasks(traineeId),
       repo.listCompletionsFor(traineeId),
       repo.listJournal(traineeId),
     ]);
@@ -91,7 +90,6 @@ export class AdminService {
     const completedAtByDay = new Map(
       completions.map((c) => [c.curriculum_day_id, c.completed_at.toISOString()])
     );
-    const progressByTask = new Map(progress.map((p) => [p.task_id, p]));
 
     return {
       id: traineeId,
@@ -107,18 +105,16 @@ export class AdminService {
           completedAt: completedAtByDay.get(day.id) ?? null,
         })),
       })),
-      tasks: tasks.map((task) => {
-        const p = progressByTask.get(task.id);
-        return {
-          taskId: task.id,
-          title: task.title,
-          dayId: task.curriculum_day_id,
-          isStretchGoal: task.is_stretch_goal,
-          status: p?.status ?? 'not_started',
-          codeUpdatedAt: p?.code_updated_at?.toISOString() ?? null,
-          lastSubmittedAt: p?.last_submitted_at?.toISOString() ?? null,
-        };
-      }),
+      // Only tasks the trainee has worked on: in progress or completed.
+      tasks: startedTasks.map((row) => ({
+        taskId: row.task.id,
+        title: row.task.title,
+        dayId: row.task.curriculum_day_id,
+        isStretchGoal: row.task.is_stretch_goal,
+        status: row.status,
+        codeUpdatedAt: row.code_updated_at?.toISOString() ?? null,
+        lastSubmittedAt: row.last_submitted_at?.toISOString() ?? null,
+      })),
       journal: journal.map((entry) => ({
         dayId: entry.curriculum_day.id,
         courseTitle: entry.curriculum_day.course.title,
