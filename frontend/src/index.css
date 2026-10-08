@@ -133,6 +133,10 @@
   --color-filetype-css: #1d4ed8;
   --color-filetype-js: #a16207;
   --color-filetype-ts: #2563eb;
+
+  --integrity-tone-high: #069669;
+  --integrity-tone-mid: #8a5d00;
+  --integrity-tone-low: #b91c1c;
 }
 
 /* =========================================================
@@ -294,6 +298,11 @@
   --color-filetype-css: #60a5fa;
   --color-filetype-js: #facc15;
   --color-filetype-ts: #3b82f6;
+
+  /* Integrity badge color */
+  --integrity-tone-high: #4cbf9b;
+  --integrity-tone-mid: #d4a24c;
+  --integrity-tone-low: #ff6b6b;
 }
 
 /* =========================================================

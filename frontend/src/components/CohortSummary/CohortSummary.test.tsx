@@ -17,6 +17,8 @@ function trainee(overrides: Partial<AdminTraineeSummary> = {}): AdminTraineeSumm
     lastActiveDate: null,
     latestWpm: null,
     flagsLast7Days: 0,
+    daysScored: 20,
+    averageScore: 85,
     ...overrides,
   };
 }
