@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, X, XCircle, type LucideIcon } from 'lucide-react';
 import {
   ToastContext,
   type ShowToastOptions,
@@ -18,6 +18,13 @@ type ToastItem = {
 const MAX_VISIBLE_TOASTS = 3;
 const DEFAULT_DURATION_MS = 4000;
 
+const VARIANT_ICONS: Record<ToastVariant, LucideIcon> = {
+  info: Info,
+  success: CheckCircle2,
+  warning: AlertTriangle,
+  error: XCircle,
+};
+
 function createToastId(): string {
   return `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
@@ -34,8 +41,17 @@ function ToastItemView({ toast, onDismiss }: { toast: ToastItem; onDismiss: () =
     return () => clearTimeout(timer);
   }, [toast.durationMs]);
 
+  const Icon = VARIANT_ICONS[toast.variant];
+  const isUrgent = toast.variant === 'warning' || toast.variant === 'error';
+
   return (
-    <div className={`${styles.toast} ${styles[toast.variant]}`}>
+    <div
+      className={`${styles.toast} ${styles[toast.variant]}`}
+      role={isUrgent ? 'alert' : undefined}
+    >
+      <span className={styles.iconBadge} aria-hidden="true">
+        <Icon size={18} />
+      </span>
       <p className={styles.message}>{toast.message}</p>
       <button
         type="button"
@@ -43,8 +59,9 @@ function ToastItemView({ toast, onDismiss }: { toast: ToastItem; onDismiss: () =
         aria-label="Dismiss"
         onClick={onDismiss}
       >
-        <X size={14} aria-hidden="true" />
+        <X size={16} aria-hidden="true" />
       </button>
+      <span className={styles.progress} style={{ animationDuration: `${toast.durationMs}ms` }} />
     </div>
   );
 }
