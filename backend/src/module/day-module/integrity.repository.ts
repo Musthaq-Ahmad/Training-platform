@@ -13,10 +13,13 @@ export const integrityRepository = {
     });
   },
 
-  /** Flag events for the given tasks. `context_data` is deliberately NOT selected (mentor-only). */
-  findFlagEvents(traineeId: string, taskIds: string[]) {
+  /**
+   * ALL of this trainee's flag events for the tasks of this day, whether or not the task was submitted.
+   * `context_data` is deliberately NOT selected (mentor-only).
+   */
+  findFlagEventsForDay(traineeId: string, dayId: string) {
     return prisma.flag_event.findMany({
-      where: { trainee_id: traineeId, task_id: { in: taskIds } },
+      where: { trainee_id: traineeId, task: { curriculum_day_id: dayId } },
       select: { task_id: true, type: true, review_priority: true, duration_ms: true },
       orderBy: { timestamp: 'asc' },
     });

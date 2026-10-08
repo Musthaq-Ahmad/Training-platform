@@ -11,17 +11,24 @@ export const integrityService = {
     const status = await dayService.getDayStatus(traineeId, dayId);
     if (status.isLocked) throw new DayLockedError();
 
-    const started = await integrityRepository.findStartedTasks(traineeId, dayId);
-    const startedTaskIds = started.map((row) => row.task_id);
+    const [progressRows, flagRows] = await Promise.all([
+      integrityRepository.findStartedTasks(traineeId, dayId),
+      integrityRepository.findFlagEventsForDay(traineeId, dayId),
+    ]);
 
-    const rows =
-      startedTaskIds.length > 0
-        ? await integrityRepository.findFlagEvents(traineeId, startedTaskIds)
-        : [];
+    // A task counts as "worked on" if it has a progress row OR it has recorded flag events.
+    // Submission is not required: flags on an unsubmitted task must still count.
+    // The Set means a task that appears in both lists is counted once (no double counting).
+    const startedTaskIds = [
+      ...new Set([
+        ...progressRows.map((row) => row.task_id),
+        ...flagRows.map((row) => row.task_id),
+      ]),
+    ];
 
     return buildDayIntegrity({
       startedTaskIds,
-      events: rows.map((row) => ({
+      events: flagRows.map((row) => ({
         taskId: row.task_id,
         type: row.type,
         reviewPriority: row.review_priority,

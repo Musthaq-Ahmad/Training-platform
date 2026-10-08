@@ -26,10 +26,10 @@ export const SCORING = {
   PASTE_MAX_COUNTED: 5, // repeated paste attempts stop adding after 5 per task
 
   TAB_SWITCH_BASE: 3,
-  TAB_SWITCH_MAX_EXTRA_MINUTES: 6, // max 8 points per event
+  TAB_SWITCH_MAX_EXTRA_MINUTES: 6, // max 9 points per event
 
   FULLSCREEN_BASE: 4,
-  FULLSCREEN_MAX_EXTRA_MINUTES: 7, // max 10 points per event
+  FULLSCREEN_MAX_EXTRA_MINUTES: 7, // max 11 points per event
 
   // WINDOW_BLUR usually fires together with a tab switch / fullscreen exit,
   // so it is a small signal to avoid counting the same moment twice.
