@@ -57,6 +57,7 @@ export type AdminTraineeDetail = {
   profile: ProfileData; // same object the trainee's own profile page gets
   courses: { id: string; title: string; days: AdminDay[] }[];
   tasks: AdminTaskRow[];
+  totalTasks: number;
   journal: AdminJournalEntry[];
 };
 

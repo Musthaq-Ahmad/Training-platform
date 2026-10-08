@@ -39,17 +39,6 @@ export class AdminRepository {
       },
     });
 
-  /** Every task in curriculum order, so tasks the trainee never opened still appear. */
-  listTasks = () =>
-    prisma.task.findMany({
-      orderBy: [
-        { curriculum_day: { course: { sort_order: 'asc' } } },
-        { curriculum_day: { day_number: 'asc' } },
-        { sequence_order: 'asc' },
-      ],
-      select: { id: true, title: true, curriculum_day_id: true, is_stretch_goal: true },
-    });
-
   findTask = (taskId: string) =>
     prisma.task.findUnique({
       where: { id: taskId },
@@ -98,11 +87,27 @@ export class AdminRepository {
       where: { trainee_id: traineeId },
       select: { curriculum_day_id: true, completed_at: true },
     });
-
-  listTaskProgress = (traineeId: string) =>
+  getTotalTasks = () => prisma.task.count();
+  /**
+   * The tasks this trainee has worked on (in progress or completed), in curriculum order.
+   * Tasks they never opened are left out; the day grid already shows how far they are.
+   */
+  listStartedTasks = (traineeId: string) =>
     prisma.task_progress.findMany({
-      where: { trainee_id: traineeId },
-      select: { task_id: true, status: true, code_updated_at: true, last_submitted_at: true },
+      where: { trainee_id: traineeId, status: 'completed' },
+      orderBy: [
+        { task: { curriculum_day: { course: { sort_order: 'asc' } } } },
+        { task: { curriculum_day: { day_number: 'asc' } } },
+        { task: { sequence_order: 'asc' } },
+      ],
+      select: {
+        status: true,
+        code_updated_at: true,
+        last_submitted_at: true,
+        task: {
+          select: { id: true, title: true, curriculum_day_id: true, is_stretch_goal: true },
+        },
+      },
     });
 
   /** Read only. Never creates a progress row. */
