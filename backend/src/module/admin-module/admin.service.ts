@@ -11,6 +11,7 @@ import { istDateValue } from '../../utils/istDate';
 import { ProfileService } from '../profile-module/profile.service';
 import { ProgressService } from '../progress-module/progress.service';
 import { AdminRepository } from './admin.repository';
+import { buildAdminIntegrity } from './integrity.overall';
 
 const repo = new AdminRepository();
 const profileService = new ProfileService();
@@ -32,6 +33,30 @@ export class AdminService {
       repo.flagCountsSince(new Date(Date.now() - WEEK_MS)),
     ]);
 
+    const traineeIds = trainees.map((trainee) => trainee.id);
+    const [startedTasks, flagEvents] = await Promise.all([
+      repo.findStartedTasks(traineeIds),
+      repo.findFlagEvents(traineeIds),
+    ]);
+    const progressRows = startedTasks.map((row) => ({
+      traineeId: row.trainee_id,
+      taskId: row.task_id,
+      dayId: row.task.curriculum_day_id,
+    }));
+    const flagRows = flagEvents.map((row) => ({
+      traineeId: row.trainee_id,
+      taskId: row.task_id,
+      dayId: row.task.curriculum_day_id,
+      type: row.type,
+      reviewPriority: row.review_priority,
+      durationMs: row.duration_ms,
+    }));
+    const integrity = buildAdminIntegrity({
+      traineeIds,
+      progressRows,
+      flagRows,
+    });
+
     const completedBy = new Map<string, Set<string>>();
     for (const completion of completions) {
       const set = completedBy.get(completion.trainee_id) ?? new Set<string>();
@@ -42,12 +67,14 @@ export class AdminService {
     const todayBy = new Map(today.map((row) => [row.trainee_id, row.active_seconds]));
     const wpmBy = new Map(typing.map((row) => [row.trainee_id, row.wpm]));
     const flagsBy = new Map(flags.map((row) => [row.trainee_id, row._count._all]));
+    const integrityByTrainee = new Map(integrity.trainees.map((item) => [item.traineeId, item]));
 
     return trainees.map((trainee) => {
       const done = completedBy.get(trainee.id) ?? new Set<string>();
       // First day in curriculum order that isn't completed; null = finished everything.
       const current = days.find((day) => !done.has(day.id));
       const total = totalsBy.get(trainee.id);
+      const traineeIntegrity = integrityByTrainee.get(trainee.id);
 
       return {
         id: trainee.id,
@@ -69,6 +96,8 @@ export class AdminService {
         lastActiveDate: total?._max.date ? total._max.date.toISOString().slice(0, 10) : null,
         latestWpm: wpmBy.get(trainee.id) ?? null,
         flagsLast7Days: flagsBy.get(trainee.id) ?? 0,
+        averageScore: traineeIntegrity?.score ?? null,
+        daysScored: traineeIntegrity?.daysScored ?? 0,
       };
     });
   };
