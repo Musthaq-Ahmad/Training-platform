@@ -137,7 +137,7 @@ describe('DayIntegrityBadge', () => {
       expect(screen.getByText('/100')).toBeInTheDocument();
     });
 
-    it('renders an em dash when score is null', () => {
+    it('renders value 100 when score is null', () => {
       mockedGetIntegrityBand.mockReturnValue(null);
 
       render(
@@ -148,7 +148,7 @@ describe('DayIntegrityBadge', () => {
         />
       );
 
-      expect(screen.getByText('—')).toBeInTheDocument();
+      expect(screen.getByText('100')).toBeInTheDocument();
       expect(screen.queryByText('/100')).not.toBeInTheDocument();
     });
   });

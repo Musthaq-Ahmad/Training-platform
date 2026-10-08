@@ -50,7 +50,7 @@ export default function DayIntegrityBadge({
       <ShieldCheck size={16} strokeWidth={2} className={styles.icon} aria-hidden="true" />
       <span className={styles.label}>Integrity</span>
       {score === null ? (
-        <span className={styles.score}>—</span>
+        <span className={styles.score}>100</span>
       ) : (
         <span className={styles.score}>
           {score}
