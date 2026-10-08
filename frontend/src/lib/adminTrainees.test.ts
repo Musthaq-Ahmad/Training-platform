@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { AdminTraineeSummary } from '@itp/types';
-import { summarizeCohort } from './adminTrainees';
+import { summarizeCohort, toCsv } from './adminTrainees';
 
 function trainee(overrides: Partial<AdminTraineeSummary> = {}): AdminTraineeSummary {
   return {
@@ -97,6 +97,118 @@ describe('summarizeCohort', () => {
     const copy = structuredClone(list);
 
     summarizeCohort(list);
+
+    expect(list).toEqual(copy);
+  });
+});
+
+describe('toCsv', () => {
+  const HEADER =
+    'Trainee,Email,Progress,Current day,Today,Total active,WPM,Flags (7 days),Last active';
+
+  /** The data rows, one string per trainee. */
+  const rowsOf = (csv: string) => csv.split('\n').slice(1);
+
+  it('starts with the header row: the table’s columns, plus email', () => {
+    expect(toCsv([trainee()]).split('\n')[0]).toBe(HEADER);
+  });
+
+  it('writes one row per trainee, with the values the table shows', () => {
+    const csv = toCsv([
+      trainee({
+        name: 'Asha Rao',
+        email: 'asha.rao@vonnue.com',
+        daysCompleted: 12,
+        currentDay: {
+          id: 'js-day-03',
+          courseTitle: 'JavaScript',
+          dayNumber: 3,
+          title: 'Functions',
+        },
+        todayActiveSeconds: 5_400,
+        totalActiveSeconds: 153_000,
+        latestWpm: 48,
+        flagsLast7Days: 2,
+        lastActiveDate: '2026-10-07',
+      }),
+      trainee({ name: 'Ben Cole', email: 'ben.cole@vonnue.com' }),
+    ]);
+
+    expect(csv.split('\n')).toEqual([
+      HEADER,
+      'Asha Rao,asha.rao@vonnue.com,12 / 54,JavaScript · Day 3 — Functions,1h 30m,42h 30m,48,2,2026-10-07',
+      'Ben Cole,ben.cole@vonnue.com,0 / 54,HTML · Day 1 — Structure,0h 0m,0h 0m,—,0,Never',
+    ]);
+  });
+
+  it('keeps the rows in the order it was given', () => {
+    const csv = toCsv([
+      trainee({ name: 'Zed' }),
+      trainee({ name: 'Amy' }),
+      trainee({ name: 'Mia' }),
+    ]);
+
+    expect(rowsOf(csv).map((line) => line.split(',')[0])).toEqual(['Zed', 'Amy', 'Mia']);
+  });
+
+  it('wraps a value that contains a comma in quotes', () => {
+    const csv = toCsv([trainee({ name: 'John, Doe' })]);
+
+    expect(rowsOf(csv)[0].startsWith('"John, Doe",trainee@vonnue.com,')).toBe(true);
+  });
+
+  it('doubles the double quotes in a value and wraps it in quotes', () => {
+    const csv = toCsv([trainee({ name: 'John "JD" Doe' })]);
+
+    expect(rowsOf(csv)[0].startsWith('"John ""JD"" Doe",trainee@vonnue.com,')).toBe(true);
+  });
+
+  it('escapes a value that has both a comma and quotes', () => {
+    const csv = toCsv([trainee({ name: 'Doe, "JD"' })]);
+
+    expect(rowsOf(csv)[0].startsWith('"Doe, ""JD""",trainee@vonnue.com,')).toBe(true);
+  });
+
+  it('keeps a line break inside one quoted value', () => {
+    const csv = toCsv([trainee({ name: 'Line\nBreak' })]);
+
+    expect(csv).toContain('"Line\nBreak",trainee@vonnue.com,');
+  });
+
+  it('escapes the day title as well, since it is data too', () => {
+    const csv = toCsv([
+      trainee({
+        currentDay: { id: 'x', courseTitle: 'CSS', dayNumber: 2, title: 'Boxes, margins & "gaps"' },
+      }),
+    ]);
+
+    expect(csv).toContain(',"CSS · Day 2 — Boxes, margins & ""gaps""",');
+  });
+
+  it('says Finished for a trainee who has no day left, like the table', () => {
+    const csv = toCsv([trainee({ currentDay: null, daysCompleted: 54 })]);
+
+    expect(rowsOf(csv)[0]).toContain(',54 / 54,Finished,');
+  });
+
+  it('shows a dash for a trainee with no typing result, like the table', () => {
+    expect(rowsOf(toCsv([trainee({ latestWpm: null })]))[0]).toContain(',0h 0m,—,0,');
+    expect(rowsOf(toCsv([trainee({ latestWpm: 0 })]))[0]).toContain(',0h 0m,0,0,');
+  });
+
+  it('says Never for a trainee who has not logged any time, like the table', () => {
+    expect(rowsOf(toCsv([trainee({ lastActiveDate: null })]))[0].endsWith(',Never')).toBe(true);
+  });
+
+  it('produces just the header row for an empty list', () => {
+    expect(toCsv([])).toBe(HEADER);
+  });
+
+  it('does not change the list it is given', () => {
+    const list = [trainee({ name: 'Zed' }), trainee({ name: 'Amy' })];
+    const copy = structuredClone(list);
+
+    toCsv(list);
 
     expect(list).toEqual(copy);
   });

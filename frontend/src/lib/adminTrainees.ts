@@ -1,4 +1,5 @@
 import type { AdminTraineeSummary } from '@itp/types';
+import { formatDurationHM } from './formatTime';
 
 /** Default order of the mentor's trainee list: by name, A to Z, ignoring case. */
 export function sortTraineesByName(trainees: AdminTraineeSummary[]): AdminTraineeSummary[] {
@@ -130,4 +131,38 @@ export function needsAttention(
   }
 
   return reasons;
+}
+
+type CsvColumn = { header: string; value: (trainee: AdminTraineeSummary) => string | number };
+
+/** The table's columns, in the table's order, with Email added after the name. */
+const CSV_COLUMNS: CsvColumn[] = [
+  { header: 'Trainee', value: (t) => t.name },
+  { header: 'Email', value: (t) => t.email },
+  { header: 'Progress', value: (t) => `${t.daysCompleted} / ${t.totalDays}` },
+  { header: 'Current day', value: (t) => formatCurrentDay(t.currentDay) },
+  { header: 'Today', value: (t) => formatDurationHM(t.todayActiveSeconds) },
+  { header: 'Total active', value: (t) => formatDurationHM(t.totalActiveSeconds) },
+  { header: 'WPM', value: (t) => t.latestWpm ?? '—' },
+  { header: 'Flags (7 days)', value: (t) => t.flagsLast7Days },
+  { header: 'Last active', value: (t) => formatLastActive(t.lastActiveDate) },
+];
+
+/** Wraps a value in quotes when it has a comma, a quote or a line break; doubles inner quotes. */
+function escapeCsvValue(value: string | number): string {
+  const text = String(value);
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+/**
+ * The trainee table as CSV: one header row, then one row per trainee, in the order given.
+ * Pass the rows the table shows (after search, filter and sort) to export the current view.
+ * Lines end with "\n".
+ */
+export function toCsv(trainees: AdminTraineeSummary[]): string {
+  const header = CSV_COLUMNS.map((column) => escapeCsvValue(column.header)).join(',');
+  const rows = trainees.map((trainee) =>
+    CSV_COLUMNS.map((column) => escapeCsvValue(column.value(trainee))).join(',')
+  );
+  return [header, ...rows].join('\n');
 }
