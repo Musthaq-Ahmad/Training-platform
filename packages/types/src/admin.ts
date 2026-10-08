@@ -3,6 +3,12 @@ import type { FlagEventType } from './activity';
 import type { ProfileData } from './profile';
 import type { TaskFile, TaskStatus } from './tasks';
 
+export type TraineeIntegrityItem = {
+  traineeId: string;
+  score: number | null; // average of the trainee's day scores; null = nothing started yet, show "-"
+  daysScored: number; // how many days the average is based on
+};
+
 /** GET /api/admin/trainees — one row per trainee */
 export type AdminTraineeSummary = {
   id: string;
@@ -22,6 +28,9 @@ export type AdminTraineeSummary = {
   lastActiveDate: string | null; // "YYYY-MM-DD" (IST calendar day)
   latestWpm: number | null;
   flagsLast7Days: number;
+
+  averageScore: number | null;
+  daysScored: number;
 };
 
 export type AdminDay = {

@@ -151,4 +151,30 @@ export class AdminRepository {
         task: { select: { id: true, title: true, curriculum_day_id: true } },
       },
     });
+  /** Tasks each trainee has worked on (a task_progress row that is not "not_started"), with the task's day. */
+  findStartedTasks = (traineeIds: string[]) => {
+    return prisma.task_progress.findMany({
+      where: { trainee_id: { in: traineeIds }, status: { in: ['in_progress', 'completed'] } },
+      select: { trainee_id: true, task_id: true, task: { select: { curriculum_day_id: true } } },
+    });
+  };
+
+  /**
+   * All flag events for these trainees, submitted or not, with the task's day.
+   * `context_data` is deliberately NOT selected (mentor-only, and not needed for a score).
+   */
+  findFlagEvents = (traineeIds: string[]) => {
+    return prisma.flag_event.findMany({
+      where: { trainee_id: { in: traineeIds } },
+      select: {
+        trainee_id: true,
+        task_id: true,
+        type: true,
+        review_priority: true,
+        duration_ms: true,
+        task: { select: { curriculum_day_id: true } },
+      },
+      orderBy: { timestamp: 'asc' },
+    });
+  };
 }
