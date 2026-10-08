@@ -140,6 +140,7 @@ export default function AdminHeader({ leading }: AdminHeaderProps) {
           <nav className={styles.nav} aria-label="Mentor navigation">
             <NavLink
               to="/admin"
+              end
               className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
             >
               <UsersIcon />

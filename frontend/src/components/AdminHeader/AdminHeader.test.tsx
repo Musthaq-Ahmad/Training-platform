@@ -49,10 +49,13 @@ describe('AdminHeader', () => {
     expect(screen.queryByRole('link', { name: 'Mentor One' })).not.toBeInTheDocument();
   });
 
-  it('keeps Trainees active on a trainee detail page', () => {
+  it('does not keep Trainees active on a trainee detail page', () => {
     renderHeader(<AdminHeader />, '/admin/trainees/abc');
 
-    expect(screen.getByRole('link', { name: 'Trainees' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Trainees' })).not.toHaveAttribute(
+      'aria-current',
+      'page'
+    );
   });
 
   it('shows leading content instead of the app name when given', () => {
