@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
-import { useState } from 'react';
-import { NavLink } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+import { Link, NavLink } from 'react-router';
 import { useAuth } from '../../context/Useauth';
-import { ConfirmPopover } from '../Common/ConfirmDialog';
 import styles from './AdminHeader.module.css';
+import ThemeToggle from '../ThemeToggle';
 
 type AdminHeaderProps = {
   /** Replaces the app name on the left (for example a breadcrumb on the detail page). */
@@ -30,12 +30,11 @@ function UsersIcon() {
   );
 }
 
-function PowerIcon({ className }: { className?: string }) {
+function PowerIcon() {
   return (
     <svg
-      className={className}
-      width="20"
-      height="20"
+      width="16"
+      height="16"
       viewBox="0 0 20 20"
       fill="none"
       stroke="currentColor"
@@ -50,25 +49,62 @@ function PowerIcon({ className }: { className?: string }) {
   );
 }
 
+function ChevronIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 4.5 6 7.5 9 4.5" />
+    </svg>
+  );
+}
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  const first = parts[0][0];
+  const second = parts.length > 1 ? parts[parts.length - 1][0] : '';
+  return (first + second).toUpperCase();
+}
+
 /**
  * Header for the mentor area. The trainee Header links to Home, Typing Test and Profile,
  * which admins cannot open, and it flushes trainee activity time on logout (admins have none).
  */
 export default function AdminHeader({ leading }: AdminHeaderProps) {
   const { user, logout } = useAuth();
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const openConfirm = () => {
-    setLogoutError(null);
-    setConfirmOpen(true);
-  };
+  // Close the menu on outside click or Escape
+  useEffect(() => {
+    if (!isMenuOpen) return;
 
-  const closeConfirm = () => {
-    if (isLoggingOut) return;
-    setConfirmOpen(false);
-  };
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) setIsMenuOpen(false);
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMenuOpen(false);
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMenuOpen]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -76,7 +112,7 @@ export default function AdminHeader({ leading }: AdminHeaderProps) {
     try {
       await logout();
       // On success the auth state clears and the app leaves this page.
-      setConfirmOpen(false);
+      setIsMenuOpen(false);
     } catch (error) {
       console.error('Logout failed', error);
       setLogoutError('Could not log out. Please try again.');
@@ -88,16 +124,19 @@ export default function AdminHeader({ leading }: AdminHeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <div className={styles.brand}>
-          {leading ?? (
-            <span className={styles.appName}>
-              Vink<span className={styles.up}>Up</span>
-            </span>
-          )}
-          <span className={styles.badge}>Mentor view</span>
-        </div>
+        <div className={styles.start}>
+          <div className={styles.brand}>
+            {leading ?? (
+              <Link to="/admin" className={styles.appName} aria-label="VinkUp home">
+                Vink<span className={styles.up}>Up</span>
+              </Link>
+            )}
+            <span className={styles.badge}>Mentor view</span>
+          </div>
 
-        <div className={styles.end}>
+          <span className={styles.divider} aria-hidden="true" />
+
+          {/* No `end` prop: stays active on /admin and on a selected trainee's page */}
           <nav className={styles.nav} aria-label="Mentor navigation">
             <NavLink
               to="/admin"
@@ -109,34 +148,62 @@ export default function AdminHeader({ leading }: AdminHeaderProps) {
               </span>
             </NavLink>
           </nav>
+        </div>
 
-          {user && <span className={styles.userName}>{user.name}</span>}
+        <div className={styles.end}>
+          <ThemeToggle />
           <span className={styles.divider} aria-hidden="true" />
 
-          <ConfirmPopover
-            open={confirmOpen}
-            message="Log out?"
-            confirmLabel="Log out"
-            busyLabel="Logging out…"
-            isBusy={isLoggingOut}
-            error={logoutError}
-            onConfirm={() => {
-              void handleLogout();
-            }}
-            onCancel={closeConfirm}
-          >
-            <button
-              type="button"
-              className={styles.logoutButton}
-              aria-label="Log out"
-              aria-haspopup="dialog"
-              aria-expanded={confirmOpen}
-              title="Log out"
-              onClick={openConfirm}
-            >
-              <PowerIcon className={styles.logoutIcon} />
-            </button>
-          </ConfirmPopover>
+          {user && (
+            <div className={styles.account} ref={menuRef}>
+              <button
+                type="button"
+                className={styles.accountButton}
+                aria-haspopup="menu"
+                aria-expanded={isMenuOpen}
+                aria-label="Account menu"
+                onClick={() => {
+                  setLogoutError(null);
+                  setIsMenuOpen((open) => !open);
+                }}
+              >
+                <span className={styles.avatar} aria-hidden="true">
+                  {getInitials(user.name)}
+                </span>
+                <ChevronIcon
+                  className={`${styles.chevron} ${isMenuOpen ? styles.chevronOpen : ''}`}
+                />
+              </button>
+
+              {isMenuOpen && (
+                <div className={styles.menu} role="menu">
+                  <div className={styles.menuHeader}>
+                    <span className={styles.menuName}>{user.name}</span>
+                    <span className={styles.menuEmail}>{user.email}</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={styles.menuItem}
+                    disabled={isLoggingOut}
+                    onClick={() => {
+                      void handleLogout();
+                    }}
+                  >
+                    <PowerIcon />
+                    {isLoggingOut ? 'Logging out…' : 'Log out'}
+                  </button>
+
+                  {logoutError && (
+                    <p className={styles.menuError} role="alert">
+                      {logoutError}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </header>
