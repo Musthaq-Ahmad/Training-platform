@@ -1,27 +1,47 @@
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   margin-bottom: 2.5rem;
+  background-color: var(--color-bg-page-tint);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .container {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid var(--color-border-divider);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  max-width: 100%;
+  height: 64px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  border-bottom: 1px solid var(--color-border-divider);
 }
+
+.start {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  height: 100%;
+  min-width: 0;
+}
+
+/* ---------- Brand ---------- */
 
 .brand {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .appName {
-  font-size: 2rem;
-  font-weight: 900;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--color-text-primary);
+  white-space: nowrap;
 }
 
 .up {
@@ -35,43 +55,40 @@
   border-radius: 999px;
   background-color: var(--color-accent-tint);
   color: var(--color-accent-text);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
-.end {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
+.divider {
+  width: 1px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 1px;
+  background-color: var(--color-border-default);
 }
+
+/* ---------- Nav ---------- */
 
 .nav {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px;
+  align-items: stretch;
+  height: 100%;
   font-size: 0.875rem;
-  line-height: 1.25rem;
 }
 
 .link {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 30px;
-  padding: 0 16px;
-  /* Border is always there (transparent) so hover/active never move anything */
-  border: 1px solid transparent;
-  border-radius: 8px;
+  gap: 8px;
+  height: 100%;
+  padding: 0 12px;
   color: var(--color-text-secondary);
   white-space: nowrap;
-  transition:
-    border-color 150ms ease,
-    background-color 150ms ease,
-    color 150ms ease;
+  transition: color 150ms ease;
 }
 
 .link svg {
@@ -79,14 +96,30 @@
 }
 
 .link:hover {
-  border-color: var(--color-overlay-highlight-8);
   color: var(--color-text-primary);
 }
 
-.link.active,
-.link.active:hover {
+/* Underline sits on the header's bottom border */
+.link::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background-color: var(--color-accent-purple);
+  transform: scaleX(0);
+  transition: transform 150ms ease;
+}
+
+.link.active {
   color: var(--color-text-primary);
   font-weight: 600;
+}
+
+.link.active::after {
+  transform: scaleX(1);
 }
 
 /* Reserves the bold width so the nav doesn't shift when the link becomes active. */
@@ -106,47 +139,145 @@
   pointer-events: none;
 }
 
-.userName {
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
-  font-weight: 600;
-  white-space: nowrap;
+/* ---------- Right side ---------- */
+
+.end {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.divider {
-  width: 1px;
-  height: 20px;
-  flex-shrink: 0;
-  border-radius: 1px;
-  background-color: var(--color-border-default);
+/* ---------- Account menu ---------- */
+
+.account {
+  position: relative;
 }
 
-.logoutButton {
+.accountButton {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 28px;
-  border-radius: 8px;
+  gap: 6px;
+  padding: 3px 8px 3px 3px;
+  border: 1px solid transparent;
+  border-radius: 999px;
   color: var(--color-text-secondary);
-}
-
-.logoutIcon {
-  opacity: 0.65;
   transition:
-    opacity 150ms ease,
-    filter 150ms ease,
+    border-color 150ms ease,
+    background-color 150ms ease,
     color 150ms ease;
 }
 
-.logoutButton:hover:not(:disabled) .logoutIcon,
-.logoutButton:focus-visible .logoutIcon {
-  opacity: 1;
-  filter: brightness(1.3);
+.accountButton:hover,
+.accountButton[aria-expanded='true'] {
+  border-color: var(--color-border-default);
+  background-color: var(--color-bg-panel);
   color: var(--color-text-primary);
 }
 
-.logoutButton:disabled {
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--color-accent-tint);
+  border: 1px solid var(--color-accent-purple-wash);
+  color: var(--color-accent-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.chevron {
+  flex-shrink: 0;
+  transition: transform 150ms ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  padding: 6px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px;
+  background-color: var(--color-bg-card);
+  box-shadow: 0 12px 32px var(--color-overlay-highlight-15);
+}
+
+.menuHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px 12px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--color-border-divider);
+}
+
+.menuName {
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.menuEmail {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: left;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.menuItem:hover:not(:disabled),
+.menuItem:focus-visible {
+  background-color: var(--color-status-error-tint);
+  color: var(--color-status-error-text);
+}
+
+.menuItem:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+.menuError {
+  padding: 6px 12px 4px;
+  color: var(--color-status-error-text);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .start {
+    gap: 0.75rem;
+  }
+
+  /* Keep just the icon on small screens */
+  .label {
+    display: none;
+  }
 }
