@@ -312,6 +312,7 @@ export function buildAdminTraineeDetail(traineeId: string): AdminTraineeDetail |
     },
     courses: buildCourses(t),
     tasks: buildTaskRows(t),
+    totalTasks: 7,
     journal: buildJournal(t),
   };
 }
