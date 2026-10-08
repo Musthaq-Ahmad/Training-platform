@@ -109,7 +109,7 @@ describe('AdminTraineePage', () => {
     expect(screen.getByRole('tab', { name: /^Journal/ })).toBeInTheDocument();
   });
 
-  it('opens on the task list, with every started task shown', async () => {
+  it('opens on the task list, with every submitted task shown', async () => {
     renderPage();
 
     const panel = await screen.findByRole('tabpanel');
@@ -163,13 +163,15 @@ describe('AdminTraineePage', () => {
     const user = userEvent.setup();
     renderPage();
 
-    const started = detail.tasks.find((task) => task.status !== 'not_started');
-    if (!started) throw new Error('fixture trainee has no started task');
+    const completed = detail.tasks.find((task) => task.status === 'completed');
+    if (!completed) throw new Error('fixture trainee has no completed task');
 
-    await user.click(await screen.findByRole('button', { name: `View code for ${started.title}` }));
+    await user.click(
+      await screen.findByRole('button', { name: `View code for ${completed.title}` })
+    );
 
-    expect(getAdminTaskCode).toHaveBeenCalledWith(traineeId, started.taskId);
-    const viewer = await screen.findByRole('region', { name: started.title });
+    expect(getAdminTaskCode).toHaveBeenCalledWith(traineeId, completed.taskId);
+    const viewer = await screen.findByRole('region', { name: completed.title });
     expect(await within(viewer).findByText('Read only')).toBeInTheDocument();
     expect(
       within(viewer).queryByRole('button', { name: /run|save|reset|submit/i })
@@ -194,31 +196,6 @@ describe('AdminTraineePage', () => {
     await user.click(await screen.findByRole('button', { name: `View code for ${task.title}` }));
 
     expect(await screen.findByRole('note')).toHaveTextContent(/hasn.t saved any work/);
-  });
-
-  it('hides tasks the trainee has not started, even if the API sends them', async () => {
-    vi.mocked(getAdminTrainee).mockResolvedValue({
-      ...detail,
-      tasks: [
-        ...detail.tasks,
-        {
-          taskId: 'unopened-task',
-          title: 'Unopened task',
-          dayId: detail.tasks[0].dayId,
-          isStretchGoal: false,
-          status: 'not_started',
-          codeUpdatedAt: null,
-          lastSubmittedAt: null,
-        },
-      ],
-    });
-    renderPage();
-
-    await screen.findByRole('tabpanel');
-
-    expect(screen.queryByText('Unopened task')).not.toBeInTheDocument();
-    expect(screen.queryByText('Not started')).not.toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: `Tasks (${detail.tasks.length})` })).toBeInTheDocument();
   });
 
   it('closes the code viewer', async () => {

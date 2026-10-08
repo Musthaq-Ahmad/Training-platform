@@ -112,13 +112,12 @@ function TraineeDetail({ traineeId }: { traineeId: string }) {
     );
   }
 
-  const { profile, courses, journal } = detail.data;
+  const { profile, courses, totalTasks, journal } = detail.data;
   // Only work the trainee has started matters for review; the day grid already shows the rest.
   const tasks = detail.data.tasks;
   const selectedTask = tasks.find((task) => task.taskId === selectedTaskId);
-
   const tabs: { id: TabId; label: string }[] = [
-    { id: 'tasks', label: `Tasks (${tasks.length})` },
+    { id: 'tasks', label: `Tasks (${tasks.length}/${totalTasks})` },
     { id: 'journal', label: `Journal (${journal.length})` },
     {
       id: 'flags',

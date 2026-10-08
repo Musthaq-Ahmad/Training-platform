@@ -87,7 +87,7 @@ export class AdminRepository {
       where: { trainee_id: traineeId },
       select: { curriculum_day_id: true, completed_at: true },
     });
-
+  getTotalTasks = () => prisma.task.count();
   /**
    * The tasks this trainee has worked on (in progress or completed), in curriculum order.
    * Tasks they never opened are left out; the day grid already shows how far they are.

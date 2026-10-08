@@ -77,14 +77,16 @@ export class AdminService {
   getTraineeDetail = async (traineeId: string): Promise<AdminTraineeDetail> => {
     await this.assertTrainee(traineeId); // 404 before any other work
 
-    const [profile, statuses, courses, startedTasks, completions, journal] = await Promise.all([
-      profileService.getProfile(traineeId),
-      progressService.getDayStatuses(traineeId),
-      repo.listCoursesWithDays(),
-      repo.listStartedTasks(traineeId),
-      repo.listCompletionsFor(traineeId),
-      repo.listJournal(traineeId),
-    ]);
+    const [profile, statuses, courses, startedTasks, totalTasks, completions, journal] =
+      await Promise.all([
+        profileService.getProfile(traineeId),
+        progressService.getDayStatuses(traineeId),
+        repo.listCoursesWithDays(),
+        repo.listStartedTasks(traineeId),
+        repo.getTotalTasks(),
+        repo.listCompletionsFor(traineeId),
+        repo.listJournal(traineeId),
+      ]);
 
     const statusByDay = new Map(statuses.map((day) => [day.dayId, day.status]));
     const completedAtByDay = new Map(
@@ -115,6 +117,7 @@ export class AdminService {
         codeUpdatedAt: row.code_updated_at?.toISOString() ?? null,
         lastSubmittedAt: row.last_submitted_at?.toISOString() ?? null,
       })),
+      totalTasks,
       journal: journal.map((entry) => ({
         dayId: entry.curriculum_day.id,
         courseTitle: entry.curriculum_day.course.title,

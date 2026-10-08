@@ -12,13 +12,9 @@ type AdminTaskListProps = {
 };
 
 function describeProgress(task: AdminTaskRow): string {
-  if (task.status === 'completed') {
-    return task.lastSubmittedAt
-      ? `Submitted ${formatIstDateTime(task.lastSubmittedAt)}`
-      : 'Completed';
-  }
-  if (task.codeUpdatedAt) return `Saved ${formatIstDateTime(task.codeUpdatedAt)}`;
-  return '—';
+  return task.lastSubmittedAt
+    ? `Submitted ${formatIstDateTime(task.lastSubmittedAt)}`
+    : 'Completed';
 }
 
 /** The tasks the trainee has started, grouped by course and day. Days still in progress start open. */
@@ -43,7 +39,7 @@ export default function AdminTaskList({
     .filter((course) => course.days.length > 0);
 
   if (visibleCourses.length === 0) {
-    return <p className={styles.empty}>No completed or in-progress tasks yet.</p>;
+    return <p className={styles.empty}>No completed tasks yet.</p>;
   }
 
   return (
@@ -54,19 +50,13 @@ export default function AdminTaskList({
 
           {course.days.map((day) => {
             const dayTasks = tasksByDay.get(day.id) ?? [];
-            const done = dayTasks.filter((task) => task.status === 'completed').length;
-            const isOpenByDefault = dayTasks.some(
-              (task) => task.status === 'in_progress' || task.taskId === selectedTaskId
-            );
+            const isOpenByDefault = dayTasks.some((task) => task.taskId === selectedTaskId);
 
             return (
               <details key={day.id} className={styles.day} open={isOpenByDefault}>
                 <summary className={styles.summary}>
                   <span className={styles.dayTitle}>
                     Day {day.dayNumber} · {day.title}
-                  </span>
-                  <span className={styles.dayCount}>
-                    {done}/{dayTasks.length} done
                   </span>
                 </summary>
 

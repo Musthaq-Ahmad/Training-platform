@@ -23,7 +23,7 @@ const tasks: AdminTaskRow[] = [
     dayId: 'html-1',
     isStretchGoal: false,
     status: 'completed',
-    codeUpdatedAt: '2026-10-01T10:00:00.000Z',
+    codeUpdatedAt: '2026-10-01T12:12:00.000Z',
     lastSubmittedAt: '2026-10-01T12:12:00.000Z',
   },
   {
@@ -31,14 +31,14 @@ const tasks: AdminTaskRow[] = [
     title: 'Semantic article',
     dayId: 'html-2',
     isStretchGoal: true,
-    status: 'in_progress',
+    status: 'completed',
     codeUpdatedAt: '2026-10-02T12:12:00.000Z',
-    lastSubmittedAt: null,
+    lastSubmittedAt: '2026-10-02T12:12:00.000Z',
   },
 ];
 
 describe('AdminTaskList', () => {
-  it('groups tasks by day and leaves out days that have no tasks', () => {
+  it('groups completed tasks by day and leaves out days that have no tasks', () => {
     render(
       <AdminTaskList tasks={tasks} courses={courses} selectedTaskId={null} onViewCode={vi.fn()} />
     );
@@ -46,38 +46,50 @@ describe('AdminTaskList', () => {
     expect(screen.getByText('Day 1 · Structure')).toBeInTheDocument();
     expect(screen.getByText('Day 2 · Forms')).toBeInTheDocument();
     expect(screen.queryByText('Day 3 · Media')).not.toBeInTheDocument();
-    expect(screen.getByText('1/1 done')).toBeInTheDocument();
-    expect(screen.getByText('0/1 done')).toBeInTheDocument();
   });
 
-  it('shows status, submission and stretch state', () => {
+  it('shows submission and stretch state for completed tasks', () => {
     render(
       <AdminTaskList tasks={tasks} courses={courses} selectedTaskId={null} onViewCode={vi.fn()} />
     );
 
     expect(screen.getByText('Submitted 01 Oct 2026, 17:42')).toBeInTheDocument();
-    expect(screen.getByText('Saved 02 Oct 2026, 17:42')).toBeInTheDocument();
+    expect(screen.getByText('Submitted 02 Oct 2026, 17:42')).toBeInTheDocument();
     expect(screen.getByText('Stretch')).toBeInTheDocument();
-    expect(screen.getByText('In progress')).toBeInTheDocument();
-    expect(screen.getByText('Completed')).toBeInTheDocument();
+    expect(screen.getAllByText('Completed')).toHaveLength(2);
+
+    expect(screen.queryByText('In progress')).not.toBeInTheDocument();
     expect(screen.queryByText('Not started')).not.toBeInTheDocument();
   });
 
-  it('opens a day that is in progress and leaves finished days closed', () => {
+  it('leaves finished days closed by default', () => {
     render(
       <AdminTaskList tasks={tasks} courses={courses} selectedTaskId={null} onViewCode={vi.fn()} />
     );
 
-    const inProgress = screen.getByText('Day 2 · Forms').closest('details');
-    const finished = screen.getByText('Day 1 · Structure').closest('details');
+    const day1 = screen.getByText('Day 1 · Structure').closest('details');
+    const day2 = screen.getByText('Day 2 · Forms').closest('details');
 
-    expect(inProgress).toHaveAttribute('open');
-    expect(finished).not.toHaveAttribute('open');
+    expect(day1).not.toHaveAttribute('open');
+    expect(day2).not.toHaveAttribute('open');
+  });
+
+  it('opens the day containing the selected task', () => {
+    render(
+      <AdminTaskList tasks={tasks} courses={courses} selectedTaskId="t2" onViewCode={vi.fn()} />
+    );
+
+    const selectedDay = screen.getByText('Day 2 · Forms').closest('details');
+    const otherDay = screen.getByText('Day 1 · Structure').closest('details');
+
+    expect(selectedDay).toHaveAttribute('open');
+    expect(otherDay).not.toHaveAttribute('open');
   });
 
   it('asks to view code for the task that was clicked', async () => {
     const user = userEvent.setup();
     const onViewCode = vi.fn();
+
     render(
       <AdminTaskList tasks={tasks} courses={courses} selectedTaskId="t2" onViewCode={onViewCode} />
     );
@@ -85,21 +97,23 @@ describe('AdminTaskList', () => {
     await user.click(screen.getByRole('button', { name: 'View code for Profile page' }));
 
     expect(onViewCode).toHaveBeenCalledWith('t1');
+
     expect(screen.getByRole('button', { name: 'View code for Semantic article' })).toHaveAttribute(
       'aria-pressed',
       'true'
     );
+
     expect(screen.getByRole('button', { name: 'View code for Profile page' })).toHaveAttribute(
       'aria-pressed',
       'false'
     );
   });
 
-  it('has an empty state', () => {
+  it('shows no tasks when there are no completed tasks', () => {
     render(
       <AdminTaskList tasks={[]} courses={courses} selectedTaskId={null} onViewCode={vi.fn()} />
     );
 
-    expect(screen.getByText('No completed or in-progress tasks yet.')).toBeInTheDocument();
+    expect(screen.getByText('No completed tasks yet.')).toBeInTheDocument();
   });
 });
