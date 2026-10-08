@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import type { JournalEntry } from '@itp/types';
 
 import JournalPage from './JournalPage';
@@ -11,6 +12,14 @@ vi.mock('../../api/journal', () => ({
 
 vi.mock('../../components/Header', () => ({
   default: () => <header data-testid="header">Header</header>,
+}));
+
+vi.mock('../../components/HelpButton', () => ({
+  default: () => (
+    <a href="/help" aria-label="Open help">
+      Help
+    </a>
+  ),
 }));
 
 vi.mock('../../components/JournalMessage', () => ({
@@ -121,6 +130,14 @@ const mockEntries: JournalEntry[] = [
 
 const mockedGetJournalEntries = vi.mocked(getJournalEntries);
 
+function renderJournalPage() {
+  return render(
+    <MemoryRouter>
+      <JournalPage />
+    </MemoryRouter>
+  );
+}
+
 describe('JournalPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -129,7 +146,7 @@ describe('JournalPage', () => {
   it('renders the loading state initially', () => {
     mockedGetJournalEntries.mockReturnValue(new Promise(() => {}));
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     expect(screen.getByLabelText('Loading journal entries')).toBeInTheDocument();
 
@@ -143,7 +160,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     expect(await screen.findByText('Introduction to React')).toBeInTheDocument();
 
@@ -159,7 +176,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 
@@ -175,7 +192,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 
@@ -183,15 +200,12 @@ describe('JournalPage', () => {
       name: 'Introduction to React',
     });
 
-    // Initially expanded
     expect(screen.getByTestId('expanded-day-1')).toHaveTextContent('expanded');
 
-    // Collapse
     fireEvent.click(day1Button);
 
     expect(screen.getByTestId('expanded-day-1')).toHaveTextContent('collapsed');
 
-    // Expand again
     fireEvent.click(day1Button);
 
     expect(screen.getByTestId('expanded-day-1')).toHaveTextContent('expanded');
@@ -202,7 +216,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 
@@ -224,7 +238,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 
@@ -246,7 +260,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 
@@ -276,7 +290,7 @@ describe('JournalPage', () => {
       entries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 
@@ -294,7 +308,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 
@@ -312,7 +326,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 
@@ -330,7 +344,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 
@@ -350,7 +364,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 
@@ -378,7 +392,7 @@ describe('JournalPage', () => {
       entries: [],
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     expect(await screen.findByTestId('journal-message-empty')).toBeInTheDocument();
 
@@ -390,7 +404,7 @@ describe('JournalPage', () => {
       message: 'Failed to load journal entries',
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     expect(await screen.findByTestId('journal-message-error')).toBeInTheDocument();
 
@@ -406,7 +420,7 @@ describe('JournalPage', () => {
         entries: mockEntries,
       });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     expect(await screen.findByTestId('journal-message-error')).toBeInTheDocument();
 
@@ -424,7 +438,7 @@ describe('JournalPage', () => {
   it('disables search while loading', () => {
     mockedGetJournalEntries.mockReturnValue(new Promise(() => {}));
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     expect(screen.getByTestId('journal-search')).toBeDisabled();
 
@@ -436,7 +450,7 @@ describe('JournalPage', () => {
       message: 'Something went wrong',
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByTestId('journal-message-error');
 
@@ -450,7 +464,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 
@@ -474,7 +488,7 @@ describe('JournalPage', () => {
       entries: mockEntries,
     });
 
-    render(<JournalPage />);
+    renderJournalPage();
 
     await screen.findByText('Introduction to React');
 

@@ -1,0 +1,26 @@
+.helpButton {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background-color: var(--color-accent-purple);
+  color: var(--color-text-on-accent);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 16px var(--color-accent-icon-shadow);
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.helpButton:hover {
+  background-color: var(--color-accent-purple-soft);
+  box-shadow: 0 6px 20px var(--color-accent-icon-shadow);
+  transform: translateY(-1px);
+}
