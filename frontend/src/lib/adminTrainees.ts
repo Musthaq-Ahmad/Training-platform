@@ -1,4 +1,5 @@
 import type { AdminTraineeSummary } from '@itp/types';
+import { INTEGRITY_MID_MIN } from './Integrityband';
 
 /** Default order of the mentor's trainee list: by name, A to Z, ignoring case. */
 export function sortTraineesByName(trainees: AdminTraineeSummary[]): AdminTraineeSummary[] {
@@ -86,6 +87,7 @@ export function summarizeCohort(trainees: AdminTraineeSummary[]): CohortSummary 
 export const ATTENTION_REASONS = {
   inactive: 'Inactive 2+ days',
   behind: 'Behind cohort',
+  lowIntegrity: 'Low integrity score',
 } as const;
 
 /** Informational only: a new trainee and one who never opens the platform look the same. */
@@ -131,6 +133,10 @@ export function needsAttention(
 
   if (cohortMedian - t.daysCompleted > BEHIND_BY_MORE_THAN_DAYS) {
     reasons.push(ATTENTION_REASONS.behind);
+  }
+
+  if (t.averageScore !== null && t.averageScore < INTEGRITY_MID_MIN) {
+    reasons.push(ATTENTION_REASONS.lowIntegrity);
   }
 
   return reasons;
