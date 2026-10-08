@@ -166,3 +166,16 @@
 
   color: var(--color-text-primary);
 }
+
+/* Needs attention: a short rounded bar inside the row, so it never touches the card edge. */
+.bodyRow[data-attention='true']::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 8px;
+  width: 3px;
+
+  background: var(--color-status-warning);
+  border-radius: 999px;
+}

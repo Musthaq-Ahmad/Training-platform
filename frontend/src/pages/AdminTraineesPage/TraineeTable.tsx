@@ -3,9 +3,12 @@ import type { AdminTraineeSummary } from '@itp/types';
 import { formatDurationHM } from '../../lib/formatTime';
 import { formatCurrentDay, formatLastActive, progressPercent } from '../../lib/adminTrainees';
 import styles from './TraineeTable.module.css';
+import AttentionBadge from './AttentionBadge';
 
 type TraineeTableProps = {
   trainees: AdminTraineeSummary[];
+  /** Attention reasons by trainee id (from `needsAttention`); a missing id means none. */
+  attentionReasons?: Record<string, string[]>;
 };
 
 const COLUMNS = [
@@ -23,7 +26,7 @@ const COLUMNS = [
  * One row per trainee. The name is the only real link; its ::after covers the whole row,
  * so the entire row is clickable while screen readers and keyboards see one link per trainee.
  */
-export default function TraineeTable({ trainees }: TraineeTableProps) {
+export default function TraineeTable({ trainees, attentionReasons = {} }: TraineeTableProps) {
   return (
     <div className={styles.scroll}>
       <div className={styles.table} role="table" aria-label="Trainees">
@@ -40,12 +43,18 @@ export default function TraineeTable({ trainees }: TraineeTableProps) {
             const isFlagged = trainee.flagsLast7Days > 0;
 
             return (
-              <div key={trainee.id} className={`${styles.row} ${styles.bodyRow}`} role="row">
+              <div
+                key={trainee.id}
+                className={`${styles.row} ${styles.bodyRow}`}
+                role="row"
+                data-attention={(attentionReasons[trainee.id] ?? []).length > 0}
+              >
                 <div className={styles.identity} role="cell">
                   <Link to={`/admin/trainees/${trainee.id}`} className={styles.nameLink}>
                     {trainee.name}
                   </Link>
                   <span className={styles.email}>{trainee.email}</span>
+                  <AttentionBadge reasons={attentionReasons[trainee.id] ?? []} />
                 </div>
 
                 <div className={styles.progress} role="cell">
