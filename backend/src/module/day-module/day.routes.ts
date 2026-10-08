@@ -4,6 +4,7 @@ import { dayTasksParamsSchema } from './day-tasks.schema';
 import { dayTasksController } from './day-tasks.controller';
 import { journalDayIdParamsSchema, saveJournalBodySchema } from './journal.schema';
 import { journalController } from './journal.controller';
+import { integrityController } from './integrity.controller';
 import { dayController } from './day.controller';
 
 export const dayRouter = Router();
@@ -45,6 +46,11 @@ dayRouter.get(
   '/:dayId/tasks',
   validate({ params: dayTasksParamsSchema }),
   dayTasksController.getDayTasks
+);
+dayRouter.get(
+  '/:dayId/integrity',
+  validate({ params: dayTasksParamsSchema }),
+  integrityController.getDayIntegrity
 );
 
 export default dayRouter;

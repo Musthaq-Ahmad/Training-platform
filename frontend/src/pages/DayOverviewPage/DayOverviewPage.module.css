@@ -35,12 +35,20 @@
 
 .tasksHeader {
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   justify-content: space-between;
   gap: 16px;
   padding-bottom: 18px;
   margin-bottom: 18px;
   border-bottom: 1px solid var(--color-border-card);
+}
+.tasksSide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .tasksEyebrow {
