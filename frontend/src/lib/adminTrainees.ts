@@ -81,3 +81,53 @@ export function summarizeCohort(trainees: AdminTraineeSummary[]): CohortSummary 
     flaggedTraineeCount,
   };
 }
+
+/** The reasons a mentor should look at a trainee. The labels are what the badge shows. */
+export const ATTENTION_REASONS = {
+  inactive: 'Inactive 2+ days',
+  behind: 'Behind cohort',
+} as const;
+
+const INACTIVE_AFTER_DAYS = 2;
+const BEHIND_BY_MORE_THAN_DAYS = 3;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/** Whole days from one "YYYY-MM-DD" calendar day to another. */
+function daysBetween(from: string, to: string): number {
+  return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / MS_PER_DAY);
+}
+
+/** Median of `daysCompleted` across the cohort (the average of the middle two for an even count). */
+export function medianDaysCompleted(trainees: AdminTraineeSummary[]): number {
+  if (trainees.length === 0) return 0;
+  const sorted = trainees.map((t) => t.daysCompleted).sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+}
+
+/**
+ * Every reason this trainee needs attention, in a fixed order; an empty list means none.
+ * `today` is "YYYY-MM-DD" (see `todayKey`). `cohortMedian` comes from `medianDaysCompleted`;
+ * if you leave it out, "Behind cohort" can never apply.
+ */
+export function needsAttention(
+  t: AdminTraineeSummary,
+  today: string,
+  cohortMedian: number = t.daysCompleted
+): string[] {
+  const reasons: string[] = [];
+
+  const isFinished = t.currentDay === null;
+  if (
+    !isFinished &&
+    (t.lastActiveDate === null || daysBetween(t.lastActiveDate, today) >= INACTIVE_AFTER_DAYS)
+  ) {
+    reasons.push(ATTENTION_REASONS.inactive);
+  }
+
+  if (cohortMedian - t.daysCompleted > BEHIND_BY_MORE_THAN_DAYS) {
+    reasons.push(ATTENTION_REASONS.behind);
+  }
+
+  return reasons;
+}

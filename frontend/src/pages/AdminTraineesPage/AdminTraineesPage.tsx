@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
 import type { AdminTraineeSummary } from '@itp/types';
 import { getAdminTrainees } from '../../api/admin';
-import { sortTraineesByName } from '../../lib/adminTrainees';
 import AdminHeader from '../../components/AdminHeader';
 import LoaderOverlay from '../../components/Common/LoadingState';
 import { ErrorState } from '../../components/Common/ErrorState';
 import TraineeTable from './TraineeTable';
 import styles from './AdminTraineesPage.module.css';
 import CohortSummary from '../../components/CohortSummary';
+import { filterTrainees, sortTrainees } from '../../lib/traineeListState';
+import TraineeListToolbar from './TraineeListToolbar';
+import { useTraineeListParams } from './useTraineeListParams';
+import { medianDaysCompleted, needsAttention, sortTraineesByName } from '../../lib/adminTrainees';
+import { todayKey } from '../../lib/platformDate';
 
 function UsersIcon() {
   return (
@@ -34,6 +38,8 @@ export default function AdminTraineesPage() {
   const [trainees, setTrainees] = useState<AdminTraineeSummary[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const { query, sort, attentionOnly, setQuery, setSort, setAttentionOnly } =
+    useTraineeListParams();
 
   useEffect(() => {
     // Ignore a response that arrives after the mentor left the page or retried.
@@ -86,6 +92,18 @@ export default function AdminTraineesPage() {
     );
   }
 
+  // Reasons and the chip count use the whole cohort, so they don't change while a mentor types.
+  const today = todayKey();
+  const median = medianDaysCompleted(trainees);
+  const attentionReasons: Record<string, string[]> = {};
+  for (const t of trainees) attentionReasons[t.id] = needsAttention(t, today, median);
+  const attentionCount = trainees.filter((t) => attentionReasons[t.id].length > 0).length;
+
+  const candidates = attentionOnly
+    ? trainees.filter((t) => attentionReasons[t.id].length > 0)
+    : trainees;
+  const visibleTrainees = sortTrainees(filterTrainees(candidates, query), sort);
+
   return (
     <>
       <AdminHeader />
@@ -93,7 +111,9 @@ export default function AdminTraineesPage() {
         <div className={styles.titleBlock}>
           <h1 className={styles.title}>Trainees</h1>
           <p className={styles.subtitle}>
-            {trainees.length} {trainees.length === 1 ? 'trainee' : 'trainees'}
+            {visibleTrainees.length === trainees.length
+              ? `${trainees.length} ${trainees.length === 1 ? 'trainee' : 'trainees'}`
+              : `${visibleTrainees.length} of ${trainees.length} trainees`}
           </p>
         </div>
 
@@ -111,7 +131,24 @@ export default function AdminTraineesPage() {
               </p>
             </div>
           ) : (
-            <TraineeTable trainees={trainees} />
+            <>
+              <TraineeListToolbar
+                query={query}
+                onQueryChange={setQuery}
+                sort={sort}
+                onSortChange={setSort}
+                attentionOnly={attentionOnly}
+                attentionCount={attentionCount}
+                onAttentionChange={setAttentionOnly}
+              />
+              {visibleTrainees.length === 0 ? (
+                <p className={styles.noMatches} role="status">
+                  No trainees match your filters.
+                </p>
+              ) : (
+                <TraineeTable trainees={visibleTrainees} attentionReasons={attentionReasons} />
+              )}
+            </>
           )}
         </section>
       </main>

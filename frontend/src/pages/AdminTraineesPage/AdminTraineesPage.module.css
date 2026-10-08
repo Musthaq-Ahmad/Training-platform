@@ -81,6 +81,14 @@
   color: var(--color-text-secondary);
 }
 
+.noMatches {
+  padding: 48px 24px;
+  text-align: center;
+
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
 @media (max-width: 640px) {
   .page {
     padding: 0 12px 3rem;
