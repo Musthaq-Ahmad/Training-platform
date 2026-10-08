@@ -1,74 +1,137 @@
 .container {
   position: fixed;
   right: 16px;
-  bottom: 16px;
+  bottom: 44px; /* sit above the editor status bar */
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: min(360px, calc(100vw - 32px));
+  gap: 10px;
+  width: min(400px, calc(100vw - 32px));
 }
 
 .toast {
+  --toast-accent: var(--color-accent-purple);
+  --toast-tint: var(--color-accent-tint);
+
+  position: relative;
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  border-left: 3px solid transparent;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  padding: 14px 14px 16px 16px;
+  border: 1px solid var(--toast-accent);
+  border-left-width: 6px;
+  border-radius: 10px;
+  /* solid card underneath so translucent tints never show the page through */
   background-color: var(--color-bg-card);
+  background-image: linear-gradient(var(--toast-tint), var(--toast-tint));
   color: var(--color-text-primary);
-  box-shadow: 0 8px 24px var(--color-overlay-scrim);
+  box-shadow:
+    0 0 0 3px var(--toast-tint),
+    0 12px 32px var(--color-overlay-scrim);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .toast {
-    animation: toast-slide-in 160ms ease-out;
+    animation: toast-slide-in 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
   }
 }
 
 @keyframes toast-slide-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateX(32px) scale(0.96);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0) scale(1);
   }
+}
+
+.iconBadge {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--toast-accent);
+  color: var(--color-text-on-accent);
 }
 
 .message {
   flex: 1;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 .dismissButton {
+  display: grid;
   flex-shrink: 0;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
   color: var(--color-text-secondary);
 }
 
 .dismissButton:hover {
+  background-color: var(--color-overlay-highlight-8);
   color: var(--color-text-primary);
 }
 
+/* Countdown bar showing how long the toast stays */
+.progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background-color: var(--toast-accent);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .progress {
+    animation-name: toast-countdown;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+  }
+}
+
+@keyframes toast-countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* ---------- Variants ---------- */
+
 .info {
-  background-color: var(--color-bg-card);
+  --toast-accent: var(--color-accent-purple);
+  --toast-tint: var(--color-accent-tint);
 }
 
 .success {
-  border-left-color: var(--color-status-success);
+  --toast-accent: var(--color-status-success);
+  --toast-tint: var(--color-bg-green-fill);
 }
 
 .warning {
-  background-color: var(--color-status-warning-bg);
-  border-left-color: var(--color-status-warning);
-  color: var(--color-text-primary);
+  --toast-accent: var(--color-status-warning);
+  --toast-tint: var(--color-status-warning-bg);
+}
+
+/* white-on-amber is low contrast, so use dark ink for the icon */
+.warning .iconBadge {
+  color: var(--color-text-bright);
 }
 
 .error {
-  background-color: var(--color-status-error-tint);
-  border-left-color: var(--color-status-error-icon);
-  color: var(--color-text-primary);
+  --toast-accent: var(--color-status-error-icon);
+  --toast-tint: var(--color-status-error-tint);
 }
