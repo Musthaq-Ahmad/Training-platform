@@ -206,9 +206,6 @@ export default function DayCelebration({ onDismiss }: DayCelebrationProps) {
         </div>
         <h2>Day submitted!</h2>
         <p>Nice work. Your progress is saved.</p>
-        <button type="button" className={styles.continueButton} onClick={onDismiss}>
-          Continue
-        </button>
       </section>
     </div>
   );

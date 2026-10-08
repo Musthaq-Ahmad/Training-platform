@@ -13,6 +13,8 @@ function setup(overrides: Overrides = {}) {
       isCompleted={false}
       isSubmitting={false}
       onComplete={onComplete}
+      showNextDay={false}
+      onNextDay={vi.fn()}
       {...overrides}
     />
   );
