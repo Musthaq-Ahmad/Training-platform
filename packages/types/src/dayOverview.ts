@@ -58,3 +58,16 @@ export interface DayJournal {
 export type SaveJournalRequest = {
   responseText: string;
 };
+
+/** Counts of recorded events for the tasks counted in a day's score. No timestamps, priorities or notes. */
+export type IntegrityBreakdown = {
+  pasteAttempts: number;
+  tabSwitches: number;
+  fullscreenExits: number;
+  windowBlurs: number;
+};
+
+/** GET /api/days/:dayId/integrity */
+export type DayIntegrityResponse = {
+  score: number | null; // null = no task worked on yet, show "-"
+};

@@ -5,6 +5,7 @@ import type {
   DayCurrentStatus,
   DayTask,
   SaveJournalRequest,
+  DayIntegrityResponse,
 } from '@itp/types';
 import { apiClient } from './client';
 
@@ -36,4 +37,9 @@ export async function saveJournal(dayId: string, responseText: string): Promise<
 export async function completeDay(dayId: string): Promise<DayCurrentStatus> {
   const { data } = await apiClient.patch<CompleteDayResponse>(`/days/${dayId}/complete`);
   return data.status;
+}
+
+export async function getDayIntegrity(dayId: string): Promise<DayIntegrityResponse> {
+  const res = await apiClient.get<DayIntegrityResponse>(`/days/${dayId}/integrity`);
+  return res.data;
 }

@@ -1,8 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ArrowRight } from 'lucide-react';
-import type { DayTask, DayContent, DayCurrentStatus } from '@itp/types';
-import { getDayTasks, getDayStatus, getDayJournal, saveJournal, completeDay } from '../../api/days';
+import type { DayTask, DayContent, DayCurrentStatus, DayIntegrityResponse } from '@itp/types';
+import {
+  getDayTasks,
+  getDayStatus,
+  getDayJournal,
+  saveJournal,
+  completeDay,
+  getDayIntegrity,
+} from '../../api/days';
 import { mockDayContents } from '../../api/dayOverview';
 import DaySummary from '../../components/DaySummary/DaySummary';
 import LearningObjectives from '../../components/LearningObjectives/LearningObjectives';
@@ -16,6 +23,7 @@ import StateMessage from '../../components/StateMessage';
 import { ApiError } from '../../api/errors';
 import Loader from '../../components/Common/LoadingState';
 import DayCelebration from '../../components/DayCelebration/DayCelebration';
+import DayIntegrityBadge from '../../components/DayIntegrityBadge/DayIntegrityBadge';
 import HelpButton from '../../components/HelpButton';
 
 type LoadResult =
@@ -33,6 +41,9 @@ function DayTasks({
   completedTasks,
   requiredTasks,
   onSelectTask,
+  integrity,
+  isIntegrityLoading,
+  hasIntegrityError,
 }: {
   courseTitle: string;
   dayNumber: number;
@@ -40,6 +51,9 @@ function DayTasks({
   completedTasks: number;
   requiredTasks: number;
   onSelectTask: (task: DayTask) => void;
+  integrity: DayIntegrityResponse | null;
+  isIntegrityLoading: boolean;
+  hasIntegrityError: boolean;
 }) {
   return (
     <section className={styles.tasks} aria-labelledby="day-tasks-title">
@@ -58,9 +72,16 @@ function DayTasks({
           </h2>
           <p className={styles.tasksDescription}>Select a task to open its workspace.</p>
         </div>
-        <p className={styles.tasksProgress}>
-          {completedTasks} of {requiredTasks} completed
-        </p>
+        <div className={styles.tasksSide}>
+          <DayIntegrityBadge
+            integrity={integrity}
+            isLoading={isIntegrityLoading}
+            hasError={hasIntegrityError}
+          />
+          <p className={styles.tasksProgress}>
+            {completedTasks} of {requiredTasks} completed
+          </p>
+        </div>
       </header>
 
       {tasks.length === 0 ? (
@@ -130,6 +151,9 @@ function DayOverviewContent() {
   const day: DayContent | undefined = dayId ? mockDayContents[dayId] : undefined;
   const shouldLoad = Boolean(dayId && day);
 
+  const [integrity, setIntegrity] = useState<DayIntegrityResponse | null>(null);
+  const [integrityStatus, setIntegrityStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+
   // Hooks must run before any early return.
   useEffect(() => {
     if (!dayId || !shouldLoad) return;
@@ -140,10 +164,17 @@ function DayOverviewContent() {
       getDayStatus(dayId),
       // A journal failure is not fatal: the page still renders with an empty journal.
       getDayJournal(dayId).catch(() => ({ responseText: null })),
+      getDayIntegrity(dayId).catch(() => null),
     ])
-      .then(([tasks, status, journal]) => {
+      .then(([tasks, status, journal, integrityData]) => {
         if (!isCancelled) {
           setResult({ dayId, tasks, status, journalResponse: journal.responseText ?? '' });
+          if (integrityData) {
+            setIntegrity(integrityData);
+            setIntegrityStatus('ready');
+          } else {
+            setIntegrityStatus('error');
+          }
         }
       })
       .catch((error: ApiError) => {
@@ -294,6 +325,9 @@ function DayOverviewContent() {
               completedTasks={completedTasks}
               requiredTasks={requiredTasks}
               onSelectTask={(task) => void navigate(`/tasks/${task.id}`)}
+              integrity={integrity}
+              isIntegrityLoading={integrityStatus === 'loading'}
+              hasIntegrityError={integrityStatus === 'error'}
             />
             <LearningObjectives objectives={day.learningObjectives} />
           </div>
