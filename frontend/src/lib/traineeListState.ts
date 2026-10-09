@@ -6,6 +6,7 @@ export const SORT_OPTIONS = [
   { value: 'name', label: 'Name' },
   { value: 'progress', label: 'Progress' },
   { value: 'lastActive', label: 'Last active' },
+  { value: 'integrity', label: 'Integrity score' },
 ] as const;
 
 export type SortKey = (typeof SORT_OPTIONS)[number]['value'];
@@ -40,6 +41,12 @@ const COMPARATORS: Record<SortKey, Comparator> = {
     if (a.lastActiveDate === null) return -1;
     if (b.lastActiveDate === null) return 1;
     return a.lastActiveDate.localeCompare(b.lastActiveDate) || byName(a, b);
+  },
+  integrity: (a, b) => {
+    if (a.averageScore === b.averageScore) return byName(a, b);
+    if (a.averageScore === null) return 1;
+    if (b.averageScore === null) return -1;
+    return a.averageScore - b.averageScore || byName(a, b);
   },
 };
 
