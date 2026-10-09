@@ -10,7 +10,9 @@ import { istDateString, istDateValue, istDayStart } from '../../utils/istDate';
 import { ProgressService } from '../progress-module/progress.service';
 import { DashboardRepository } from './dashboard.repository';
 import { buildTypingSummary, TYPING_TREND_DAYS } from './dashboard.typing';
+import { CertificateService } from './certificate.service';
 
+const certificateService = new CertificateService();
 const dashboardRepository = new DashboardRepository();
 const progressService = new ProgressService();
 
@@ -37,13 +39,15 @@ export class DashboardService {
   async getDashboard(traineeId: string, now: Date = new Date()): Promise<DashboardResponse> {
     const trendStart = istDateString(TYPING_TREND_DAYS - 1, now);
 
-    const [statuses, totals, today, latestTyping, recentTyping] = await Promise.all([
-      progressService.getDayStatuses(traineeId),
-      dashboardRepository.sumActivity(traineeId),
-      dashboardRepository.findActivityOn(traineeId, istDateValue(0, now)),
-      dashboardRepository.findLatestTyping(traineeId),
-      dashboardRepository.findTypingSince(traineeId, istDayStart(trendStart)),
-    ]);
+    const [statuses, totals, today, latestTyping, recentTyping, completedCourseIds] =
+      await Promise.all([
+        progressService.getDayStatuses(traineeId),
+        dashboardRepository.sumActivity(traineeId),
+        dashboardRepository.findActivityOn(traineeId, istDateValue(0, now)),
+        dashboardRepository.findLatestTyping(traineeId),
+        dashboardRepository.findTypingSince(traineeId, istDayStart(trendStart)),
+        certificateService.getCompletedCourseIds(traineeId),
+      ]);
 
     // There is at most one UNLOCKED day; none once every day is completed.
     const next = statuses.find((day) => day.status === 'UNLOCKED');
@@ -61,6 +65,7 @@ export class DashboardService {
         codingSeconds: totals._sum.coding_seconds ?? 0,
       },
       typing: buildTypingSummary(latestTyping, recentTyping, now),
+      completedCourseIds,
     };
   }
 

@@ -18,3 +18,9 @@ courseRoutes.get(
   validate({ params: courseIdParamsSchema }),
   dashboardController.getCourseDays
 );
+
+courseRoutes.get(
+  '/:courseId/certificate',
+  validate({ params: courseIdParamsSchema }),
+  dashboardController.getCourseCertificate
+);

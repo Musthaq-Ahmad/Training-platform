@@ -31,7 +31,7 @@ import {
 } from './mockTasks';
 import { mockStatusByDay, mockJournalByDay } from '../test/fixtures/dayStatus';
 import { mockDayContents } from './dayOverview';
-import { buildCourseDays, buildDashboard } from '../test/fixtures/dashboard';
+import { buildCourseDays, buildDashboard, buildCertificate } from '../test/fixtures/dashboard';
 import { addTypingResult, buildTypingResults } from '../test/fixtures/typingTest';
 import { mockProfile } from '../test/fixtures/profile';
 import { addMockTrainee } from '../test/fixtures/admin';
@@ -151,6 +151,7 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
   const adminTraineeMatch = /^\/admin\/trainees\/([^/]+)$/.exec(url);
   const adminFlagsMatch = /^\/admin\/trainees\/([^/]+)\/flags$/.exec(url);
   const adminCodeMatch = /^\/admin\/trainees\/([^/]+)\/tasks\/([^/]+)\/code$/.exec(url);
+  const courseCertificateMatch = /^\/courses\/([^/]+)\/certificate$/.exec(url);
 
   if (method === 'get' && codeMatch) {
     const taskId = codeMatch[1];
@@ -391,6 +392,22 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
     const days = buildCourseDays(courseDaysMatch[1]);
     if (!days) return errorResponse(config, 404, 'NOT_FOUND', 'Course not found.');
     return respond(config, 200, days);
+  }
+
+  if (method === 'get' && courseCertificateMatch) {
+    const result = buildCertificate(courseCertificateMatch[1]);
+    if (result.kind === 'no-course') {
+      return errorResponse(config, 404, 'NOT_FOUND', 'Course not found.');
+    }
+    if (result.kind === 'locked') {
+      return errorResponse(
+        config,
+        403,
+        'FORBIDDEN',
+        'Finish every day of this course to get its certificate.'
+      );
+    }
+    return respond(config, 200, result.data);
   }
 
   if (method === 'get' && url === '/typing-test/results') {

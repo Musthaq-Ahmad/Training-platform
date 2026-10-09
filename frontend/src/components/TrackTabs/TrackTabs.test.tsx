@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import TrackTabs, { type Track } from './TrackTabs';
+import { MemoryRouter } from 'react-router';
 
 const mockTracks: Track[] = [
   {
@@ -118,5 +119,53 @@ describe('TrackTabs', () => {
 
     expect(screen.getByRole('tablist')).toBeInTheDocument();
     expect(screen.queryAllByRole('tab')).toHaveLength(0);
+  });
+
+  describe('certificate badges', () => {
+    function renderTabs(completedTrackIds?: string[], onSelect = vi.fn()) {
+      return render(
+        <MemoryRouter>
+          <TrackTabs
+            tracks={mockTracks}
+            activeTrackId="javascript"
+            onSelect={onSelect}
+            completedTrackIds={completedTrackIds}
+          />
+        </MemoryRouter>
+      );
+    }
+
+    it('shows no badges by default', () => {
+      renderTabs();
+
+      expect(screen.queryAllByRole('link')).toHaveLength(0);
+    });
+
+    it('shows a Certificate link only on finished tracks', () => {
+      renderTabs(['node']);
+
+      expect(screen.getByRole('link', { name: 'Node.js certificate' })).toHaveAttribute(
+        'href',
+        '/certificates/node'
+      );
+      expect(screen.queryByRole('link', { name: 'React certificate' })).not.toBeInTheDocument();
+      expect(screen.getAllByRole('link')).toHaveLength(1);
+    });
+
+    it('keeps every tab a tab when badges are shown', () => {
+      renderTabs(['javascript', 'node']);
+
+      expect(screen.getAllByRole('tab')).toHaveLength(3);
+    });
+
+    it('does not select the tab when its badge is clicked', async () => {
+      const user = userEvent.setup();
+      const onSelect = vi.fn();
+      renderTabs(['node'], onSelect);
+
+      await user.click(screen.getByRole('link', { name: 'Node.js certificate' }));
+
+      expect(onSelect).not.toHaveBeenCalled();
+    });
   });
 });

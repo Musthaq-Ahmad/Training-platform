@@ -8,6 +8,7 @@ import type {
   DayJournal,
   DashboardResponse,
   DaySummary,
+  CourseCertificate,
 } from '@itp/types';
 import { installMockAdapter } from './mockAdapter';
 import { mockDayContents } from './dayOverview';
@@ -617,6 +618,39 @@ describe('mockAdapter', () => {
             },
           },
         },
+      });
+    });
+  });
+
+  describe('certificates', () => {
+    it('lists the finished courses on GET /dashboard', async () => {
+      const res = await client.get<DashboardResponse>('/dashboard');
+
+      expect(res.data.completedCourseIds).toContain('html');
+      expect(res.data.completedCourseIds).not.toContain('react');
+    });
+
+    it('returns the certificate of a finished course', async () => {
+      const res = await client.get<CourseCertificate>('/courses/html/certificate');
+
+      expect(res.status).toBe(200);
+      expect(res.data).toMatchObject({
+        courseId: 'html',
+        courseTitle: 'HTML',
+        daysCompleted: 5,
+      });
+      expect(res.data.certificateId).toMatch(/^VK-/);
+    });
+
+    it('rejects an unfinished course with 403 FORBIDDEN', async () => {
+      await expect(client.get('/courses/react/certificate')).rejects.toMatchObject({
+        response: { status: 403, data: { error: { code: 'FORBIDDEN' } } },
+      });
+    });
+
+    it('rejects an unknown course with 404 NOT_FOUND', async () => {
+      await expect(client.get('/courses/cobol/certificate')).rejects.toMatchObject({
+        response: { status: 404, data: { error: { code: 'NOT_FOUND' } } },
       });
     });
   });

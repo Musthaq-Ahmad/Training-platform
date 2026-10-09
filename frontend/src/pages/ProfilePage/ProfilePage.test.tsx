@@ -1,10 +1,11 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'; // changed: + beforeEach
 import { MemoryRouter } from 'react-router';
-import type { ProfileData } from '@itp/types';
+import type { CourseCertificate, ProfileData } from '@itp/types'; // changed: + CourseCertificate
 
 import ProfilePage from './ProfilePage';
 import { getProfile } from '../../api/profile';
+import { useEarnedCertificates } from '../../hooks/useEarnedCerificates'; // new
 
 vi.mock('../../context/Useauth', () => ({
   useAuth: () => ({
@@ -25,6 +26,11 @@ vi.mock('../../api/profile', () => ({
   getProfile: vi.fn(),
 }));
 
+// new: the certificates row has its own tests; here it is a plain list of data
+vi.mock('../../hooks/useEarnedCerificates', () => ({
+  useEarnedCertificates: vi.fn(),
+}));
+
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
@@ -39,6 +45,11 @@ function renderProfilePage() {
 }
 
 describe('ProfilePage', () => {
+  // new: by default the trainee has earned no certificates
+  beforeEach(() => {
+    vi.mocked(useEarnedCertificates).mockReturnValue([]);
+  });
+
   const profile: ProfileData = {
     trainee: {
       name: 'Rahul Sharma',
@@ -70,6 +81,26 @@ describe('ProfilePage', () => {
       },
     ],
   };
+
+  // new
+  const certificates: CourseCertificate[] = [
+    {
+      courseId: 'html',
+      courseTitle: 'HTML',
+      traineeName: 'Rahul Sharma',
+      daysCompleted: 5,
+      completedAt: '2026-10-05T10:00:00.000Z',
+      certificateId: 'VK-HTML000000',
+    },
+    {
+      courseId: 'css',
+      courseTitle: 'CSS',
+      traineeName: 'Rahul Sharma',
+      daysCompleted: 5,
+      completedAt: '2026-10-06T09:00:00.000Z',
+      certificateId: 'VK-CSS0000000',
+    },
+  ];
 
   it('renders the loading state while the profile is loading', () => {
     vi.mocked(getProfile).mockImplementation(() => new Promise<ProfileData>(() => {}));
@@ -139,6 +170,33 @@ describe('ProfilePage', () => {
 
     expect(screen.getAllByText('74 WPM')).toHaveLength(2);
     expect(screen.getByText('72 WPM')).toBeInTheDocument();
+  });
+
+  // new
+  it('lists the earned certificates, each linking to its page', async () => {
+    vi.mocked(getProfile).mockResolvedValue(profile);
+    vi.mocked(useEarnedCertificates).mockReturnValue(certificates);
+
+    renderProfilePage();
+
+    const section = await screen.findByRole('region', { name: 'Certificates' });
+    const html = within(section).getByRole('link', { name: /HTML/ });
+    const css = within(section).getByRole('link', { name: /CSS/ });
+
+    expect(html).toHaveAttribute('href', '/certificates/html');
+    expect(html).toHaveTextContent('5 October 2026');
+    expect(css).toHaveAttribute('href', '/certificates/css');
+    expect(css).toHaveTextContent('6 October 2026');
+  });
+
+  // new
+  it('hides the Certificates row when there are none', async () => {
+    vi.mocked(getProfile).mockResolvedValue(profile);
+
+    renderProfilePage();
+
+    await screen.findByText('rahul.sharma@vonnue.com');
+    expect(screen.queryByRole('region', { name: 'Certificates' })).not.toBeInTheDocument();
   });
 
   it('renders an error state when loading the profile fails', async () => {

@@ -59,28 +59,34 @@ vi.mock('../../components/CurrentLessonCard', () => ({
   ),
 }));
 
+// changed: also shows the finished courses the page passes down, so tests can check them
 vi.mock('../../components/TrackTabs', () => ({
   default: ({
     tracks,
     activeTrackId,
     onSelect,
+    completedTrackIds = [],
   }: {
     tracks: { id: string; label: string }[];
     activeTrackId: string;
     onSelect: (id: string) => void;
+    completedTrackIds?: string[];
   }) => (
-    <div role="tablist">
-      {tracks.map((track) => (
-        <button
-          key={track.id}
-          role="tab"
-          aria-selected={track.id === activeTrackId}
-          onClick={() => onSelect(track.id)}
-        >
-          {track.label}
-        </button>
-      ))}
-    </div>
+    <>
+      <div role="tablist">
+        {tracks.map((track) => (
+          <button
+            key={track.id}
+            role="tab"
+            aria-selected={track.id === activeTrackId}
+            onClick={() => onSelect(track.id)}
+          >
+            {track.label}
+          </button>
+        ))}
+      </div>
+      <p>Certificates: {completedTrackIds.join(', ') || 'none'}</p>
+    </>
   ),
 }));
 
@@ -188,6 +194,7 @@ const mockDashboard: DashboardResponse = {
       { date: '2026-09-22', averageWpm: 70 },
     ],
   },
+  completedCourseIds: ['html', 'css'], // new
 };
 
 function renderPage() {
@@ -273,6 +280,15 @@ describe('DashboardPage', () => {
     renderPage();
 
     expect(await screen.findByText('17 of 60 days complete overall')).toBeInTheDocument();
+  });
+
+  // new
+  it('passes the finished courses to the track tabs for their certificate badges', async () => {
+    vi.mocked(getDashboard).mockResolvedValue(mockDashboard);
+
+    renderPage();
+
+    expect(await screen.findByText('Certificates: html, css')).toBeInTheDocument();
   });
 
   it("opens the tab of the next day's course and loads only that course's days", async () => {
@@ -504,6 +520,7 @@ describe('DashboardPage', () => {
       ...mockDashboard,
       nextDay: { ...day('html', 1, 'UNLOCKED'), courseTotalDays: 2 },
       totalDaysCompleteOverall: 0,
+      completedCourseIds: [], // new
     };
 
     it('shows HTML Day 1 on the card', async () => {
@@ -523,6 +540,15 @@ describe('DashboardPage', () => {
       expect(await screen.findByText('HTML Module — Schedule')).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: 'HTML' })).toHaveAttribute('aria-selected', 'true');
       expect(getCourseDays).toHaveBeenCalledWith('html');
+    });
+
+    // new
+    it('shows no certificate badges', async () => {
+      vi.mocked(getDashboard).mockResolvedValue(newTraineeDashboard);
+
+      renderPage();
+
+      expect(await screen.findByText('Certificates: none')).toBeInTheDocument();
     });
   });
 
