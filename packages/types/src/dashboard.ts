@@ -18,6 +18,7 @@ export type DashboardResponse = {
   today: TimeTotals; // the activity_log row for today (Asia/Kolkata)
   total: TimeTotals; // sum of all activity_log rows
   typing: TypingSummaryResponse; // from typing_test_result; the trend covers the last 30 days
+  completedCourseIds: string[];
 };
 export type DayStatus = 'LOCKED' | 'UNLOCKED' | 'COMPLETED';
 
@@ -30,5 +31,13 @@ export type DaySummary = {
   status: DayStatus;
 };
 
+export type CourseCertificate = {
+  courseId: string;
+  courseTitle: string;
+  traineeName: string;
+  daysCompleted: number;
+  completedAt: string; // ISO, latest day_completion.completed_at in the course
+  certificateId: string; // e.g. VK-3F9A2C71B0
+};
 /** GET /api/courses/:courseId/days */
 export type CourseDaysResponse = DaySummary[];

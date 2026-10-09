@@ -18,6 +18,7 @@ import ReferencePage from './pages/ReferencePage';
 import { useParams } from 'react-router';
 import { RoleRoute } from './routes/RoleRoute';
 import LoaderOverlay from './components/Common/LoadingState';
+import CertificatePage from './pages/CertificatePage';
 
 const TaskPage = lazy(() => import('./pages/TaskPage'));
 const AdminTraineesPage = lazy(() => import('./pages/AdminTraineesPage'));
@@ -45,6 +46,7 @@ export default function App() {
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/typing-test" element={<TypingTestPage />} />
                 <Route path="/journal" element={<JournalPage />} />
+                <Route path="/certificates/:courseId" element={<CertificatePage />} />
                 <Route
                   path="/tasks/:taskId"
                   element={

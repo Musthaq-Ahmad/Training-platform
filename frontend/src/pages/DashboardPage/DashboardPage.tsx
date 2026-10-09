@@ -201,6 +201,7 @@ export default function DashboardPage() {
             tracks={CURRICULUM_COURSES}
             activeTrackId={activeTrack.id}
             onSelect={handleSelectCourse}
+            completedTrackIds={dashboard.completedCourseIds}
           />
         </section>
 
