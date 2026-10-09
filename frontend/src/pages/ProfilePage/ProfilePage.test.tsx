@@ -1,10 +1,17 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router';
 import type { ProfileData } from '@itp/types';
 
 import ProfilePage from './ProfilePage';
 import { getProfile } from '../../api/profile';
+import { getActivityTime } from '../../api/activity';
+
+vi.mock('../../api/activity', () => ({ getActivityTime: vi.fn() }));
+
+beforeEach(() => {
+  vi.mocked(getActivityTime).mockResolvedValue([]);
+});
 
 vi.mock('../../context/Useauth', () => ({
   useAuth: () => ({

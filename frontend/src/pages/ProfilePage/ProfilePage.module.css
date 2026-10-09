@@ -27,6 +27,34 @@
   color: var(--color-text-secondary);
 }
 
+/* The activity heatmap, between the stats summary and the 7-day table. */
+.heatmapSlot {
+  padding: 32px;
+
+  border-bottom: 1px solid var(--color-border-divider);
+}
+
+.heatmapSkeleton {
+  height: 190px;
+
+  background: var(--color-bg-surface-2);
+  border-radius: 8px;
+
+  animation: heatmapPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes heatmapPulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heatmapSkeleton {
+    animation: none;
+  }
+}
+
 @media (max-width: 900px) {
   .page {
     width: min(100% - 40px, 760px);

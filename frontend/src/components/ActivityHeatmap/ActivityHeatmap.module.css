@@ -1,0 +1,111 @@
+.heatmap {
+  min-width: 0;
+  flex-grow: 1;
+}
+
+.summary {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.summary strong {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* Scrolls inside the card on narrow screens, never the page.
+   The top padding leaves room for the tooltip above the first row. */
+.scroll {
+  overflow-x: auto;
+  padding: 36px 0 4px;
+}
+
+.canvas {
+  position: relative;
+
+  width: 100%;
+  min-width: 680px; /* below this the card scrolls sideways instead of shrinking the squares more */
+  margin-inline: auto;
+}
+
+.canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.axisLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--color-text-muted);
+}
+
+.cell {
+  stroke: transparent;
+  stroke-width: 1.5px;
+}
+
+.cell:hover,
+.cell:focus-visible {
+  stroke: var(--color-text-primary);
+  outline: none;
+}
+
+/* One class per level in HEATMAP_LEVEL_FLOORS_SECONDS (lib/activityHeatmap.ts). */
+.level0 {
+  fill: var(--color-border-card);
+}
+
+.level1,
+.level2,
+.level3,
+.level4 {
+  fill: var(--color-accent-purple);
+}
+
+.level1 {
+  fill-opacity: 0.3;
+}
+
+.level2 {
+  fill-opacity: 0.55;
+}
+
+.level3 {
+  fill-opacity: 0.8;
+}
+
+.level4 {
+  fill-opacity: 1;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 2;
+
+  padding: 6px 10px;
+
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--color-text-primary);
+
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px var(--color-overlay-highlight-15);
+
+  pointer-events: none;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+
+  margin-top: 12px;
+  margin-inline: auto;
+
+  font-size: 11px;
+  color: var(--color-text-muted);
+}

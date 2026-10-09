@@ -1,67 +1,55 @@
 import { type ProfileData } from '@itp/types';
+import { HEATMAP_DAYS } from '../../lib/activityHeatmap';
+import { buildMockActivityTime, mockDateKey } from './activity';
 
-//mock data
-export const mockProfile: ProfileData = {
-  trainee: {
-    name: 'Rahul Sharma',
-    email: 'rahul.sharma@vonnue.com',
-    track: 'JavaScript',
-    currentDay: 6,
-    totalDays: 12,
-  },
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-  total: {
-    activeSeconds: 28 * 60 * 60 + 15 * 60,
-    codingSeconds: 14 * 60 * 60 + 15 * 60,
-  },
+/** "2026-10-09" -> "Oct 09", the label the real profile API sends. */
+function dayLabel(dateKey: string): string {
+  const [, month, day] = dateKey.split('-');
+  return `${MONTHS[Number(month) - 1]} ${day}`;
+}
 
-  typing: {
-    latestWpm: 74,
-    latestAccuracy: 98.4,
-  },
+/**
+ * The mock profile is built from the same generated activity as GET /activity/time, so the
+ * total, the 7-day table and the heatmap on the profile page always agree.
+ */
+export function buildMockProfile(): ProfileData {
+  const activity = buildMockActivityTime(HEATMAP_DAYS);
+  const byDate = new Map(activity.map((day) => [day.date, day]));
 
-  dailyActivity: [
-    {
-      date: 'Oct 14',
-      timeSpentSeconds: 4 * 60 * 60 + 10 * 60,
-      typingWpm: 74,
-      isToday: true,
+  return {
+    trainee: {
+      name: 'Rahul Sharma',
+      email: 'rahul.sharma@vonnue.com',
+      track: 'JavaScript',
+      currentDay: 6,
+      totalDays: 12,
     },
-    {
-      date: 'Oct 13',
-      timeSpentSeconds: 3 * 60 * 60 + 45 * 60,
-      typingWpm: 72,
-      isToday: false,
+
+    total: {
+      activeSeconds: activity.reduce((sum, day) => sum + day.activeSeconds, 0),
+      codingSeconds: activity.reduce((sum, day) => sum + day.codingSeconds, 0),
     },
-    {
-      date: 'Oct 12',
-      timeSpentSeconds: 4 * 60 * 60 + 30 * 60,
-      typingWpm: 70,
-      isToday: false,
+
+    typing: {
+      latestWpm: 74,
+      latestAccuracy: 98.4,
     },
-    {
-      date: 'Oct 11',
-      timeSpentSeconds: 3 * 60 * 60 + 20 * 60,
-      typingWpm: 71,
-      isToday: false,
-    },
-    {
-      date: 'Oct 10',
-      timeSpentSeconds: 4 * 60 * 60 + 5 * 60,
-      typingWpm: 68,
-      isToday: false,
-    },
-    {
-      date: 'Oct 09',
-      timeSpentSeconds: 3 * 60 * 60 + 50 * 60,
-      typingWpm: 67,
-      isToday: false,
-    },
-    {
-      date: 'Oct 08',
-      timeSpentSeconds: 4 * 60 * 60 + 15 * 60,
-      typingWpm: 66,
-      isToday: false,
-    },
-  ],
-};
+
+    // Newest first, today included (a day with no activity shows 0h 00m and no WPM).
+    dailyActivity: Array.from({ length: 7 }, (_, daysAgo) => {
+      const date = mockDateKey(daysAgo);
+      const timeSpentSeconds = byDate.get(date)?.activeSeconds ?? 0;
+
+      return {
+        date: dayLabel(date),
+        timeSpentSeconds,
+        typingWpm: timeSpentSeconds > 0 ? 74 - daysAgo : null,
+        isToday: daysAgo === 0,
+      };
+    }),
+  };
+}
+
+export const mockProfile: ProfileData = buildMockProfile();

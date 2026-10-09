@@ -3,12 +3,15 @@ import { getProfile } from '../../api/profile';
 import { type ProfileData } from '@itp/types';
 import ProfileHeader from '../../components/ProfileHeader';
 import StatsSummary from '../../components/StatsSummary';
+import ActivityHeatmap from '../../components/ActivityHeatmap';
 import DailyActivityTable from '../../components/DailyActivityTable';
 import styles from './ProfilePage.module.css';
 import Header from '../../components/Header';
 import LoaderOverlay from '../../components/Common/LoadingState';
 import { ErrorState } from '../../components/Common/ErrorState';
 import HelpButton from '../../components/HelpButton';
+import { HEATMAP_DAYS } from '../../lib/activityHeatmap';
+import { useActivityHistory } from './hooks/useActivityHistory';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -16,6 +19,9 @@ export default function ProfilePage() {
   const [error, setError] = useState<Error | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
+
+  // Loaded beside the profile; a failure here only affects the heatmap.
+  const activity = useActivityHistory(HEATMAP_DAYS);
 
   useEffect(() => {
     let isMounted = true;
@@ -85,6 +91,26 @@ export default function ProfilePage() {
 
         <section className={styles.card}>
           <StatsSummary total={profile.total} typing={profile.typing} />
+
+          <div className={styles.heatmapSlot}>
+            {activity.isLoading && (
+              <div
+                className={styles.heatmapSkeleton}
+                aria-busy="true"
+                aria-label="Loading activity history"
+              />
+            )}
+
+            {activity.error && (
+              <ErrorState
+                title="Couldn't load activity history"
+                message={activity.error.message}
+                onRetry={activity.retry}
+              />
+            )}
+
+            {activity.days && <ActivityHeatmap days={activity.days} />}
+          </div>
 
           <DailyActivityTable days={profile.dailyActivity} />
         </section>
