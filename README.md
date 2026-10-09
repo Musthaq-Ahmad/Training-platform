@@ -4,9 +4,10 @@ Vinkup is Vonnue's in-house training platform for new engineering trainees. Trai
 their company Google account and work through an 8-course, 54-day curriculum one day at a time:
 read the lesson, solve the day's tasks in a code editor that runs in the browser, submit them, and
 submit the day to unlock the next one. The platform saves their work and records active time,
-coding time and focus events for mentors.
+coding time and focus events. Mentors sign in to their own dashboard to follow every trainee, review
+their code and journal, and add new trainees.
 
-**Live:** [vinkup.netlify.app](https://vinkup.netlify.app) · **Version:** v0.1.0 (beta)
+**Live:** [vinkup.netlify.app](https://vinkup.netlify.app) · **Version:** v0.2.0 (beta)
 
 ## Features
 
@@ -18,11 +19,19 @@ coding time and focus events for mentors.
   - SQL runs in PGlite (PostgreSQL in WebAssembly).
 - **Autosave:** code saves a few seconds after typing stops and survives a dropped connection.
 - **Day page:** lesson summary, learning objectives, task list, end-of-day checklist, optional
-  journal and Submit Day.
+  journal, the day's integrity score, Submit Day and a button to the next day.
 - **Focus tracking:** fullscreen only, paste blocked in the editor; leaving fullscreen or switching
-  tabs is recorded for mentors (no penalty).
+  tabs is recorded for mentors and turned into an integrity score out of 100 (it never blocks the
+  trainee).
 - **Dashboard, profile and typing test:** progress, time spent, typing speed and daily activity.
-- **Reference pages:** reading material for every day, with search.
+- **Course certificates:** finishing every day of a course unlocks a printable certificate.
+- **Journal, help and reference pages:** past journal entries with search, a help guide, and reading
+  material for every day.
+- **Mentor dashboard** (`/admin`): cohort summary; trainee list with search, sort, a "needs
+  attention" filter and CSV export; add trainee; per-trainee detail with read-only code, journal,
+  flags and a printable progress report.
+- **Two roles:** trainees and mentors (admins) sign in the same way; each role only reaches its own
+  pages and endpoints.
 
 ## Tech stack
 
@@ -118,6 +127,7 @@ Training-platform/
 | [Architecture overview](docs/architecture-overview.md) | How the system fits together: frontend flow, backend layers, hosting |
 | [API reference](docs/api-specifications.md)            | Every endpoint, with requests, responses and errors                  |
 | [Database](docs/database.md)                           | ER diagram and data dictionary                                       |
+| [Release notes v0.2.0](docs/release-notes/v0.2.0.md)   | Mentor dashboard, certificates, integrity score and other changes    |
 | [Release notes v0.1.0](docs/release-notes/v0.1.0.md)   | What's in the first beta, known limitations and future scope         |
 
 ## Contributing
