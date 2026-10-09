@@ -36,6 +36,7 @@ import { addTypingResult, buildTypingResults } from '../test/fixtures/typingTest
 import { mockProfile } from '../test/fixtures/profile';
 import { addMockTrainee } from '../test/fixtures/admin';
 import type { CreateTraineeRequest } from '@itp/types';
+import { buildMockActivityTime } from '../test/fixtures/activity';
 
 const MOCK_DELAY_MS = 300;
 
@@ -208,9 +209,11 @@ async function handle(config: InternalAxiosRequestConfig): Promise<AxiosResponse
     console.log(config.data);
     return respond(config, 204, undefined);
   }
-  if (method === 'post' && url === '/activity/time') {
-    console.log('[MOCK ACTIVITY POST]', config.data);
-    return respond(config, 204, undefined);
+
+  if (method === 'get' && url === '/activity/time') {
+    const params = config.params as { days?: number } | undefined;
+    const days = params?.days ?? 7;
+    return respond(config, 200, buildMockActivityTime(days));
   }
 
   if (method === 'get' && url === '/activity/time') {

@@ -8,12 +8,17 @@ import type {
   DayJournal,
   DashboardResponse,
   DaySummary,
+  ActivityTimeDay,
+  ProfileData,
 } from '@itp/types';
 import { installMockAdapter } from './mockAdapter';
 import { mockDayContents } from './dayOverview';
 import { mockTasksByDay } from '../test/fixtures/dayTasks';
 import { mockJournalByDay, mockStatusByDay } from '../test/fixtures/dayStatus';
+import { mockDateKey } from '../test/fixtures/activity';
 import { CURRICULUM_COURSES } from '../constants/courses';
+import { HEATMAP_DAYS } from '../lib/activityHeatmap';
+import { todayKey } from '../lib/platformDate';
 
 function createClient() {
   const client = axios.create();
@@ -456,21 +461,48 @@ describe('mockAdapter', () => {
   });
 
   describe('activity', () => {
-    it('answers POST /activity/time with 204', async () => {
-      const res = await client.post('/activity/time', {
-        activeSeconds: 60,
-        codingSeconds: 0,
-        date: '2026-10-01',
+    it('answers GET /activity/time with generated activity, newest first', async () => {
+      const res = await client.get<ActivityTimeDay[]>('/activity/time', {
+        params: { days: HEATMAP_DAYS },
       });
 
-      expect(res.status).toBe(204);
+      expect(res.status).toBe(200);
+      expect(res.data.length).toBeGreaterThan(0);
+      expect(res.data.length).toBeLessThanOrEqual(HEATMAP_DAYS);
+
+      for (const day of res.data) {
+        expect(day.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        expect(day.activeSeconds).toBeGreaterThan(0);
+        expect(day.codingSeconds).toBeLessThanOrEqual(day.activeSeconds);
+      }
+
+      const dates = res.data.map((day) => day.date);
+      expect(dates).toEqual([...dates].sort().reverse());
+      expect(dates[0] <= todayKey()).toBe(true); // nothing in the future
     });
 
-    it('answers GET /activity/time with an empty list', async () => {
-      const res = await client.get('/activity/time');
+    it('returns only the last 7 days when days is not given', async () => {
+      const res = await client.get<ActivityTimeDay[]>('/activity/time');
 
       expect(res.status).toBe(200);
-      expect(res.data).toEqual([]);
+      const oldest = mockDateKey(6);
+      expect(res.data.every((day) => day.date >= oldest)).toBe(true);
+    });
+
+    it('matches the mock profile: same total and same last 7 days', async () => {
+      const activity = await client.get<ActivityTimeDay[]>('/activity/time', {
+        params: { days: HEATMAP_DAYS },
+      });
+      const profile = await client.get<ProfileData>('/profile');
+
+      const total = activity.data.reduce((sum, day) => sum + day.activeSeconds, 0);
+      expect(total).toBe(profile.data.total.activeSeconds);
+
+      // dailyActivity is newest first with today included; a day without activity is 0.
+      profile.data.dailyActivity.forEach((row, daysAgo) => {
+        const day = activity.data.find((d) => d.date === mockDateKey(daysAgo));
+        expect(row.timeSpentSeconds).toBe(day?.activeSeconds ?? 0);
+      });
     });
   });
 
