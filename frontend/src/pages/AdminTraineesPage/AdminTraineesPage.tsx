@@ -10,7 +10,13 @@ import CohortSummary from '../../components/CohortSummary';
 import { filterTrainees, sortTrainees } from '../../lib/traineeListState';
 import TraineeListToolbar from './TraineeListToolbar';
 import { useTraineeListParams } from './useTraineeListParams';
-import { medianDaysCompleted, needsAttention, sortTraineesByName } from '../../lib/adminTrainees';
+import {
+  medianDaysCompleted,
+  needsAttention,
+  sortTraineesByName,
+  toCsv,
+} from '../../lib/adminTrainees';
+import { csvFilename, downloadCsv } from '../../lib/downloadCsv';
 import { todayKey } from '../../lib/platformDate';
 import { UserPlus } from 'lucide-react';
 import { useToast } from '../../components/Toast';
@@ -116,6 +122,9 @@ export default function AdminTraineesPage() {
     : trainees;
   const visibleTrainees = sortTrainees(filterTrainees(candidates, query), sort);
 
+  // Exactly the rows the table shows now: same search, attention filter and sort.
+  const handleExport = () => downloadCsv(toCsv(visibleTrainees), csvFilename());
+
   return (
     <>
       <AdminHeader />
@@ -153,6 +162,7 @@ export default function AdminTraineesPage() {
                 attentionOnly={attentionOnly}
                 attentionCount={attentionCount}
                 onAttentionChange={setAttentionOnly}
+                onExport={handleExport}
               />
               {visibleTrainees.length === 0 ? (
                 <p className={styles.noMatches} role="status">

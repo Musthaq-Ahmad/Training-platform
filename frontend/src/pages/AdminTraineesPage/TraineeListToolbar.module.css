@@ -3,7 +3,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 12px 16px;
-
   padding: 16px 24px;
   border-bottom: 1px solid var(--color-border-divider);
 }
@@ -110,6 +109,17 @@
   border-color: var(--color-accent-purple);
 }
 
+/* ---------- Actions: Needs attention + Export CSV, on the right ---------- */
+
+/* Search and sort stay on the left; this group takes the free space before it. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
 /* ---------- Needs attention chip ---------- */
 
 .chip {
@@ -117,7 +127,6 @@
   align-items: center;
   gap: 10px;
   height: 38px;
-  margin-left: auto; /* pushes the filter to the right edge, away from search and sort */
   padding: 0 8px 0 14px;
 
   font-family: var(--font-sans);
@@ -173,4 +182,42 @@
 .chip[aria-pressed='true'] .chipCount {
   background: var(--color-status-warning-bg);
   border: 1px solid var(--color-status-warning-border);
+}
+
+/* ---------- Export CSV ---------- */
+
+.exportButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+
+  background: var(--color-bg-surface-2);
+  border: 1px solid var(--color-border-input);
+  border-radius: 10px;
+  color: var(--color-text-primary);
+
+  transition: border-color 150ms ease;
+}
+
+.exportButton:hover {
+  border-color: var(--color-accent-purple);
+}
+
+/* Narrow screens: the actions get their own full-width row, buttons share it. */
+@media (max-width: 640px) {
+  .actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .actions > * {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
 }

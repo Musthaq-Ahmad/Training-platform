@@ -1,3 +1,4 @@
+import { Download } from 'lucide-react';
 import { SORT_OPTIONS, parseSortKey, type SortKey } from '../../lib/traineeListState';
 import styles from './TraineeListToolbar.module.css';
 
@@ -9,6 +10,8 @@ type TraineeListToolbarProps = {
   attentionOnly: boolean;
   attentionCount: number;
   onAttentionChange: (value: boolean) => void;
+  /** Downloads the rows currently shown in the table as a CSV file. */
+  onExport: () => void;
 };
 
 function SearchIcon() {
@@ -30,7 +33,7 @@ function SearchIcon() {
   );
 }
 
-/** Search box, sort menu and "Needs attention" chip above the trainee table. Holds no state. */
+/** Search box, sort menu, "Needs attention" chip and Export CSV above the trainee table. Holds no state. */
 export default function TraineeListToolbar({
   query,
   onQueryChange,
@@ -39,6 +42,7 @@ export default function TraineeListToolbar({
   attentionOnly,
   attentionCount,
   onAttentionChange,
+  onExport,
 }: TraineeListToolbarProps) {
   return (
     <div className={styles.toolbar} role="search">
@@ -71,18 +75,25 @@ export default function TraineeListToolbar({
         </span>
       </label>
 
-      <button
-        type="button"
-        className={styles.chip}
-        aria-pressed={attentionOnly}
-        aria-label={`Needs attention (${attentionCount})`}
-        onClick={() => onAttentionChange(!attentionOnly)}
-      >
-        Needs attention
-        <span className={styles.chipCount} aria-hidden="true">
-          {attentionCount}
-        </span>
-      </button>
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={styles.chip}
+          aria-pressed={attentionOnly}
+          aria-label={`Needs attention (${attentionCount})`}
+          onClick={() => onAttentionChange(!attentionOnly)}
+        >
+          Needs attention
+          <span className={styles.chipCount} aria-hidden="true">
+            {attentionCount}
+          </span>
+        </button>
+
+        <button type="button" className={styles.exportButton} onClick={onExport}>
+          <Download size={14} aria-hidden="true" />
+          Export CSV
+        </button>
+      </div>
     </div>
   );
 }
