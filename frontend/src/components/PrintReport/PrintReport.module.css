@@ -1,0 +1,169 @@
+/* The report exists only while printing; on screen it stays hidden behind the print dialog. */
+@media screen {
+  .report {
+    display: none;
+  }
+}
+
+@media print {
+  /* Margin boxes repeat on every page in Chrome and Edge (131+); other browsers ignore them. */
+  @page {
+    size: A4;
+    margin: 14mm 12mm 18mm;
+
+    @bottom-left {
+      content: 'Vinkup · Confidential — for mentor use only';
+      font-size: 8pt;
+      color: #6b6b7b;
+    }
+
+    @bottom-right {
+      content: 'Page ' counter(page) ' of ' counter(pages);
+      font-size: 8pt;
+      color: #6b6b7b;
+    }
+  }
+
+  :global(html),
+  :global(body) {
+    background: #ffffff !important;
+  }
+
+  .report {
+    font-size: 11pt;
+    line-height: 1.45;
+    color: var(--color-text-primary);
+  }
+}
+
+.header {
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--color-accent-purple);
+}
+
+.kicker {
+  margin: 0 0 4px;
+  font-size: 9pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-accent-text);
+}
+
+.name {
+  margin: 0 0 4px;
+  font-family: var(--font-sans);
+  font-size: 20pt;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.meta {
+  margin: 0;
+  font-size: 10pt;
+  color: var(--color-text-secondary);
+}
+
+.section {
+  margin-bottom: 18px;
+}
+
+.sectionTitle {
+  margin: 0 0 8px;
+  font-size: 13pt;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  break-after: avoid;
+}
+
+.block {
+  margin-bottom: 10px;
+  border: 1px solid var(--color-border-card);
+  border-radius: 8px;
+  overflow: hidden;
+  break-inside: avoid;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9.5pt;
+}
+
+.table th,
+.table td {
+  padding: 5px 6px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-border-card);
+}
+
+.table th {
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+.table tr {
+  break-inside: avoid;
+}
+
+/* Repeat the column names when a table runs over a page. */
+.table thead {
+  display: table-header-group;
+}
+
+.tag {
+  margin-left: 6px;
+  padding: 0 6px;
+  font-size: 8pt;
+  font-weight: 700;
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+}
+
+.journal {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.journalEntry {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border-card);
+  break-inside: avoid;
+}
+
+.journalTitle {
+  margin: 0;
+  font-size: 10.5pt;
+  font-weight: 700;
+}
+
+.journalDate {
+  margin: 0 0 4px;
+  font-size: 9pt;
+  color: var(--color-text-secondary);
+}
+
+.journalText {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.note,
+.empty {
+  margin: 0 0 8px;
+  font-size: 10pt;
+  color: var(--color-text-secondary);
+}
+
+/* Also at the end of the report, for browsers without @page margin boxes. */
+.footer {
+  margin-top: 16px;
+  padding-top: 8px;
+  font-size: 8pt;
+  text-align: center;
+  color: var(--color-text-secondary);
+  border-top: 1px solid var(--color-border-card);
+}

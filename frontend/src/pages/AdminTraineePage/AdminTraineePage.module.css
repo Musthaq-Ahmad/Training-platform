@@ -27,6 +27,27 @@
   text-decoration: underline;
 }
 
+/* Back link on the left, Print report on the right. */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.topBar .back {
+  margin-bottom: 0;
+}
+
+/* While printing, only the PrintReport is shown. */
+@media print {
+  .screenOnly {
+    display: none !important;
+  }
+}
+
 .card {
   margin: 20px 0;
   overflow: hidden;

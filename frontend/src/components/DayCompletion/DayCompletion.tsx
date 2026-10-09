@@ -1,3 +1,4 @@
+import { ArrowRight } from 'lucide-react';
 import styles from './DayCompletion.module.css';
 
 type DayCompletionProps = {
@@ -6,6 +7,8 @@ type DayCompletionProps = {
   isCompleted: boolean;
   isSubmitting: boolean;
   onComplete: () => void | Promise<void>;
+  showNextDay: boolean;
+  onNextDay: () => void | Promise<void>;
 };
 
 export default function DayCompletion({
@@ -14,6 +17,8 @@ export default function DayCompletion({
   isCompleted,
   isSubmitting,
   onComplete,
+  showNextDay,
+  onNextDay,
 }: DayCompletionProps) {
   const hasIncompleteTasks = completedTasks < totalTasks;
 
@@ -40,29 +45,41 @@ export default function DayCompletion({
         </p>
       </div>
 
-      <button
-        type="button"
-        className={styles.dayCompletionButton}
-        onClick={() => void onComplete()}
-        disabled={isCompleted || hasIncompleteTasks || isSubmitting}
-        aria-busy={isSubmitting}
-      >
-        <svg
-          className={styles.buttonIcon}
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={styles.dayCompletionButton}
+          onClick={() => void onComplete()}
+          disabled={isCompleted || hasIncompleteTasks || isSubmitting}
+          aria-busy={isSubmitting}
         >
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
-        <span>{buttonLabel}</span>
-      </button>
+          <svg
+            className={styles.buttonIcon}
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span>{buttonLabel}</span>
+        </button>
+        {isCompleted && showNextDay && (
+          <button
+            type="button"
+            className={`${styles.dayCompletionButton} ${styles.nextDayButton}`}
+            onClick={() => void onNextDay()}
+          >
+            <span>Next day</span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </button>
+        )}
+      </div>
     </section>
   );
 }

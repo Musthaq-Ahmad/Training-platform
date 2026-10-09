@@ -71,6 +71,17 @@
   transition: all 0.2s ease;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.nextDayButton {
+  letter-spacing: 0.01em;
+}
+
 .buttonIcon {
   flex-shrink: 0;
 }
@@ -95,5 +106,11 @@
   .dayCompletionButton {
     align-self: flex-end;
     padding: 10px 0;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
   }
 }
