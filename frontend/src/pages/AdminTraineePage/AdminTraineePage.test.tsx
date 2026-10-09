@@ -294,4 +294,32 @@ describe('AdminTraineePage', () => {
     expect(screen.queryByText(detail.profile.trainee.name)).not.toBeInTheDocument();
     expect(getAdminTrainee).toHaveBeenLastCalledWith('other-trainee');
   });
+
+  it('prints a report of the trainee from the Print report button', async () => {
+    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => undefined);
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(await screen.findByRole('button', { name: 'Print report' }));
+    const dialog = screen.getByRole('dialog', { name: 'Print report' });
+    await user.click(within(dialog).getByRole('checkbox', { name: 'Journal entries' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Print' }));
+
+    expect(printSpy).toHaveBeenCalledTimes(1);
+    const report = screen.getByRole('article', { name: 'Printable trainee report' });
+    expect(
+      within(report).getByRole('heading', { level: 1, name: detail.profile.trainee.name })
+    ).toBeInTheDocument();
+    expect(report).toHaveTextContent('Prepared by Mock Mentor');
+    expect(within(report).queryByRole('heading', { name: /^Journal/ })).not.toBeInTheDocument();
+
+    act(() => {
+      window.dispatchEvent(new Event('afterprint'));
+    });
+
+    expect(
+      screen.queryByRole('article', { name: 'Printable trainee report' })
+    ).not.toBeInTheDocument();
+    printSpy.mockRestore();
+  });
 });
