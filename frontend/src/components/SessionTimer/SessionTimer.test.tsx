@@ -4,10 +4,12 @@ import SessionTimer from './SessionTimer';
 
 beforeEach(() => {
   vi.useFakeTimers();
+  vi.spyOn(document, 'hasFocus').mockReturnValue(true);
 });
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 describe('SessionTimer', () => {
