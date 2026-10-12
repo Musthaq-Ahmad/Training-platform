@@ -49,6 +49,7 @@ describe('GET /api/dashboard', () => {
       today: { activeSeconds: 0, codingSeconds: 0 },
       total: { activeSeconds: 0, codingSeconds: 0 },
       typing: { latest: null, todayAverageWpm: null, trend: [] },
+      completedCourseIds: [],
     });
   });
 

@@ -1,0 +1,104 @@
+/* A document: fixed colours so it looks the same in dark mode.
+   Sizes use cqw (1% of the sheet width), so it scales on screen and fills A4 when printed. */
+.sheet {
+  container-type: inline-size;
+  width: 100%;
+  aspect-ratio: 297 / 210;
+  background: #ffffff;
+  color: #14162a;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(20, 22, 42, 0.12);
+  font-family: var(--font-sans);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.frame {
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 4cqw 7cqw 7cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 0.5cqw solid #7c41e4;
+  outline: 0.2cqw solid #d9c8fb;
+  outline-offset: -1.6cqw;
+}
+
+.logo {
+  width: 7cqw;
+  height: 5cqw;
+  background-color: #7c41e4;
+  mask: url('../../assets/logo-mark-currentColor.svg') center / contain no-repeat;
+  -webkit-mask: url('../../assets/logo-mark-currentColor.svg') center / contain no-repeat;
+}
+
+.kicker {
+  margin: 1cqw 0 0;
+  font-size: 1.5cqw;
+  font-weight: 800;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #6941c6;
+}
+
+.title {
+  margin: 2.2cqw 0 3cqw;
+  font-size: 4.6cqw;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.lead {
+  margin: 0.6cqw 0;
+  font-size: 1.9cqw;
+  color: #5b5d6e;
+}
+
+.name {
+  margin: 1cqw 0;
+  max-width: 85%;
+  font-size: 5cqw;
+  font-weight: 800;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  color: #14162a;
+}
+
+.meta {
+  margin: 2.6cqw 0 0;
+  font-size: 1.9cqw;
+  font-weight: 700;
+}
+
+.id {
+  margin: 0.8cqw 0 0;
+  font-family: var(--font-mono);
+  font-size: 1.3cqw;
+  letter-spacing: 0.08em;
+  color: #716c82;
+}
+
+.footer {
+  position: absolute;
+  bottom: 3cqw;
+  margin: 0;
+  font-size: 1.25cqw;
+  color: #716c82;
+}
+
+@media print {
+  .sheet {
+    /* A hair under A4 so rounding never adds a blank second page. */
+    width: 297mm;
+    height: 209.5mm;
+    aspect-ratio: auto;
+    overflow: hidden;
+    border-radius: 0;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

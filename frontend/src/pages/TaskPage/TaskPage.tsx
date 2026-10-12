@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from 'react';
 import { useParams, Link } from 'react-router';
 import { Lock } from 'lucide-react';
 import Header from '../../components/Header';
+import SessionTimer from '../../components/SessionTimer';
 import TaskBreadcrumb from '../../components/TaskBreadcrumb';
 import TaskPageSkeleton from '../../components/TaskPageSkeleton';
 import TaskWorkspace from '../../components/TaskWorkspace';
@@ -129,10 +130,11 @@ export default function TaskPage() {
       />
     ) : undefined;
 
+  const sessionTimer = data.status === 'success' ? <SessionTimer key={data.task.id} /> : undefined;
+
   return (
     <div className={styles.page}>
-      {/* TODO(BL-1): pass the ACTIVE SESSION timer as `status` once the activity timer exists */}
-      <Header leading={breadcrumb} />
+      <Header leading={breadcrumb} status={sessionTimer} />
       <div className={styles.body}>
         <TaskPageBody data={data} />
       </div>

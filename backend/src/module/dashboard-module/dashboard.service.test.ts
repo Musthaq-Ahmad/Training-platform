@@ -10,6 +10,7 @@ const repo = vi.hoisted(() => ({
   findTypingSince: vi.fn(),
 }));
 const { mockGetDayStatuses } = vi.hoisted(() => ({ mockGetDayStatuses: vi.fn() }));
+const { mockCompletedCourseIds } = vi.hoisted(() => ({ mockCompletedCourseIds: vi.fn() }));
 
 vi.mock('./dashboard.repository', () => ({
   DashboardRepository: class {
@@ -25,6 +26,12 @@ vi.mock('./dashboard.repository', () => ({
 vi.mock('../progress-module/progress.service', () => ({
   ProgressService: class {
     getDayStatuses = mockGetDayStatuses;
+  },
+}));
+
+vi.mock('./certificate.service', () => ({
+  CertificateService: class {
+    getCompletedCourseIds = mockCompletedCourseIds;
   },
 }));
 
@@ -66,6 +73,7 @@ describe('DashboardService', () => {
     repo.findActivityOn.mockResolvedValue(null);
     repo.findLatestTyping.mockResolvedValue(null);
     repo.findTypingSince.mockResolvedValue([]);
+    mockCompletedCourseIds.mockResolvedValue([]);
   });
 
   describe('getDashboard', () => {
@@ -152,6 +160,15 @@ describe('DashboardService', () => {
       repo.findDayWithCourseSize.mockResolvedValue(null);
 
       await expect(service.getDashboard(traineeId, NOW)).rejects.toBeInstanceOf(NotFoundError);
+    });
+
+    it('sends the ids of the courses the trainee has finished', async () => {
+      mockCompletedCourseIds.mockResolvedValue(['html']);
+
+      const dashboard = await service.getDashboard(traineeId, NOW);
+
+      expect(dashboard.completedCourseIds).toEqual(['html']);
+      expect(mockCompletedCourseIds).toHaveBeenCalledWith(traineeId);
     });
   });
 

@@ -12,8 +12,11 @@ import { ErrorState } from '../../components/Common/ErrorState';
 import HelpButton from '../../components/HelpButton';
 import { HEATMAP_DAYS } from '../../lib/activityHeatmap';
 import { useActivityHistory } from './hooks/useActivityHistory';
+import CertificateList from '../../components/CertificateList';
+import { useEarnedCertificates } from '../../hooks/useEarnedCerificates';
 
 export default function ProfilePage() {
+  const certificates = useEarnedCertificates();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState<Error | null>(null);
@@ -114,6 +117,7 @@ export default function ProfilePage() {
 
           <DailyActivityTable days={profile.dailyActivity} />
         </section>
+        <CertificateList certificates={certificates} />
       </main>
       <HelpButton />
     </>

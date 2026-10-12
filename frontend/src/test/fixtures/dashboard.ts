@@ -1,4 +1,11 @@
-import type { DashboardResponse, DaySummary, DayStatus, TimeTotals } from '@itp/types';
+import type {
+  CourseCertificate,
+  DashboardResponse,
+  DaySummary,
+  DayStatus,
+  TimeTotals,
+} from '@itp/types';
+import { mockUser } from './user';
 
 /* ---------- Raw rows: same columns as the DB tables (Prisma-style camelCase) ---------- */
 
@@ -228,6 +235,34 @@ export function buildDashboard(): DashboardResponse {
           typingResults.filter((r) => r.takenAt.slice(0, 10) === date).map((r) => r.wpm)
         ),
       })),
+    },
+    completedCourseIds: completedCourseIds(),
+  };
+}
+/** Ids of the courses whose every day is COMPLETED. */
+function completedCourseIds(): string[] {
+  return courses
+    .filter((c) => (buildCourseDays(c.id) ?? []).every((d) => d.status === 'COMPLETED'))
+    .map((c) => c.id);
+}
+
+/** GET /courses/:courseId/certificate */
+export function buildCertificate(
+  courseId: string
+): { kind: 'no-course' } | { kind: 'locked' } | { kind: 'ok'; data: CourseCertificate } {
+  const course = courses.find((c) => c.id === courseId);
+  if (!course) return { kind: 'no-course' };
+  if (!completedCourseIds().includes(courseId)) return { kind: 'locked' };
+
+  return {
+    kind: 'ok',
+    data: {
+      courseId,
+      courseTitle: course.title,
+      traineeName: mockUser.name,
+      daysCompleted: DAY_COUNTS[courseId],
+      completedAt: isoDaysAgo(1),
+      certificateId: `VK-${courseId.toUpperCase().padEnd(10, '0').slice(0, 10)}`,
     },
   };
 }

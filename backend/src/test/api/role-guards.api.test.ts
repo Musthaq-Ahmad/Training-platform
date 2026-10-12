@@ -38,6 +38,9 @@ const traineeEndpoints: [method: 'get' | 'post' | 'put' | 'patch', path: string,
     ['get', '/api/typing-test/results'],
     ['post', '/api/typing-test/results', { wpm: 60, accuracy: 95 }],
     ['get', '/api/profile'],
+    ['get', '/api/courses/html/days'],
+    ['get', '/api/courses/html/certificate'], // new
+    ['get', `/api/days/${DAY.html1}`],
   ];
 
 let a: TestTrainee;

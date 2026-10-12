@@ -149,4 +149,25 @@ describe('TaskPage', () => {
     unmount();
     expect(document.title).not.toBe('Services Grid Layout · Task 7');
   });
+
+  it('shows the session timer in the header once the task has loaded', async () => {
+    vi.mocked(getTask).mockResolvedValue(taskFixture);
+    vi.mocked(getTaskCode).mockResolvedValue(taskCodeFixture);
+
+    renderTaskPage();
+
+    const timer = await screen.findByRole('timer');
+    expect(timer).toHaveTextContent('0:00');
+    expect(timer).toHaveAccessibleName(/^Time on this task:/);
+  });
+
+  it('shows no session timer when the task could not load', async () => {
+    vi.mocked(getTask).mockRejectedValue(new ApiError(404, 'NOT_FOUND', 'Task not found.'));
+    vi.mocked(getTaskCode).mockResolvedValue(taskCodeFixture);
+
+    renderTaskPage('not-found');
+
+    await screen.findByRole('alert');
+    expect(screen.queryByRole('timer')).not.toBeInTheDocument();
+  });
 });
