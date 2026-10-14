@@ -1,6 +1,6 @@
 # Vinkup API reference
 
-REST/JSON API of Vinkup, the in-house trainee training platform (Express 5 backend in `backend/`). Written from the code on `main` as of 4 October 2026; when the code and this document disagree, the code wins.
+REST/JSON API of Vinkup, the in-house trainee training platform (Express 5 backend in `backend/`). Written from the code on `main` as of 9 October 2026 (v0.2.0); when the code and this document disagree, the code wins.
 
 ## Base URLs
 
@@ -19,18 +19,22 @@ All paths below include the `/api` prefix. The frontend axios client uses the re
 
 - **Mechanism:** a JWT in an HTTP cookie. There is no `Authorization` header support.
 - **Cookie name:** `auth_token` (`AUTH_COOKIE_NAME`, `auth.constants.ts:3`).
-- **How it is set:** only by `GET /api/auth/google/callback` after a successful Google OAuth login. The JWT payload is `{ id, name, email }` of the trainee, signed with `JWT_SECRET`, `expiresIn: JWT_EXPIRES_IN` (env, default `'1h'`).
+- **How it is set:** only by `GET /api/auth/google/callback` after a successful Google OAuth login. The JWT payload is `{ id, name, email, role }` of the trainee or mentor, signed with `JWT_SECRET`, `expiresIn: JWT_EXPIRES_IN` (env, default `'1h'`; set it to `7d` in production to match the cookie).
 - **requireAuth** (`middleware/authMiddleware.ts`): reads `req.cookies.auth_token`.
   - Missing cookie: `401 UNAUTHENTICATED`, message `"Not authenticated"`.
   - Invalid/expired JWT: `401 UNAUTHENTICATED`, message `"Invalid or expired token"`.
-  - On success `req.user = { id, email, name }` from the token claims (no database lookup).
-- **Which routes require it** (`app.ts`):
+  - On success `req.user = { id, email, name, role }` from the token claims (no database lookup).
+- **Roles:** `role` is `'trainee'` or `'admin'` (a mentor). Two guards build on `requireAuth` (`middleware/authMiddleware.ts`):
+  - **requireTrainee:** signed in **and** `role === 'trainee'`. A mentor gets `403 FORBIDDEN` `"This page is for trainees."`.
+  - **requireAdmin:** signed in **and** `role === 'admin'` **and** an `admin` row with that id and `is_active = true` still exists (checked on every request, so switching an admin off takes effect at once). Otherwise `403 FORBIDDEN` `"You don't have access to this."`.
+- **Which routes require what** (`app.ts`):
   - Public: `GET /api/health`, `GET /api/auth/google`, `GET /api/auth/google/callback`.
-  - `POST /api/auth/logout`, `GET /api/auth/me`: `requireAuth` on the route (`auth.routes.ts:53-54`).
-  - `POST /api/activity/:taskId/events`: `requireAuth` on the route (`flag.routes.ts:11`); the router is mounted without it (`app.ts:38`).
-  - Everything under `/api/profile`, `/api/activity` (time), `/api/dashboard`, `/api/courses`, `/api/tasks`, `/api/days`, `/api/typing-test`: `requireAuth` at the mount (`app.ts:40-46`).
-  - Because `requireAuth` runs at the mount, an **unknown path under those prefixes returns 401 (not 404) when the caller is unauthenticated**.
-- **Identity:** the trainee is always taken from the token (`req.user.id`), never from the body or URL.
+  - Any signed-in user (`requireAuth` on the route, `auth.routes.ts`): `POST /api/auth/logout`, `GET /api/auth/me`.
+  - Trainees only (`requireTrainee`): everything under `/api/profile`, `/api/activity`, `/api/dashboard`, `/api/courses`, `/api/tasks`, `/api/days`, `/api/journal`, `/api/typing-test` (at the mount), and `POST /api/activity/:taskId/events` (on the route, `flag.routes.ts`).
+  - Mentors only (`requireAdmin`): everything under `/api/admin`.
+  - Because the guards run at the mount, an **unknown path under those prefixes returns 401 (not 404) when the caller is unauthenticated**, and 403 for the wrong role.
+- **Identity:** the trainee is always taken from the token (`req.user.id`), never from the body or URL. Mentor endpoints take the trainee from the URL (`:traineeId`) and are read-only, except `POST /api/admin/trainees`.
+- **In this document,** "Auth: required" on a trainee endpoint means `requireTrainee`; mentor endpoints say "Auth: admin".
 - **CORS:** `origin: env.FRONTEND_URL` (default `http://localhost:5173`), `credentials: true`.
 
 ### Request/response format
@@ -68,17 +72,20 @@ Every error is sent by `errorHandler` (`middleware/errorHandler.ts`) with this e
 
 ### Error codes
 
-| Code                   | HTTP           | Raised by                                                                 | Meaning / default message                                                                                                                                                                                                                                                                                                   |
-| ---------------------- | -------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VALIDATION_FAILED`    | 400            | `ValidationError` (validate(), activity `days` query); body-parser errors | `"Some fields are invalid."`, `details` = Zod `issues` array. Body > 5 MB: `"The request is too large (5 MB max)."`. Malformed JSON: `"The request body is not valid JSON."`. Other client-side body-parser rejections (charset/encoding/aborted): `"The request could not be read."` (no `details` for body-parser cases). |
-| `UNAUTHENTICATED`      | 401            | `UnauthorizedError`                                                       | Missing/invalid/expired cookie. Default message `"Please log in."`; requireAuth uses `"Not authenticated"` / `"Invalid or expired token"`. Also used internally in OAuth when Google returns no email (surfaces as a login redirect, not JSON).                                                                             |
-| `FORBIDDEN`            | 403            | `ForbiddenError`                                                          | Defined (`"You don't have access to this."`) but not thrown by any route.                                                                                                                                                                                                                                                   |
-| `NOT_FOUND`            | 404            | `NotFoundError`                                                           | Unknown route, course, day, task, trainee or empty curriculum. Message varies (see each endpoint).                                                                                                                                                                                                                          |
-| `DAY_LOCKED`           | 403            | `DayLockedError`                                                          | `"This day isn't unlocked yet."`                                                                                                                                                                                                                                                                                            |
-| `CHECKLIST_INCOMPLETE` | 403            | `ChecklistIncompleteError`                                                | `"Complete all required tasks before submitting the day."`, `details: { completedTasks: number, requiredTasks: number }`.                                                                                                                                                                                                   |
-| `DOMAIN_NOT_PERMITTED` | 403 (internal) | `DomainNotPermittedError`                                                 | `"This Google account is not on an approved domain."` Only ever delivered as `?error=DOMAIN_NOT_PERMITTED` on the login redirect.                                                                                                                                                                                           |
-| `NOT_PROVISIONED`      | 403 (internal) | `NotProvisionedError`                                                     | `"Your account has not been provisioned yet. Contact your administrator."` Only delivered as `?error=NOT_PROVISIONED` on the login redirect.                                                                                                                                                                                |
-| `INTERNAL_ERROR`       | 500            | errorHandler fallback                                                     | Any unexpected error.                                                                                                                                                                                                                                                                                                       |
+| Code                     | HTTP           | Raised by                                                                 | Meaning / default message                                                                                                                                                                                                                                                                                                   |
+| ------------------------ | -------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VALIDATION_FAILED`      | 400            | `ValidationError` (validate(), activity `days` query); body-parser errors | `"Some fields are invalid."`, `details` = Zod `issues` array. Body > 5 MB: `"The request is too large (5 MB max)."`. Malformed JSON: `"The request body is not valid JSON."`. Other client-side body-parser rejections (charset/encoding/aborted): `"The request could not be read."` (no `details` for body-parser cases). |
+| `UNAUTHENTICATED`        | 401            | `UnauthorizedError`                                                       | Missing/invalid/expired cookie. Default message `"Please log in."`; requireAuth uses `"Not authenticated"` / `"Invalid or expired token"`. Also used internally in OAuth when Google returns no email (surfaces as a login redirect, not JSON).                                                                             |
+| `FORBIDDEN`              | 403            | `ForbiddenError`                                                          | Wrong role (`requireTrainee`: `"This page is for trainees."`; `requireAdmin`: `"You don't have access to this."`), and a course certificate before the course is finished (`"Finish every day of this course to get its certificate."`).                                                                                    |
+| `NOT_FOUND`              | 404            | `NotFoundError`                                                           | Unknown route, course, day, task, trainee or empty curriculum. Message varies (see each endpoint).                                                                                                                                                                                                                          |
+| `DAY_LOCKED`             | 403            | `DayLockedError`                                                          | `"This day isn't unlocked yet."`                                                                                                                                                                                                                                                                                            |
+| `CHECKLIST_INCOMPLETE`   | 403            | `ChecklistIncompleteError`                                                | `"Complete all required tasks before submitting the day."`, `details: { completedTasks: number, requiredTasks: number }`.                                                                                                                                                                                                   |
+| `DOMAIN_NOT_PERMITTED`   | 403 (internal) | `DomainNotPermittedError`                                                 | `"This Google account is not on an approved domain."` Delivered as `?error=DOMAIN_NOT_PERMITTED` on the login redirect.                                                                                                                                                                                                     |
+| `DOMAIN_NOT_PERMITTED`   | 400            | `TraineeDomainError`                                                      | `POST /api/admin/trainees` only: `"Use a company email address ending in @<ALLOWED_EMAIL_DOMAIN>."`                                                                                                                                                                                                                         |
+| `TRAINEE_EXISTS`         | 409            | `ConflictError`                                                           | `POST /api/admin/trainees`: `"A trainee with this email already exists."` (also when two requests race for the same email).                                                                                                                                                                                                 |
+| `EMAIL_BELONGS_TO_ADMIN` | 409            | `ConflictError`                                                           | `POST /api/admin/trainees`: `"This email belongs to a mentor account."`                                                                                                                                                                                                                                                     |
+| `NOT_PROVISIONED`        | 403 (internal) | `NotProvisionedError`                                                     | `"Your account has not been provisioned yet. Contact your administrator."` Only delivered as `?error=NOT_PROVISIONED` on the login redirect.                                                                                                                                                                                |
+| `INTERNAL_ERROR`         | 500            | errorHandler fallback                                                     | Any unexpected error.                                                                                                                                                                                                                                                                                                       |
 
 The frontend additionally uses a client-only `NETWORK_ERROR` (status 0) when the server is unreachable (`frontend/src/api/errors.ts`); the backend never sends it.
 
@@ -116,46 +123,50 @@ The frontend additionally uses a client-only `NETWORK_ERROR` (status 0) when the
 
 ### Day locking (shared rule)
 
-Days are ordered across the whole curriculum by course `sort_order`, then `day_number` (courses seeded: `html`, `css`, `js`, `ts`, `node`, `postgresql`, `prisma`, `react`). There is no unlock table. Two implementations exist (see Notes):
+Days are ordered across the whole curriculum by course `sort_order`, then `day_number` (courses seeded: `html`, `css`, `js`, `ts`, `node`, `postgresql`, `prisma`, `react`). There is no unlock table.
 
-- **day-access** (`day-module/day-access.services.ts`), used by `GET /days/:dayId/status`, `PATCH /days/:dayId/complete|status`, `GET|PUT /days/:dayId/journal`, `GET /days/:dayId/tasks`: a day is unlocked if it is completed, or it is the first day of the curriculum, or the immediately preceding day is completed. Unknown day → 404 first, then locked → 403.
-- **progress** (`progress-module/progress.service.ts`), used by all `/tasks/*` routes, flag events, dashboard, course days and profile: completed days are `COMPLETED`; the **first** non-completed day in order is `UNLOCKED`; every other day is `LOCKED`. Only `LOCKED` is rejected (403).
-
-In normal use (days completed in order) both give the same result.
+One rule, `ProgressService.isDayUnlocked()` (`progress-module/progress.service.ts`), decides for every endpoint (day pages, journal, tasks, flag events, integrity, dashboard, course days, profile and the mentor views): a day is `COMPLETED` if this trainee completed it; otherwise it is `UNLOCKED` if it is the first day of the curriculum or the immediately preceding day is completed; every other day is `LOCKED`. `day-module/day-access.services.ts` only calls this rule. Unknown day → 404 first, then locked → `403 DAY_LOCKED`. (Before v0.2.0 two slightly different rules existed.)
 
 ---
 
 ## Endpoint summary
 
-| Method | Path                           | Auth | Purpose                                                           |
-| ------ | ------------------------------ | ---- | ----------------------------------------------------------------- |
-| GET    | `/api/health`                  | No   | Liveness check                                                    |
-| GET    | `/api/auth/google`             | No   | Start Google OAuth (redirect)                                     |
-| GET    | `/api/auth/google/callback`    | No   | OAuth callback; sets `auth_token` cookie and redirects            |
-| POST   | `/api/auth/logout`             | Yes  | Clear the auth cookie                                             |
-| GET    | `/api/auth/me`                 | Yes  | Current trainee from the token                                    |
-| GET    | `/api/dashboard`               | Yes  | Dashboard: next day, progress counts, time totals, typing summary |
-| GET    | `/api/courses/:courseId/days`  | Yes  | Days of one course with this trainee's status                     |
-| GET    | `/api/days/:dayId`             | Yes  | Day lesson content (readable even when locked)                    |
-| GET    | `/api/days/:dayId/status`      | Yes  | Lock/completion state of a day                                    |
-| PATCH  | `/api/days/:dayId/complete`    | Yes  | Complete a day; returns status and next day id                    |
-| PATCH  | `/api/days/:dayId/status`      | Yes  | Legacy alias of complete; returns status only                     |
-| GET    | `/api/days/:dayId/journal`     | Yes  | Trainee's journal response for a day                              |
-| PUT    | `/api/days/:dayId/journal`     | Yes  | Create/replace journal response                                   |
-| GET    | `/api/days/:dayId/tasks`       | Yes  | Task list of a day with per-trainee status                        |
-| GET    | `/api/tasks/:taskId`           | Yes  | Task details                                                      |
-| GET    | `/api/tasks/:taskId/code`      | Yes  | Saved files, or starter files                                     |
-| PUT    | `/api/tasks/:taskId/code`      | Yes  | Replace the saved file set                                        |
-| POST   | `/api/tasks/:taskId/submit`    | Yes  | Mark task completed (repeatable)                                  |
-| POST   | `/api/activity/time`           | Yes  | Add active/coding seconds to a day                                |
-| GET    | `/api/activity/time`           | Yes  | Per-day activity for the last N days                              |
-| POST   | `/api/activity/:taskId/events` | Yes  | Log an integrity flag event for a task                            |
-| POST   | `/api/typing-test/results`     | Yes  | Save a typing test result                                         |
-| GET    | `/api/typing-test/results`     | Yes  | All typing results, newest first                                  |
-| GET    | `/api/profile`                 | Yes  | Profile page data                                                 |
-| GET    | `/api/journal`                 | Yes  | Accessible journal entries, newest curriculum day first           |
+| Method | Path                                                | Auth    | Purpose                                                                             |
+| ------ | --------------------------------------------------- | ------- | ----------------------------------------------------------------------------------- |
+| GET    | `/api/health`                                       | No      | Liveness check                                                                      |
+| GET    | `/api/auth/google`                                  | No      | Start Google OAuth (redirect)                                                       |
+| GET    | `/api/auth/google/callback`                         | No      | OAuth callback; sets `auth_token` cookie and redirects                              |
+| POST   | `/api/auth/logout`                                  | Any     | Clear the auth cookie                                                               |
+| GET    | `/api/auth/me`                                      | Any     | Current user (trainee or mentor) and role from the token                            |
+| GET    | `/api/dashboard`                                    | Trainee | Dashboard: next day, progress counts, time totals, typing summary, finished courses |
+| GET    | `/api/courses/:courseId/days`                       | Trainee | Days of one course with this trainee's status                                       |
+| GET    | `/api/courses/:courseId/certificate`                | Trainee | Certificate for a finished course                                                   |
+| GET    | `/api/days/:dayId`                                  | Trainee | Day lesson content (readable even when locked)                                      |
+| GET    | `/api/days/:dayId/status`                           | Trainee | Lock/completion state of a day                                                      |
+| PATCH  | `/api/days/:dayId/complete`                         | Trainee | Complete a day; returns status and next day id                                      |
+| PATCH  | `/api/days/:dayId/status`                           | Trainee | Legacy alias of complete; returns status only                                       |
+| GET    | `/api/days/:dayId/journal`                          | Trainee | Trainee's journal response for a day                                                |
+| PUT    | `/api/days/:dayId/journal`                          | Trainee | Create/replace journal response                                                     |
+| GET    | `/api/days/:dayId/tasks`                            | Trainee | Task list of a day with per-trainee status                                          |
+| GET    | `/api/days/:dayId/integrity`                        | Trainee | The day's integrity score (0–100) from its focus events                             |
+| GET    | `/api/tasks/:taskId`                                | Trainee | Task details                                                                        |
+| GET    | `/api/tasks/:taskId/code`                           | Trainee | Saved files, or starter files                                                       |
+| PUT    | `/api/tasks/:taskId/code`                           | Trainee | Replace the saved file set                                                          |
+| POST   | `/api/tasks/:taskId/submit`                         | Trainee | Mark task completed (repeatable)                                                    |
+| POST   | `/api/activity/time`                                | Trainee | Add active/coding seconds to a day                                                  |
+| GET    | `/api/activity/time`                                | Trainee | Per-day activity for the last N days                                                |
+| POST   | `/api/activity/:taskId/events`                      | Trainee | Log an integrity flag event for a task                                              |
+| POST   | `/api/typing-test/results`                          | Trainee | Save a typing test result                                                           |
+| GET    | `/api/typing-test/results`                          | Trainee | All typing results, newest first                                                    |
+| GET    | `/api/profile`                                      | Trainee | Profile page data                                                                   |
+| GET    | `/api/journal`                                      | Trainee | Accessible journal entries, newest curriculum day first                             |
+| GET    | `/api/admin/trainees`                               | Admin   | Every trainee with progress, time, typing, flags and integrity                      |
+| POST   | `/api/admin/trainees`                               | Admin   | Add a trainee                                                                       |
+| GET    | `/api/admin/trainees/:traineeId`                    | Admin   | One trainee: profile, course progress, worked-on tasks, journal                     |
+| GET    | `/api/admin/trainees/:traineeId/flags`              | Admin   | The trainee's flag events, newest first                                             |
+| GET    | `/api/admin/trainees/:traineeId/tasks/:taskId/code` | Admin   | The trainee's saved files for a task (read-only)                                    |
 
-25 endpoints (including the legacy `PATCH /api/days/:dayId/status`).
+32 endpoints (including the legacy `PATCH /api/days/:dayId/status`). "Any" = any signed-in user (`requireAuth`); "Trainee" = `requireTrainee`; "Admin" = `requireAdmin`.
 
 ---
 
@@ -187,8 +198,9 @@ Google OAuth 2.0 via `passport-google-oauth20`, `session: false`, scope `['profi
 - **Verification** (`auth.service.ts`, `passport.ts`):
   1. Email = first Google profile email. None → `UNAUTHENTICATED` (`"Google did not return an email address."`).
   2. Email must end with `@${ALLOWED_EMAIL_DOMAIN}` (case-sensitive string match) → else `DOMAIN_NOT_PERMITTED`.
-  3. A `trainee` row with exactly that email must exist (no self-registration) → else `NOT_PROVISIONED`.
-- **Success:** sets cookie `auth_token` (options above, `maxAge` 7 days) and **302 redirects to `${FRONTEND_URL}`** (no path).
+  3. An **active** `admin` row with that email (lower-cased) → signs in as `role: 'admin'` and sets `admin.last_login_at`. Mentors are checked first, so an email in both lists signs in as a mentor.
+  4. Otherwise a `trainee` row with exactly that email must exist (no self-registration) → `role: 'trainee'`; else `NOT_PROVISIONED`.
+- **Success:** sets cookie `auth_token` (options above, `maxAge` 7 days) and **302 redirects to `${FRONTEND_URL}/admin`** for a mentor or **`${FRONTEND_URL}`** (no path) for a trainee.
 - **Rejected login:** **302 redirect to `${FRONTEND_URL}/login?error=<CODE>&email=<email>`** where `<CODE>` is the `AppError` code (`DOMAIN_NOT_PERMITTED`, `NOT_PROVISIONED`, or `UNAUTHENTICATED`), or `LOGIN_FAILED` when passport fails without a message; `email` is the Google email or `""`. If the user cancels on Google's screen, passport fails with Google's `error_description` as the message (check: the value placed in `error` is then not one of the codes above).
 - **Unexpected errors** (e.g. database down, token exchange failure): passed to `errorHandler` → `500 INTERNAL_ERROR` JSON, not a redirect (check for token-exchange failures).
 
@@ -208,13 +220,14 @@ Google OAuth 2.0 via `passport-google-oauth20`, `session: false`, scope `['profi
 ### GET /api/auth/me
 
 - **Auth:** required.
-- **Response 200** (`MeResponse`), taken from the JWT claims, not the database:
+- **Response 200** (`MeResponse`), taken from the JWT claims, not the database. `role` is `"trainee"` or `"admin"`; the frontend routes on it.
 
 ```json
 {
   "id": "8f2c1d4e-6a3b-4c1e-9f7a-2b5d8e0c1a33",
   "email": "asha.k@vonnue.com",
-  "name": "Asha K"
+  "name": "Asha K",
+  "role": "trainee"
 }
 ```
 
@@ -255,16 +268,18 @@ Google OAuth 2.0 via `passport-google-oauth20`, `session: false`, scope `['profi
       { "date": "2026-10-02", "averageWpm": 47 },
       { "date": "2026-10-04", "averageWpm": 50 }
     ]
-  }
+  },
+  "completedCourseIds": ["html"]
 }
 ```
 
 - **Field rules** (`dashboard.service.ts`, `dashboard.typing.ts`):
-  - `nextDay`: the single `UNLOCKED` day (progress rule) with `courseTotalDays` = number of days in its course; `null` when every day is completed. `description` is `curriculum_day.subtitle`; `status` is always `"UNLOCKED"`.
+  - `nextDay`: the `UNLOCKED` day (day locking rule) with `courseTotalDays` = number of days in its course; `null` when every day is completed. `description` is `curriculum_day.subtitle`; `status` is always `"UNLOCKED"`.
   - `totalDaysCompleteOverall` / `totalDaysOverall`: counts across all courses.
   - `today`: the `activity_log` row for today's IST date, zeros if none. `total`: sum of all rows, zeros if none. `activeSeconds` includes `codingSeconds`.
   - `typing.latest`: most recent result or `null`. `typing.todayAverageWpm`: rounded mean WPM of today's (IST) results, or `null`. `typing.trend`: one entry per IST date that has results, within the last 30 IST days (today included), oldest first, `averageWpm` rounded. Days without results are omitted.
-- **Errors:** 401; 404 `NOT_FOUND` `"Day not found."` (only if the unlocked day vanishes mid-request).
+  - `completedCourseIds`: ids of the courses in which this trainee has completed **every** day (`certificate.service.ts`, `summarizeCompletions`), in no particular order. The frontend shows a certificate badge on those course tabs.
+- **Errors:** 401; 403 `FORBIDDEN` (mentor); 404 `NOT_FOUND` `"Day not found."` (only if the unlocked day vanishes mid-request).
 
 ### GET /api/courses/:courseId/days
 
@@ -304,6 +319,29 @@ Google OAuth 2.0 via `passport-google-oauth20`, `session: false`, scope `['profi
 `status` ∈ `LOCKED | UNLOCKED | COMPLETED` (progress rule). `description` = day subtitle.
 
 - **Errors:** 400 `VALIDATION_FAILED` (bad `courseId`); 401; 404 `NOT_FOUND` `"Course not found."`.
+
+### GET /api/courses/:courseId/certificate
+
+- **Auth:** required.
+- **Path params:** `courseId`: same rules as above.
+- **Business rules** (`certificate.service.ts`):
+  1. Unknown course → `404 "Course not found."`.
+  2. A course is finished when the trainee has a `day_completion` row for **every** day of it. Not finished → `403 FORBIDDEN` `"Finish every day of this course to get its certificate."`.
+  3. `completedAt` = the latest `completed_at` among the course's days. `certificateId` = `"VK-"` + the first 10 hex characters, upper-cased, of SHA-256 of `"<traineeId>:<courseId>"`: stable for the same trainee and course, and different for everyone else.
+- **Response 200** (`CourseCertificate`):
+
+```json
+{
+  "courseId": "html",
+  "courseTitle": "HTML",
+  "traineeName": "Asha K",
+  "daysCompleted": 5,
+  "completedAt": "2026-10-01T12:40:11.204Z",
+  "certificateId": "VK-3F9A2C71B0"
+}
+```
+
+- **Errors:** 400; 401; 403 `FORBIDDEN` (not finished, or a mentor); 404 `"Course not found."` / `"Trainee not found."`.
 
 ---
 
@@ -478,6 +516,34 @@ or `{ "responseText": "Because padding and border stay inside the declared width
 
 - **Errors:** 400; 401; 403 `DAY_LOCKED`; 404 `"Day not found"`.
 
+### GET /api/days/:dayId/integrity
+
+- **Auth:** required.
+- **Path params:** `dayId`: string, 1–100 chars.
+- **Business rules** (`integrity.service.ts`, pure scoring in `integrity.scoring.ts`):
+  1. Unknown day → 404; locked day → `403 DAY_LOCKED`.
+  2. The tasks that count are this day's tasks the trainee **worked on**: a `task_progress` row (saved code) **or** at least one flag event. Submission is not required.
+  3. **Task score** = 100 minus the penalties of that task's flag events, never below 0. Penalty per event, before the priority multiplier:
+
+| Event             | Penalty                                                            | Cap                    |
+| ----------------- | ------------------------------------------------------------------ | ---------------------- |
+| `PASTE_BLOCKED`   | 10                                                                 | first 5 per task count |
+| `TAB_SWITCH`      | 0 if `durationMs` < 10,000; else 3 + 1 per full minute (extra ≤ 6) | 9 per event            |
+| `FULLSCREEN_EXIT` | 4 + 1 per full minute (extra ≤ 7); always counts                   | 11 per event           |
+| `WINDOW_BLUR`     | 0 if `durationMs` < 10,000; else 1                                 | first 2 per task count |
+
+     Each penalty is multiplied by the event's `review_priority`: `LOW` ×1, `NORMAL` ×1.5, `HIGH` ×2. A missing `durationMs` counts as 0 extra minutes and isn't "short".
+
+4. **Day score** = the average of the task scores, rounded and clamped to 0–100; `null` when no task of the day was worked on.
+
+- **Response 200** (`DayIntegrityResponse`):
+
+```json
+{ "score": 92 }
+```
+
+- **Errors:** 400; 401; 403 `DAY_LOCKED`; 404 `"Day not found."`.
+
 ---
 
 ## Tasks
@@ -615,7 +681,7 @@ The whole request is also capped by the 5 MB JSON body limit, which is reached l
 
 ### POST /api/activity/:taskId/events
 
-- **Auth:** required (route-level `requireAuth`).
+- **Auth:** required (route-level `requireTrainee`).
 - **Path params:** `taskId`: string, 1–100 chars (no regex here, unlike `/api/tasks`).
 - **Request body** (`LogFlagEventRequest`):
 
@@ -765,3 +831,177 @@ The whole request is also capped by the 5 MB JSON body limit, which is reached l
 ```
 
 ---
+
+## Admin (mentor)
+
+All routes are under `/api/admin`, mounted behind `requireAdmin` (`app.ts`): a trainee gets `403 FORBIDDEN`, and so does a mentor whose `admin` row has been switched off. Mentors read any trainee's data but change nothing, except adding a trainee. `traineeId` path params must be UUIDs (`admin.schema.ts`), otherwise `400 VALIDATION_FAILED`. Code: `module/admin-module/`.
+
+### GET /api/admin/trainees
+
+- **Auth:** admin.
+- **Response 200** (`AdminTraineeSummary[]`), one row per trainee, ordered by name. Built with a fixed number of queries however many trainees there are.
+
+```json
+[
+  {
+    "id": "8f2c1d4e-6a3b-4c1e-9f7a-2b5d8e0c1a33",
+    "name": "Asha K",
+    "email": "asha.k@vonnue.com",
+    "daysCompleted": 12,
+    "totalDays": 54,
+    "currentDay": {
+      "id": "js-day-03",
+      "courseTitle": "JavaScript",
+      "dayNumber": 3,
+      "title": "Arrays, Objects & Destructuring"
+    },
+    "todayActiveSeconds": 5400,
+    "totalActiveSeconds": 151200,
+    "totalCodingSeconds": 88000,
+    "lastActiveDate": "2026-10-09",
+    "latestWpm": 54,
+    "flagsLast7Days": 3,
+    "averageScore": 91,
+    "daysScored": 12
+  }
+]
+```
+
+- **Field rules** (`admin.service.ts`):
+  - `daysCompleted`: this trainee's `day_completion` rows; `totalDays`: all curriculum days.
+  - `currentDay`: the first day in curriculum order that isn't completed; `null` = finished everything.
+  - `todayActiveSeconds`: today's (IST) `activity_log.active_seconds`, else 0. `totalActiveSeconds` / `totalCodingSeconds`: sums of all their rows.
+  - `lastActiveDate`: the latest `activity_log.date` (`"YYYY-MM-DD"`), or `null` if they have never been active. The frontend doesn't mark `null` as inactive.
+  - `latestWpm`: WPM of their most recent typing test, or `null`.
+  - `flagsLast7Days`: flag events with `timestamp` in the last 7 × 24 hours.
+  - `averageScore`: the average of their **day** integrity scores (same rule as `GET /api/days/:dayId/integrity`), rounded; `null` when no day has a score. `daysScored`: how many days the average uses (`integrity.overall.ts`).
+
+- **Errors:** 401; 403.
+
+### POST /api/admin/trainees
+
+- **Auth:** admin.
+- **Request body** (`CreateTraineeRequest`, `createTraineeSchema`):
+
+| Field   | Type   | Rules                                                                                                          |
+| ------- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| `name`  | string | Trimmed, 2–80 chars (`"Enter the full name."`, `"Keep the name under 80 characters."`); inner spaces collapsed |
+| `email` | string | Trimmed, lower-cased, a valid email (`"Enter a valid email address."`), ≤ 254 chars                            |
+
+```json
+{ "name": "Rahul Nair", "email": "rahul.nair@vonnue.com" }
+```
+
+- **Business rules:**
+  1. The email must end with `@${ALLOWED_EMAIL_DOMAIN}` → else `400 DOMAIN_NOT_PERMITTED`.
+  2. An `admin` row with that email (active or not) → `409 EMAIL_BELONGS_TO_ADMIN`. A `trainee` with that email → `409 TRAINEE_EXISTS` (also when two requests race and the unique index rejects the second).
+  3. Creates the `trainee` row. Nothing else is created: the trainee starts on day 1 with no progress. The admin id and new trainee id are logged.
+- **Response 201** (`AdminTraineeSummary`): the new trainee's row exactly as `GET /api/admin/trainees` would return it (`daysCompleted: 0`, `lastActiveDate: null`, `averageScore: null`, …), so the page can insert it as is.
+- **Errors:** 400 `VALIDATION_FAILED` / `DOMAIN_NOT_PERMITTED`; 401; 403; 409 `TRAINEE_EXISTS` / `EMAIL_BELONGS_TO_ADMIN`.
+
+### GET /api/admin/trainees/:traineeId
+
+- **Auth:** admin.
+- **Response 200** (`AdminTraineeDetail`):
+
+```json
+{
+  "id": "8f2c1d4e-6a3b-4c1e-9f7a-2b5d8e0c1a33",
+  "profile": {
+    "trainee": { "name": "Asha K", "…": "…" },
+    "total": {},
+    "typing": {},
+    "dailyActivity": []
+  },
+  "courses": [
+    {
+      "id": "html",
+      "title": "HTML",
+      "days": [
+        {
+          "id": "html-day-01",
+          "dayNumber": 1,
+          "title": "…",
+          "status": "COMPLETED",
+          "completedAt": "2026-09-29T11:02:45.000Z"
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "html-day-01-t-1",
+      "title": "Semantic page skeleton",
+      "dayId": "html-day-01",
+      "isStretchGoal": false,
+      "status": "completed",
+      "codeUpdatedAt": "2026-09-29T10:40:12.000Z",
+      "lastSubmittedAt": "2026-09-29T10:41:03.000Z"
+    }
+  ],
+  "totalTasks": 260,
+  "journal": [
+    {
+      "dayId": "html-day-01",
+      "courseTitle": "HTML",
+      "dayNumber": 1,
+      "dayTitle": "…",
+      "responseText": "…",
+      "updatedAt": "2026-09-29T11:05:00.000Z"
+    }
+  ]
+}
+```
+
+- **Field rules:**
+  - `profile`: the same object `GET /api/profile` returns for this trainee.
+  - `courses`: every course and day in curriculum order, with this trainee's status (day locking rule) and `completedAt`.
+  - `tasks`: the trainee's **submitted** tasks (`task_progress.status = 'completed'`), in curriculum order. Tasks never submitted are left out; the day grid shows how far they are.
+  - `totalTasks`: number of tasks in the curriculum.
+  - `journal`: all their journal responses, in curriculum order.
+- **Errors:** 400 (bad UUID); 401; 403; 404 `"Trainee not found."`.
+
+### GET /api/admin/trainees/:traineeId/flags
+
+- **Auth:** admin.
+- **Response 200** (`AdminFlagEvent[]`): the trainee's flag events, newest first, at most 500. Nothing is filtered on the server; the Flags tab hides `LOW` events by default.
+
+```json
+[
+  {
+    "id": "c2f8…",
+    "type": "TAB_SWITCH",
+    "taskId": "js-day-02-t-3",
+    "taskTitle": "Grade calculator",
+    "dayId": "js-day-02",
+    "durationMs": 42000,
+    "reviewPriority": "HIGH",
+    "timestamp": "2026-10-08T06:12:44.000Z"
+  }
+]
+```
+
+- **Errors:** 400; 401; 403; 404 `"Trainee not found."`.
+
+### GET /api/admin/trainees/:traineeId/tasks/:taskId/code
+
+- **Auth:** admin.
+- **Path params:** `traineeId` (UUID), `taskId` (string, 1–100 chars).
+- **Behaviour:** read-only: never creates a progress row and never logs a flag.
+- **Response 200** (`AdminTaskCode`):
+
+```json
+{
+  "taskId": "html-day-01-t-1",
+  "title": "Semantic page skeleton",
+  "status": "completed",
+  "isStarterCode": false,
+  "files": [{ "path": "index.html", "content": "<!doctype html>…" }],
+  "codeUpdatedAt": "2026-09-29T10:40:12.000Z",
+  "lastSubmittedAt": "2026-09-29T10:41:03.000Z"
+}
+```
+
+`isStarterCode: true` and `status: "not_started"` mean the trainee never saved this task; `files` are then the task's starter files.
+
+- **Errors:** 400; 401; 403; 404 `"Trainee not found."` / `"Task not found."`.

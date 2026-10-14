@@ -191,7 +191,7 @@ backend/
     │   ├── activity-module/     time tracking
     │   ├── flag-module/         focus events
     │   └── progress-module/     ProgressService: day statuses and unlock checks (no routes)
-    ├── middleware/              authMiddleware (requireAuth), validate, notFoundHandler, errorHandler
+    ├── middleware/              authMiddleware (requireAuth/Trainee/Admin), validate, notFoundHandler, errorHandler
     ├── errors/AppError.ts       our error classes
     ├── lib/                     prisma.ts (the one client), seed.ts
     ├── types/                   auth.types.ts (AuthenticatedRequest), express.d.ts
@@ -199,14 +199,15 @@ backend/
     └── test/api/                API contract tests and their helpers
 ```
 
-Routers are mounted in `app.ts`. Protected routers get `requireAuth` **at the mount**, so no route
-in them can forget it:
+Routers are mounted in `app.ts`. Protected routers get the guard for their role **at the mount**
+(§8.2), so no route in them can forget it:
 
 ```ts
 // backend/src/app.ts
 app.use('/api/auth', authRoutes);
-app.use('/api/tasks', requireAuth, taskRoutes);
-app.use('/api/days', requireAuth, dayRouter);
+app.use('/api/tasks', requireTrainee, taskRoutes);
+app.use('/api/days', requireTrainee, dayRouter);
+app.use('/api/admin', requireAdmin, adminRoutes);
 ```
 
 ### 5.2 What each layer does
@@ -282,7 +283,7 @@ class TaskController {
 export const taskController = new TaskController();
 ```
 
-The casts are safe because `requireAuth` and `validate()` have already run.
+The casts are safe because the route guard (`requireTrainee`) and `validate()` have already run.
 
 **Service**
 
@@ -349,16 +350,18 @@ PR.
 
 Services throw one of these instead of `new Error(...)`. Each knows its status and code.
 
-| Class                      | Status | Code                   | Use when                                                               |
-| -------------------------- | ------ | ---------------------- | ---------------------------------------------------------------------- |
-| `ValidationError`          | 400    | `VALIDATION_FAILED`    | Thrown by `validate()`; `details` lists Zod issues                     |
-| `UnauthorizedError`        | 401    | `UNAUTHENTICATED`      | No cookie, or invalid or expired JWT                                   |
-| `ForbiddenError`           | 403    | `FORBIDDEN`            | The trainee may not do this (not used yet)                             |
-| `NotFoundError`            | 404    | `NOT_FOUND`            | Unknown day, task, course or record                                    |
-| `DayLockedError`           | 403    | `DAY_LOCKED`           | The day, or the task's day, is locked                                  |
-| `ChecklistIncompleteError` | 403    | `CHECKLIST_INCOMPLETE` | Submit Day with required tasks not submitted; `details` has the counts |
-| `DomainNotPermittedError`  | 403    | `DOMAIN_NOT_PERMITTED` | Sign-in with an email outside the allowed domain                       |
-| `NotProvisionedError`      | 403    | `NOT_PROVISIONED`      | Sign-in with an email not in the trainee table                         |
+| Class                      | Status | Code                                       | Use when                                                                 |
+| -------------------------- | ------ | ------------------------------------------ | ------------------------------------------------------------------------ |
+| `ValidationError`          | 400    | `VALIDATION_FAILED`                        | Thrown by `validate()`; `details` lists Zod issues                       |
+| `UnauthorizedError`        | 401    | `UNAUTHENTICATED`                          | No cookie, or invalid or expired JWT                                     |
+| `ForbiddenError`           | 403    | `FORBIDDEN`                                | Wrong role (route guards), or not allowed yet (certificate)              |
+| `NotFoundError`            | 404    | `NOT_FOUND`                                | Unknown day, task, course or record                                      |
+| `DayLockedError`           | 403    | `DAY_LOCKED`                               | The day, or the task's day, is locked                                    |
+| `ChecklistIncompleteError` | 403    | `CHECKLIST_INCOMPLETE`                     | Submit Day with required tasks not submitted; `details` has the counts   |
+| `DomainNotPermittedError`  | 403    | `DOMAIN_NOT_PERMITTED`                     | Sign-in with an email outside the allowed domain                         |
+| `NotProvisionedError`      | 403    | `NOT_PROVISIONED`                          | Sign-in with an email in neither the admin nor the trainee table         |
+| `ConflictError`            | 409    | `TRAINEE_EXISTS`, `EMAIL_BELONGS_TO_ADMIN` | Adding a trainee whose email is already taken                            |
+| `TraineeDomainError`       | 400    | `DOMAIN_NOT_PERMITTED`                     | Adding a trainee with an email outside the allowed domain (sent as JSON) |
 
 The two sign-in errors are never sent as JSON: the OAuth callback turns them into a redirect to
 `/login?error=<code>`.
@@ -453,21 +456,31 @@ Change both in the same PR so they describe the same shape.
 
 1. **Continue with Google** goes to `/api/auth/google`; Passport redirects to Google.
 2. Google returns to `/api/auth/google/callback`. `AuthService` checks the email's domain against
-   `ALLOWED_EMAIL_DOMAIN` and that the email is in the `trainee` table. There is no
-   self-registration.
-3. On success the backend signs a JWT (`id`, `name`, `email`), sets it as the httpOnly `auth_token`
-   cookie for 7 days and redirects to the dashboard. On failure it redirects to
-   `/login?error=DOMAIN_NOT_PERMITTED` or `NOT_PROVISIONED`.
+   `ALLOWED_EMAIL_DOMAIN`, then looks for an active row in the `admin` table (role `admin`), then
+   for the email in the `trainee` table (role `trainee`). There is no self-registration.
+3. On success the backend signs a JWT (`id`, `name`, `email`, `role`), sets it as the httpOnly
+   `auth_token` cookie for 7 days and redirects mentors to `/admin` and trainees to the dashboard.
+   On failure it redirects to `/login?error=DOMAIN_NOT_PERMITTED` or `NOT_PROVISIONED`.
 4. The frontend calls `GET /api/auth/me` on every page load. `POST /api/auth/logout` clears the
    cookie.
 
 There are no server sessions: the JWT is the session.
 
-### 8.2 `requireAuth`
+### 8.2 Route guards
 
-`middleware/authMiddleware.ts` reads the `auth_token` cookie, verifies the JWT and sets `req.user`
-to `{ id, name, email }`. A missing or invalid token is `401 UNAUTHENTICATED`. In controllers, read
-it through `AuthenticatedRequest`:
+`middleware/authMiddleware.ts` has three guards. All of them read the `auth_token` cookie, verify the
+JWT and set `req.user` to `{ id, name, email, role }`; a missing or invalid token is
+`401 UNAUTHENTICATED`.
+
+| Guard            | Use it for                                                      | Extra check                                                                  |
+| ---------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `requireAuth`    | Routes any signed-in user may call (`/auth/me`, `/auth/logout`) | None                                                                         |
+| `requireTrainee` | Every trainee route                                             | `role === 'trainee'`, else `403 FORBIDDEN`                                   |
+| `requireAdmin`   | Every `/api/admin` route                                        | `role === 'admin'` and the `admin` row is still active, else `403 FORBIDDEN` |
+
+Mount a new router behind the guard for its role in `app.ts` (`app.use('/api/x', requireTrainee, xRoutes)`);
+don't add a router behind plain `requireAuth`. In controllers, read the user through
+`AuthenticatedRequest`:
 
 ```ts
 const traineeId = (req as AuthenticatedRequest).user.id;
@@ -479,9 +492,13 @@ const traineeId = (req as AuthenticatedRequest).user.id;
 - Every repository function on trainee data takes the trainee id and uses it in the `where`.
 - Locked days, and tasks on locked days, are refused in the **service** (`ProgressService`), not
   just hidden in the UI.
-- Frontend route guards (`ProtectedRoute`) are for user experience only; the backend is what
-  protects the data.
-- Flag events are write-only for trainees: no endpoint returns them.
+- Frontend route guards (`ProtectedRoute`, `RoleRoute`) are for user experience only; the backend is
+  what protects the data.
+- Flag events are write-only for trainees: no trainee endpoint returns them, only their day's
+  integrity score. Mentors read them through `/api/admin`.
+- Mentor endpoints take the trainee from the URL (`:traineeId`, validated as a UUID), check that the
+  trainee exists (404), and are **read-only**: the only write is `POST /api/admin/trainees`. Never
+  reuse a trainee service that writes (saving code, logging a flag) from a mentor endpoint.
 
 ---
 
@@ -556,7 +573,7 @@ frontend/src/
 │   └── mockTasks/       task catalog and starter files (source of the curriculum)
 ├── pages/               one folder per route; page-only hooks and state live inside
 ├── components/          reusable components, one folder each
-├── routes/              ProtectedRoute, PublicOnlyRoute
+├── routes/              ProtectedRoute, PublicOnlyRoute, RoleRoute
 ├── context/             AuthProvider + useAuth, ActivityProvider + useActivity
 ├── hooks/               shared hooks (flag tracking, fullscreen, typing test, ...)
 ├── runtimes/            browser, node and sql runtimes + RuntimeHost
@@ -615,6 +632,8 @@ Pull request previews and the frontend tests run this way.
   rules as the real API (locks, limits, status codes), so previews and tests keep working.
 - Mock data lives in `src/test/fixtures/`. Keep the fixtures consistent with each other: the same
   trainee name in `/auth/me` and `/profile`, and the same progress on every page.
+- `VITE_MOCK_ROLE=admin` makes the mock `/auth/me` answer as a mentor; mock mentor endpoints refuse a
+  trainee with 403, like the real API.
 - Mock mode must never be on in production; `netlify.toml` sets it to `false` for the production
   context.
 
@@ -820,7 +839,7 @@ Example: **save a journal entry** (`PUT /api/days/:dayId/journal`).
 6. **Service:** the rules (unknown day → 404, locked day → 403). Throw our errors.
 7. **Controller:** `try` → call the service → `res.status(200).json(...)` → `catch` → `next(error)`.
 8. **Route:** `dayRouter.put('/:dayId/journal', validate({ params, body }), journalController.saveJournal)`;
-   new routers are mounted in `app.ts` behind `requireAuth`.
+   new routers are mounted in `app.ts` behind `requireTrainee` (or `requireAdmin` for mentor routes).
 9. **Tests:** a unit test for the service rules and an API test for the endpoint.
 10. **Frontend API function:** `saveJournal(dayId, responseText)` in `src/api/days.ts`.
 11. **Mock adapter:** the same endpoint and rules in `mockAdapter.ts`.

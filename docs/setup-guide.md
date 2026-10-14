@@ -82,7 +82,9 @@ Always run `npm install` from the **repo root**, not inside `frontend/` or `back
 3. Open <http://localhost:5173> in Chrome or Edge and click **Enter fullscreen** when asked.
 
 In mock mode you are signed in automatically as a sample trainee, and every API call is answered inside
-the browser from fixtures. Saved code and progress live only in memory (journal entries persist in
+the browser from fixtures. To see the mentor side instead, add `VITE_MOCK_ROLE=admin` to
+`frontend/.env.local` and restart: you land on `/admin` as a sample mentor with sample trainees (no
+fullscreen needed). Remove it, or set `VITE_MOCK_ROLE=trainee`, to go back. Saved code and progress live only in memory (journal entries persist in
 `localStorage`), so a page reload resets them. Mock task scenarios such as `/tasks/t-node` and
 `/tasks/t-sql` are listed in `frontend/src/api/mockTasks/scenarios.ts`.
 
@@ -154,8 +156,20 @@ npm run db:seed -w backend
 ```
 
 This loads the 8 courses, 54 days and 260 tasks from `backend/prisma/seed-data/curriculum.json`, and
-the trainee list at the top of `backend/src/lib/seed.ts`. Only people in that list can sign in; if your
-email isn't there, add it (in a PR) and run the seed again. The seed is safe to run any number of times.
+the `trainees` and `admins` (mentors) lists at the top of `backend/src/lib/seed.ts`. Only people in those
+lists can sign in; if your email isn't there, add it (in a PR) and run the seed again. The seed is safe
+to run any number of times.
+
+**Mentor or trainee?** At sign-in an email with an **active** row in `admin` opens the mentor dashboard
+(`/admin`), even if it is also in the trainee list. To try the trainee side with an email that is in
+both, switch your admin row off in your development database, then sign out and in again:
+
+```sql
+UPDATE admin SET is_active = false WHERE email = 'you@vonnue.com';  -- true to switch back
+```
+
+Mentors can also add trainees from the dashboard (**Add trainee**), so a second test trainee doesn't need
+a seed change.
 
 To get a realistic account to test with (HTML and CSS days 1–2 done, CSS Day 3 open, some activity and
 typing results):
@@ -194,7 +208,7 @@ npm run dev:frontend
 Check the API: <http://localhost:3000/api/health> shows `{"status":"ok"}`.
 
 Open <http://localhost:5173>, sign in with your company Google account, enter fullscreen, and the
-dashboard loads your real progress. In development, Vite forwards every `/api` request to the backend,
+dashboard loads your real progress (or, for a mentor account, the mentor dashboard at `/admin`). In development, Vite forwards every `/api` request to the backend,
 so the app and API behave like one site and the login cookie works without extra setup.
 
 ## 6. Tests and checks
