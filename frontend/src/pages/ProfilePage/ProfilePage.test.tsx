@@ -5,7 +5,14 @@ import type { CourseCertificate, ProfileData } from '@itp/types'; // changed: + 
 
 import ProfilePage from './ProfilePage';
 import { getProfile } from '../../api/profile';
+import { getActivityTime } from '../../api/activity';
 import { useEarnedCertificates } from '../../hooks/useEarnedCerificates'; // new
+
+vi.mock('../../api/activity', () => ({ getActivityTime: vi.fn() }));
+
+beforeEach(() => {
+  vi.mocked(getActivityTime).mockResolvedValue([]);
+});
 
 vi.mock('../../context/Useauth', () => ({
   useAuth: () => ({
